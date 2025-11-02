@@ -37,6 +37,8 @@ A digital agora (public Central Square + private Arcades) where communities thri
    # - OPENAI_API_KEY (for AI Host feature)
    ```
 
+test
+
 3. Run Prisma migrations:
 
    ```bash
