@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL")
+}
+
+model Profile {
+  id          String   @id
+  handle      String   @unique
+  name        String
+  avatarUrl   String?
+  bio         String?
+  interests   String[]
+  createdAt   DateTime @default(now())
+
+  posts       Post[]        @relation("AuthorPosts")
+  memberships Membership[]
+  arcades     Arcade[]      @relation("ArcadeHost")
+  aiHost      AIHost?
+  preferences UserPreferences?
+  recommendations AIRecommendation[]
+}
+
+model Arcade {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  visibility  Visibility @default(open)
+  tags        String[]
+  hostId      String
+  createdAt   DateTime   @default(now())
+
+  host        Profile      @relation("ArcadeHost", fields: [hostId], references: [id])
+  memberships Membership[]
+  posts       Post[]
+  invites     Invite[]
+  recommendations AIRecommendation[]
+
+  @@index([visibility])
+}
+
+enum Visibility {
+  open
+  invite
+}
+
+model Membership {
+  id       String   @id @default(cuid())
+  arcadeId String
+  userId   String
+  role     Role     @default(member)
+  joinedAt DateTime @default(now())
+
+  arcade Arcade  @relation(fields: [arcadeId], references: [id])
+  profile Profile @relation(fields: [userId], references: [id])
+
+  @@unique([arcadeId, userId])
+}
+
+enum Role {
+  host
+  member
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  authorId  String
+  arcadeId  String?
+  parentId  String?
+  body      String
+  isLantern Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  author Profile @relation("AuthorPosts", fields: [authorId], references: [id])
+  arcade Arcade? @relation(fields: [arcadeId], references: [id])
+  parent Post?   @relation("Thread", fields: [parentId], references: [id])
+  replies Post[] @relation("Thread")
+  reports Report[]
+
+  @@index([arcadeId, createdAt])
+  @@index([isLantern, createdAt])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  postId     String
+  reporterId String
+  reason     String
+  createdAt  DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id])
+}
+
+model Invite {
+  id        String    @id @default(cuid())
+  arcadeId  String
+  token     String    @unique
+  createdBy String
+  expiresAt DateTime
+  usedBy    String?
+
+  arcade Arcade @relation(fields: [arcadeId], references: [id])
+
+  @@index([arcadeId])
+}
+
+model AIHost {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  name        String   @default("Your AI Host")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations AIConversation[]
+}
+
+model AIConversation {
+  id        String   @id @default(cuid())
+  aiHostId  String
+  role      String   // "user" | "assistant"
+  message   String
+  context   Json?    // Store conversation context/metadata
+  createdAt DateTime @default(now())
+
+  aiHost AIHost @relation(fields: [aiHostId], references: [id], onDelete: Cascade)
+
+  @@index([aiHostId, createdAt])
+}
+
+model UserPreferences {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  interests   String[] // Learned from conversations
+  values      String[] // Core values learned
+  goals       String[] // Goals/interests learned
+  dislikes    String[] // Things user doesn't like
+  preferences Json?    // Structured preference data
+  learnedAt   DateTime @updatedAt
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AIRecommendation {
+  id          String   @id @default(cuid())
+  userId      String
+  arcadeId    String
+  reason      String   // Why this was recommended
+  confidence  Float    // 0.0 - 1.0 confidence score
+  shownAt     DateTime @default(now())
+  clickedAt   DateTime?
+  joinedAt    DateTime?
+
+  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  arcade Arcade  @relation(fields: [arcadeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([arcadeId])
+}
