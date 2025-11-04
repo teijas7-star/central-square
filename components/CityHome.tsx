@@ -542,7 +542,7 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/discover"
+              href={`/${city.toLowerCase()}/feed`}
               className="bg-white text-neutral-900 px-6 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
             >
               Join Your City's Square
