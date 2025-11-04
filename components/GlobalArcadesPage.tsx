@@ -190,7 +190,7 @@ export default function GlobalArcadesPage() {
                 <Link href="/" className="text-neutral-600 hover:text-neutral-900 font-medium">
                   My City
                 </Link>
-                <Link href="/global" className="text-neutral-600 hover:text-neutral-900 font-medium">
+                <Link href="/agora" className="text-neutral-600 hover:text-neutral-900 font-medium">
                   Global Agora
                 </Link>
                 <Link
@@ -414,7 +414,7 @@ export default function GlobalArcadesPage() {
               <h4 className="font-semibold mb-4">Global</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
-                  <Link href="/global" className="hover:text-white">
+                  <Link href="/agora" className="hover:text-white">
                     Global Agora
                   </Link>
                 </li>
@@ -544,7 +544,7 @@ function GlobalArcadeCard({
           <span>{arcade.memberCount.toLocaleString()} members</span>
         </div>
         <Link
-          href={`/global/arcades/${arcade.id}`}
+          href={`/arcades/${arcade.id}`}
           className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors"
         >
           View Arcade
@@ -603,7 +603,7 @@ function GlobalArcadeListCard({ arcade }: { arcade: GlobalArcade }) {
               </div>
             </div>
             <Link
-              href={`/global/arcades/${arcade.id}`}
+              href={`/arcades/${arcade.id}`}
               className="bg-neutral-900 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors flex items-center"
             >
               View Arcade

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Nav from "@/components/layout/nav";
 import ArcadeCard from "@/components/arcade-card";
 
 interface Recommendation {
@@ -77,9 +76,7 @@ export default function AIHostRecommendationsPage() {
   };
 
   return (
-    <>
-      <Nav />
-      <main className="max-w-4xl mx-auto p-6">
+    <main className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold mb-2">Your AI Host Recommendations</h1>
           <p className="text-gray-600">
@@ -173,7 +170,7 @@ export default function AIHostRecommendationsPage() {
           </Link>
         </div>
       </main>
-    </>
+    </main>
   );
 }
 

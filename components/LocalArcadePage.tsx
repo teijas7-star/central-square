@@ -454,7 +454,7 @@ export default function LocalArcadePage() {
                 Back to {city} Square
               </Link>
               <Link
-                href="/global"
+                href="/agora"
                 className="bg-white border border-neutral-300 text-neutral-900 px-6 py-3 rounded-lg font-medium hover:bg-neutral-50 transition-colors text-center"
               >
                 Global Agora

@@ -62,7 +62,7 @@ export default function Nav() {
                   <Link href="/discover" className="hover:underline">
                     Discover
                   </Link>
-                  <Link href="/global" className="hover:underline">
+                  <Link href="/agora" className="hover:underline">
                     Global Agora
                   </Link>
                   <Link href="/ai-host" className="hover:underline">

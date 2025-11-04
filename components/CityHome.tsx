@@ -554,7 +554,7 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
               Start Your Arcade
             </Link>
             <Link
-              href="/global"
+              href="/agora"
               className="bg-neutral-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-700 transition-colors border border-neutral-700"
             >
               Step into the Global Agora

@@ -187,7 +187,7 @@ export default function GlobalAgora() {
                   My City
                 </Link>
                 <Link
-                  href="/global"
+                  href="/agora"
                   className="text-neutral-900 border-b-2 border-neutral-900 pb-1 font-medium"
                 >
                   Global Agora
@@ -232,7 +232,7 @@ export default function GlobalAgora() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/global-agora/feed"
+                href="/agora/feed"
                 className="bg-white text-neutral-900 px-6 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
               >
                 Explore Global Conversations
@@ -480,7 +480,7 @@ export default function GlobalAgora() {
               <h4 className="font-semibold mb-4">Global</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
-                  <Link href="/global" className="hover:text-white">
+                  <Link href="/agora" className="hover:text-white">
                     Global Agora
                   </Link>
                 </li>
