@@ -1,183 +1,126 @@
-# Central Square MVP - Testing Checklist
+# MVP Testing Checklist
 
-## 🚀 Server Status
+## ✅ **INTEGRATED & READY TO TEST**
 
-✅ Development server running at **http://localhost:3000**
+### **Authentication Flow**
+- [x] Sign in page (`/signin`) - Figma design
+- [x] Magic link email sending
+- [x] Auth callback (`/api/auth/callback`)
+- [x] Profile creation redirect (`/profile/create`)
+- [x] Dashboard redirect (`/dashboard`)
 
-## 📋 Testing Checklist
+### **Navigation Flow**
+- [x] Home page (`/`) - CityHome component
+  - Shows city-specific arcades
+  - Links to Global Agora
+- [x] Global Agora (`/global`) - GlobalAgora component
+- [x] Global Arcades (`/global/arcades`) - GlobalArcadesPage component
+- [x] Public Square (`/square`) - Public feed
+- [x] Discover Arcades (`/discover`) - Discover page
+- [x] Navigation bar includes all links
 
-### 1. Landing Page (`/`)
+### **Arcade Flow**
+- [x] Create Arcade (`/arcades/create`) - CreateArcadeForm
+- [x] Arcade Page (`/arcades/[id]`) - **Role-based rendering**:
+  - **Host**: Shows `ArcadeHomePage` (full dashboard)
+  - **Member**: Shows `MemberArcadeJourney` (member view)
+  - **Non-member**: Shows `LocalArcadePage` (public preview)
+- [x] Host Dashboard (`/arcades/[id]/dashboard`) - HostDashboard component
+- [x] Arcade Settings (`/arcades/[id]/settings`) - Settings page
+- [x] Join Arcade API (`/api/arcades/[id]/join`)
 
-- [ ] Page loads without errors
-- [ ] Header with logo and navigation
-- [ ] Hero section with search
-- [ ] Featured Arcades section (3 cards)
-- [ ] Recent Discussions section
-- [ ] Call-to-action buttons work
-- [ ] Footer displays correctly
+### **Components Created**
+- [x] CityHome - City landing page
+- [x] GlobalAgora - Global agora page
+- [x] GlobalArcadesPage - Global arcades directory
+- [x] LocalArcadePage - Public arcade preview
+- [x] MemberArcadeJourney - Member view inside arcade
+- [x] HostDashboard - Host dashboard
+- [x] ArcadeHomePage - Full arcade dashboard (host view)
 
-### 2. Authentication Flow
+## 🧪 **TESTING FLOW**
 
-- [ ] Sign-in page (`/signin`)
-- [ ] Magic link email functionality
-- [ ] Redirect after sign-in works
-- [ ] Profile creation flow (`/profile/create`)
-- [ ] Sign-out functionality
+### **1. Public User Flow**
+1. Visit `/` → Should see CityHome
+2. Click "Global Agora" → Should navigate to `/global`
+3. Click "Discover" → Should see arcades list
+4. Click an arcade → Should see `LocalArcadePage` (public preview)
+5. Try to interact → Should prompt sign-in
 
-### 3. Discovery Page (`/discover`)
+### **2. Authentication Flow**
+1. Visit `/signin` → Should see sign-in form
+2. Enter email → Click "Send Magic Link"
+3. Check email → Click magic link
+4. Should redirect to `/profile/create` (if no profile) or `/dashboard` (if profile exists)
+5. Complete profile → Should redirect to `/dashboard`
 
-- [ ] Page loads arcades from API
-- [ ] Search functionality
-- [ ] Filter buttons (Trending, Newest, By Interest)
-- [ ] Arcade cards display correctly
-- [ ] "Create Arcade" button works
-- [ ] Clicking arcade card navigates to arcade page
+### **3. Authenticated User Flow**
+1. Visit `/square` → Should see public feed with compose option
+2. Visit `/discover` → Should see arcades, can join open arcades
+3. Visit `/dashboard` → Should see "My Arcades"
+4. Click "Create Arcade" → Should create arcade and redirect
 
-### 4. Arcade Home Page (`/arcades/[id]`)
+### **4. Arcade Member Flow**
+1. Join an arcade (via discover or direct link)
+2. Visit `/arcades/[id]` → Should see `MemberArcadeJourney`
+   - Welcome banner
+   - Compose post
+   - Feed tabs (Feed, Events, People, Collaborations)
+   - Sidebar with "My Arcades", "Upcoming Events", "Active Members"
+3. Create a post → Should appear in feed
+4. View events → Should see events tab
+5. View members → Should see members tab
 
-- [ ] Page loads arcade data
-- [ ] Header with arcade name and AI Host status
-- [ ] Subheader with description
-- [ ] Tab navigation (Posts, Events, Media, Members)
+### **5. Arcade Host Flow**
+1. Create an arcade
+2. Visit `/arcades/[id]` → Should see `ArcadeHomePage`
+   - Full dashboard with tabs
+   - Host actions (moderation, settings)
+   - Member management
+   - Event management
+3. Visit `/arcades/[id]/settings` → Should see settings page
+4. Visit `/arcades/[id]/dashboard` → Should see HostDashboard
 
-#### Posts Tab
+### **6. Non-Member Arcade Flow**
+1. Visit `/arcades/[id]` (not joined) → Should see `LocalArcadePage`
+   - Public preview
+   - Join button
+   - Limited view
+2. Click "Join Arcade" → Should join and redirect to member view
 
-- [ ] Compose component appears (if member)
-- [ ] AI Host suggestion appears
-- [ ] Posts feed displays
-- [ ] Post interactions (like, comment, share)
-- [ ] Sidebar shows Events & Members
+## ⚠️ **KNOWN LIMITATIONS (MVP)**
 
-#### Events Tab
+1. **Mock Data**: Some components use mock data (MemberArcadeJourney, LocalArcadePage, etc.)
+   - Will need API integration later
+   - Currently displays static data for demo
 
-- [ ] AI Host event suggestion
-- [ ] "Create Event" button (host only)
-- [ ] Events grid displays 4 events
-- [ ] Event cards show all info (date, time, location, RSVP)
-- [ ] Recent Events section
-- [ ] Sidebar shows Resources, Members, AI Footer
+2. **Events**: Events tab exists but events aren't fully implemented in database
+   - Schema may need updates
+   - Events API endpoints may be missing
 
-#### Members Tab
+3. **AI Host**: Component exists but may need backend integration
+   - Check `/ai-host` route
+   - May need OpenAI API key setup
 
-- [ ] Members header with counts
-- [ ] Export List & Invite Members buttons (host only)
-- [ ] Search members input
-- [ ] Filter buttons (All, Online, Hosts, New, Active)
-- [ ] Member cards with full details
-- [ ] Pagination controls
-- [ ] Sidebar shows AI Host Interaction Panel
-  - [ ] AI Host Summary with metrics
-  - [ ] Participation bar chart
-  - [ ] Member Statistics
-  - [ ] Recent Activity
+4. **Image Uploads**: Post images not fully implemented
+   - Placeholder functionality exists
+   - May need file upload service
 
-#### Media Tab
+## 🔍 **QUICK CHECKS**
 
-- [ ] Placeholder message displays
+- [ ] All routes load without errors
+- [ ] Navigation links work
+- [ ] Authentication redirects correctly
+- [ ] Arcade role detection works (host/member/non-member)
+- [ ] Posts can be created and displayed
+- [ ] No console errors in browser
+- [ ] Responsive design works on mobile
 
-### 5. Create Arcade (`/arcades/create`)
+## 📝 **TESTING NOTES**
 
-- [ ] Form loads correctly
-- [ ] All form fields work
-- [ ] Validation works
-- [ ] Submit creates arcade
-- [ ] Success modal appears
-- [ ] Navigation to new arcade works
+- Start with public flow (no auth)
+- Then test sign-in flow
+- Then test authenticated features
+- Finally test arcade-specific features
 
-### 6. API Endpoints
-
-Test these endpoints directly or through the UI:
-
-#### Arcades
-
-- [ ] `GET /api/arcades` - List arcades
-- [ ] `POST /api/arcades` - Create arcade
-- [ ] `GET /api/arcades/[id]` - Get arcade details
-- [ ] `GET /api/arcades/[id]/members` - Get members
-- [ ] `POST /api/arcades/[id]/join` - Join arcade
-- [ ] `POST /api/arcades/[id]/invite` - Create invite
-
-#### Posts
-
-- [ ] `GET /api/posts?arcadeId=[id]` - Get posts
-- [ ] `POST /api/posts` - Create post
-- [ ] `POST /api/posts/[id]/lantern` - Toggle lantern
-
-#### Discovery
-
-- [ ] `GET /api/discovery` - Discover arcades
-- [ ] `GET /api/discovery?q=search` - Search arcades
-
-#### Feed
-
-- [ ] `GET /api/feed/square` - Get Square feed
-- [ ] `GET /api/feed/square?tag=tag` - Filter by tag
-
-### 7. Responsive Design
-
-Test on different screen sizes:
-
-- [ ] Mobile (< 640px)
-- [ ] Tablet (640px - 1024px)
-- [ ] Desktop (> 1024px)
-- [ ] Sidebar collapses on mobile
-- [ ] Navigation adapts to screen size
-
-### 8. Error Handling
-
-- [ ] Invalid arcade ID shows error
-- [ ] Unauthorized access shows error
-- [ ] Network errors handled gracefully
-- [ ] Loading states display correctly
-
-### 9. Component Interactions
-
-- [ ] Compose component expands when clicked
-- [ ] Tab switching works smoothly
-- [ ] Pagination changes page
-- [ ] Search filters results
-- [ ] Buttons trigger correct actions
-
-### 10. Data Persistence
-
-- [ ] Created posts appear in feed
-- [ ] Joined arcades appear in dashboard
-- [ ] User profile persists
-- [ ] Member counts update correctly
-
-## 🐛 Common Issues to Watch For
-
-1. **API Errors**: Check browser console for 500/400 errors
-2. **Missing Data**: Ensure database has seed data (`npm run db:seed`)
-3. **Auth Issues**: Verify Supabase credentials in `.env.local`
-4. **Styling**: Check if Tailwind classes are applying correctly
-5. **Navigation**: Verify all links work correctly
-
-## 📝 Notes
-
-- All components use Lucide React icons (no FontAwesome)
-- Mock data is used for Events and Resources (until backend is implemented)
-- AI Host features are UI-ready but may need backend integration
-- Pagination and filtering work but may need optimization
-
-## ✅ Quick Test Commands
-
-```bash
-# Check server status
-curl http://localhost:3000
-
-# Check API endpoint
-curl http://localhost:3000/api/discovery
-
-# Check if Prisma client is generated
-ls node_modules/.prisma/client
-```
-
-## 🎯 Priority Test Areas
-
-1. **Critical Path**: Landing → Sign In → Profile → Discover → Join Arcade → View Arcade
-2. **Posts Tab**: Create post → View post → Reply
-3. **Members Tab**: View members → Search → Filter
-4. **Events Tab**: View events → View resources
-
-Happy testing! 🚀
+**Ready to test!** 🚀

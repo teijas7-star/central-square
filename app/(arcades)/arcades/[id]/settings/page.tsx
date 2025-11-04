@@ -1,7 +1,6 @@
 import { sbServer } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import Nav from "@/components/layout/nav";
 
 async function getArcade(id: string, userId: string) {
   const arcade = await prisma.arcade.findUnique({
@@ -61,9 +60,7 @@ export default async function ArcadeSettingsPage({
   }
 
   return (
-    <>
-      <Nav />
-      <main className="max-w-4xl mx-auto p-6">
+    <main className="max-w-4xl mx-auto p-6">
         <h1 className="text-2xl font-semibold mb-6">Arcade Settings</h1>
 
         <section className="mb-8">
@@ -125,7 +122,5 @@ export default async function ArcadeSettingsPage({
           </a>
         </div>
       </main>
-    </>
   );
 }
-
