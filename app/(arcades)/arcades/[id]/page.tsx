@@ -61,6 +61,6 @@ export default async function ArcadePage({
     return <MemberArcadeJourney arcadeId={id} arcadeName={arcade.name} />;
   } else {
     // Non-member sees the public local arcade page
-    return <LocalArcadePage />;
+    return <LocalArcadePage arcade={arcade} />;
   }
 }

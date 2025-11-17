@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,15 +21,24 @@ import {
   Palette,
   Bus,
   ChevronRight,
+  Flame,
+  Star,
+  UserCircle,
+  TrendingUp,
 } from "lucide-react";
+import { AnimatedRootsLogo } from "./CSLogos/animated-logos";
+import { SequentialBloomLogo } from "./CSLogos/animated-logos";
 
-interface ArcadeCard {
+interface Arcade {
   id: string;
   name: string;
-  description: string;
-  icon: React.ReactNode;
-  host: string;
-  memberCount: number;
+  description?: string | null;
+  tags: string[];
+  visibility: string;
+  _count?: {
+    memberships: number;
+    posts: number;
+  };
 }
 
 interface EventCard {
@@ -62,74 +72,187 @@ interface WorldCard {
   members: number;
 }
 
+// Icon mapping for arcades based on name/tags
+function getArcadeIcon(name: string, tags: string[]) {
+  const lowerName = name.toLowerCase();
+  const lowerTags = tags.join(" ").toLowerCase();
+
+  if (lowerName.includes("civic") || lowerTags.includes("civic") || lowerTags.includes("engagement")) {
+    return <Landmark className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("tech") || lowerTags.includes("tech") || lowerTags.includes("code") || lowerTags.includes("innovation")) {
+    return <Code className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("education") || lowerTags.includes("education") || lowerTags.includes("learning")) {
+    return <GraduationCap className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("urban") || lowerName.includes("planning") || lowerTags.includes("urban") || lowerTags.includes("infrastructure")) {
+    return <Building2 className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("climate") || lowerName.includes("environment") || lowerTags.includes("climate") || lowerTags.includes("environment") || lowerTags.includes("sustainability")) {
+    return <Leaf className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("health") || lowerName.includes("wellness") || lowerTags.includes("health") || lowerTags.includes("wellness")) {
+    return <Heart className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("business") || lowerTags.includes("business") || lowerTags.includes("economic")) {
+    return <Store className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("arts") || lowerName.includes("culture") || lowerTags.includes("arts") || lowerTags.includes("culture")) {
+    return <Palette className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("transportation") || lowerTags.includes("transport") || lowerTags.includes("mobility")) {
+    return <Bus className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("aspen") || lowerName.includes("institute") || lowerTags.includes("institute") || lowerTags.includes("leadership")) {
+    return <Landmark className="w-6 h-6 text-white" />;
+  }
+  return <Users className="w-6 h-6 text-white" />;
+}
+
+// Get icon background color based on tags
+function getIconBgColor(tags: string[], index: number) {
+  const lowerTags = tags.join(" ").toLowerCase();
+  
+  if (lowerTags.includes("civic") || lowerTags.includes("engagement")) {
+    return "bg-neutral-700";
+  }
+  if (lowerTags.includes("tech") || lowerTags.includes("code")) {
+    return "bg-blue-600";
+  }
+  if (lowerTags.includes("education") || lowerTags.includes("learning")) {
+    return "bg-purple-600";
+  }
+  if (lowerTags.includes("climate") || lowerTags.includes("environment")) {
+    return "bg-green-600";
+  }
+  if (lowerTags.includes("health") || lowerTags.includes("wellness")) {
+    return "bg-red-600";
+  }
+  if (lowerTags.includes("business") || lowerTags.includes("economic")) {
+    return "bg-orange-600";
+  }
+  if (lowerTags.includes("arts") || lowerTags.includes("culture")) {
+    return "bg-pink-600";
+  }
+  if (lowerTags.includes("institute") || lowerTags.includes("leadership")) {
+    return "bg-indigo-600";
+  }
+  
+  const colors = [
+    "bg-neutral-700",
+    "bg-blue-600",
+    "bg-purple-600",
+    "bg-green-600",
+    "bg-yellow-600",
+    "bg-red-600",
+    "bg-orange-600",
+    "bg-pink-600",
+  ];
+  return colors[index % colors.length];
+}
+
+// Activity indicator based on arcade data
+function getActivityIndicator(arcade: Arcade) {
+  const postCount = arcade._count?.posts || 0;
+  const memberCount = arcade._count?.memberships || 0;
+  
+  if (postCount > 50 || memberCount > 200) {
+    return { icon: <Flame className="w-3 h-3 text-orange-500" />, text: "Trending", color: "text-orange-600" };
+  }
+  if (postCount > 20 || memberCount > 100) {
+    return { icon: <Star className="w-3 h-3 text-yellow-500" />, text: "Featured", color: "text-yellow-600" };
+  }
+  if (postCount > 5 || memberCount > 50) {
+    return { icon: <TrendingUp className="w-3 h-3 text-blue-500" />, text: "Growing", color: "text-blue-600" };
+  }
+  return { icon: <UserCircle className="w-3 h-3 text-neutral-400" />, text: "Active", color: "text-neutral-600" };
+}
+
 export default function CityHome({ city = "Boston" }: { city?: string }) {
-  // Mock data - replace with API calls
-  const arcades: ArcadeCard[] = [
+  // 6 example community arcades with made-up topics
+  const exampleArcades: Arcade[] = [
     {
-      id: "1",
+      id: "civic-engagement-hub",
       name: "Civic Engagement Hub",
-      description: "Discuss local policies and participate in town halls",
-      icon: <Landmark className="w-6 h-6 text-white" />,
-      host: "Sarah Chen",
-      memberCount: 1247,
+      description: "Discuss local policies and participate in town halls. A space for neighbors to engage with city governance and make their voices heard.",
+      tags: ["Civic", "Policy", "Governance"],
+      visibility: "open",
+      _count: {
+        memberships: 1247,
+        posts: 156,
+      },
     },
     {
-      id: "2",
+      id: "tech-innovation",
       name: "Tech & Innovation",
-      description: "Digital accessibility and smart city initiatives",
-      icon: <Code className="w-6 h-6 text-white" />,
-      host: "Marcus Johnson",
-      memberCount: 892,
+      description: "Digital accessibility and smart city initiatives. Explore how technology can improve our community.",
+      tags: ["Tech", "Innovation", "Smart City"],
+      visibility: "open",
+      _count: {
+        memberships: 892,
+        posts: 98,
+      },
     },
     {
-      id: "3",
+      id: "education-network",
       name: "Education Network",
-      description: "School board meetings and curriculum discussions",
-      icon: <GraduationCap className="w-6 h-6 text-white" />,
-      host: "Elena Rodriguez",
-      memberCount: 634,
+      description: "School board meetings and curriculum discussions. Connect parents, teachers, and students in meaningful dialogue.",
+      tags: ["Education", "Learning", "Schools"],
+      visibility: "open",
+      _count: {
+        memberships: 634,
+        posts: 87,
+      },
     },
     {
-      id: "4",
+      id: "urban-planning",
       name: "Urban Planning",
-      description: "City development and infrastructure projects",
-      icon: <Building2 className="w-6 h-6 text-white" />,
-      host: "Alex Thompson",
-      memberCount: 523,
+      description: "City development and infrastructure projects. Shape the future of our neighborhoods together.",
+      tags: ["Urban Planning", "Infrastructure", "Development"],
+      visibility: "open",
+      _count: {
+        memberships: 523,
+        posts: 64,
+      },
     },
     {
-      id: "5",
+      id: "environment-climate",
       name: "Environment & Climate",
-      description: "Sustainability initiatives and green projects",
-      icon: <Leaf className="w-6 h-6 text-white" />,
-      host: "Jamie Park",
-      memberCount: 445,
+      description: "Sustainability initiatives and green projects. Building a more sustainable future for our community.",
+      tags: ["Climate", "Sustainability", "Environment"],
+      visibility: "open",
+      _count: {
+        memberships: 445,
+        posts: 92,
+      },
     },
     {
-      id: "6",
+      id: "health-wellness",
       name: "Health & Wellness",
-      description: "Community health programs and mental health resources",
-      icon: <Heart className="w-6 h-6 text-white" />,
-      host: "David Kim",
-      memberCount: 389,
+      description: "Community health programs and mental health resources. Supporting each other's wellbeing.",
+      tags: ["Health", "Wellness", "Mental Health"],
+      visibility: "open",
+      _count: {
+        memberships: 389,
+        posts: 55,
+      },
     },
     {
-      id: "7",
-      name: "Local Business",
-      description: "Small business support and economic development",
-      icon: <Store className="w-6 h-6 text-white" />,
-      host: "Lisa Wang",
-      memberCount: 312,
-    },
-    {
-      id: "8",
-      name: "Arts & Culture",
-      description: "Public art projects and cultural events",
-      icon: <Palette className="w-6 h-6 text-white" />,
-      host: "Mike Chen",
-      memberCount: 278,
+      id: "aspen-institute",
+      name: "Aspen Institute",
+      description: "Leadership development and policy discussions. Engaging in thoughtful dialogue on critical issues facing our community.",
+      tags: ["Leadership", "Policy", "Education"],
+      visibility: "open",
+      _count: {
+        memberships: 567,
+        posts: 78,
+      },
     },
   ];
+
+  const [arcades, setArcades] = useState<Arcade[]>(exampleArcades);
+  const [loading, setLoading] = useState(false);
 
   const events: EventCard[] = [
     {
@@ -261,82 +384,22 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
     },
   ];
 
-  const getIconBgColor = (index: number) => {
-    const colors = [
-      "bg-neutral-700",
-      "bg-blue-600",
-      "bg-purple-600",
-      "bg-green-600",
-      "bg-yellow-600",
-      "bg-red-600",
-      "bg-orange-600",
-      "bg-pink-600",
-    ];
-    return colors[index % colors.length];
-  };
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Strip */}
-      <header className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2 bg-neutral-100 rounded-lg p-1">
-                <button className="px-3 py-1.5 bg-white rounded-md text-sm font-medium text-neutral-900 shadow-sm">
-                  Your City
-                </button>
-                <button className="px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900">
-                  Global Agora
-                </button>
-              </div>
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link href="/" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  Home
-                </Link>
-                <Link href="/discover" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  Arcades
-                </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  Events
-                </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  People
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/signin"
-                className="text-neutral-600 hover:text-neutral-900 text-sm font-medium"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signin"
-                className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors"
-              >
-                Join
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-neutral-50 to-neutral-100 py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
-                Central Square · {city}
+                City Square · {city}
               </h1>
               <p className="text-xl text-neutral-600 mb-8">
                 Your city's digital agora. Connect with neighbors, engage in civic discourse, and build community together.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/discover"
+                  href="/global/arcades"
                   className="bg-neutral-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-800 transition-colors flex items-center"
                 >
                   Explore Arcades
@@ -352,18 +415,12 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
             </div>
             <div className="relative h-64 md:h-96 rounded-xl overflow-hidden bg-neutral-200">
               <Image
-                src="/design/boston-skyline.png"
+                src="/design/boston-skyline.jpg"
                 alt={`${city} skyline`}
                 fill
                 className="object-cover"
-                onError={(e) => {
-                  // Fallback to placeholder if image doesn't exist
-                  e.currentTarget.style.display = 'none';
-                }}
+                priority
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-neutral-300">
-                <span className="text-neutral-500 text-sm">{city} Skyline</span>
-              </div>
             </div>
           </div>
         </div>
@@ -372,38 +429,119 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
       {/* Community Arcades */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Community Arcades</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {arcades.map((arcade, index) => (
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Community Arcades
+          </h2>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-neutral-200 rounded-xl p-5 animate-pulse"
+                >
+                  <div className="w-12 h-12 bg-neutral-200 rounded-lg mb-4" />
+                  <div className="h-5 bg-neutral-200 rounded mb-2" />
+                  <div className="h-4 bg-neutral-200 rounded mb-4" />
+                  <div className="h-4 bg-neutral-200 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : arcades.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-neutral-600 mb-4">No arcades found yet.</p>
               <Link
-                key={arcade.id}
-                href={`/arcades/${arcade.id}`}
-                className="bg-white border border-neutral-200 rounded-xl p-5 hover:bg-neutral-50 hover:shadow-sm transition-all group"
+                href="/arcades/create"
+                className="inline-block bg-neutral-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-800 transition-colors"
               >
-                <div className={`w-12 h-12 ${getIconBgColor(index)} rounded-lg flex items-center justify-center mb-4`}>
-                  {arcade.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">{arcade.name}</h3>
-                <p className="text-sm text-neutral-600 mb-4 line-clamp-2">{arcade.description}</p>
-                <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-                  <span>Host: {arcade.host}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-neutral-600">
-                    {arcade.memberCount.toLocaleString()} members
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
-                </div>
+                Create the First Arcade
               </Link>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {arcades.map((arcade, index) => {
+                const activity = getActivityIndicator(arcade);
+                const icon = getArcadeIcon(arcade.name, arcade.tags);
+                
+                return (
+                  <Link
+                    key={arcade.id}
+                    href={arcade.id === "aspen-institute" || arcade.name === "Aspen Institute" ? "/aspeninstitute" : `/arcades/${arcade.id}`}
+                    className="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg hover:border-neutral-300 transition-all group"
+                  >
+                    {/* Icon and Activity Indicator */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 ${getIconBgColor(arcade.tags, index)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        {icon}
+                      </div>
+                      <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-neutral-50 ${activity.color}`}>
+                        {activity.icon}
+                        <span className="text-xs font-medium">{activity.text}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Arcade Name */}
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
+                      {arcade.name}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-sm text-neutral-600 mb-4 line-clamp-2 leading-relaxed">
+                      {arcade.description || "A community space for meaningful discussions and collaboration."}
+                    </p>
+                    
+                    {/* Tags */}
+                    {arcade.tags && arcade.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {arcade.tags.slice(0, 2).map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs bg-neutral-100 text-neutral-700 px-2 py-1 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {arcade.tags.length > 2 && (
+                          <span className="text-xs text-neutral-500 px-2 py-1">
+                            +{arcade.tags.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Stats */}
+                    <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+                      <div className="flex items-center gap-3 text-xs text-neutral-600">
+                        <div className="flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>{arcade._count?.memberships || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>{arcade._count?.posts || 0}</span>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Upcoming Meets & Projects */}
       <section className="py-12 bg-neutral-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Upcoming Meets & Projects</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Upcoming Meets & Projects
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
               <div
@@ -433,7 +571,12 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
       {/* Featured Conversations */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Featured Conversations</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Featured Conversations
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {conversations.map((conversation) => (
               <div
@@ -471,7 +614,12 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
       {/* People of the Square */}
       <section className="py-12 bg-neutral-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">People of the Square</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            People of the Square
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {people.map((person) => (
               <div
@@ -503,7 +651,12 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
       {/* Across the Squares */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Across the Squares</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Across the Squares
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {worldSquares.map((square) => (
               <div
@@ -591,7 +744,7 @@ export default function CityHome({ city = "Boston" }: { city?: string }) {
               <h4 className="font-semibold text-neutral-900 mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
                 <li>
-                  <Link href="/discover" className="hover:text-neutral-900">
+                  <Link href="/global/arcades" className="hover:text-neutral-900">
                     Arcades
                   </Link>
                 </li>

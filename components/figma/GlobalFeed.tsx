@@ -132,9 +132,6 @@ export default function GlobalFeed() {
         <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
           The Global Agora Feed
         </h2>
-        <p className="text-xl md:text-2xl text-neutral-600 mb-2">
-          Conversations Shaping Our Future
-        </p>
         <p className="text-base text-neutral-500">
           Join dialogues from across the world's Squares
         </p>

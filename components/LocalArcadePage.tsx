@@ -18,7 +18,100 @@ import {
   UserPlus,
   Globe,
   ChevronRight as ChevronRightIcon,
+  Landmark,
+  Code,
+  GraduationCap,
+  Building2,
+  Leaf,
+  Heart as HeartIcon,
+  Store,
+  Palette,
+  Bus,
 } from "lucide-react";
+
+interface Arcade {
+  id: string;
+  name: string;
+  description: string | null;
+  tags: string[];
+  visibility: "open" | "invite";
+  host: {
+    id: string;
+    name: string;
+    handle: string;
+  };
+  _count: {
+    memberships: number;
+    posts: number;
+  };
+}
+
+interface LocalArcadePageProps {
+  arcade?: Arcade;
+}
+
+// Icon mapping for arcades based on name/tags
+function getArcadeIcon(name: string, tags: string[]) {
+  const lowerName = name.toLowerCase();
+  const lowerTags = tags.join(" ").toLowerCase();
+
+  if (lowerName.includes("civic") || lowerTags.includes("civic") || lowerTags.includes("engagement")) {
+    return <Landmark className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("tech") || lowerTags.includes("tech") || lowerTags.includes("code") || lowerTags.includes("innovation")) {
+    return <Code className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("education") || lowerTags.includes("education") || lowerTags.includes("learning")) {
+    return <GraduationCap className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("urban") || lowerName.includes("planning") || lowerTags.includes("urban") || lowerTags.includes("infrastructure")) {
+    return <Building2 className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("climate") || lowerName.includes("environment") || lowerTags.includes("climate") || lowerTags.includes("environment") || lowerTags.includes("sustainability")) {
+    return <Leaf className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("health") || lowerName.includes("wellness") || lowerTags.includes("health") || lowerTags.includes("wellness")) {
+    return <HeartIcon className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("business") || lowerTags.includes("business") || lowerTags.includes("economic")) {
+    return <Store className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("arts") || lowerName.includes("culture") || lowerTags.includes("arts") || lowerTags.includes("culture")) {
+    return <Palette className="w-6 h-6 text-white" />;
+  }
+  if (lowerName.includes("transportation") || lowerTags.includes("transport") || lowerTags.includes("mobility")) {
+    return <Bus className="w-6 h-6 text-white" />;
+  }
+  return <Users className="w-6 h-6 text-white" />;
+}
+
+// Get icon background color based on tags
+function getIconBgColor(name: string, tags: string[]) {
+  const lowerTags = tags.join(" ").toLowerCase();
+  
+  if (lowerTags.includes("civic") || lowerTags.includes("engagement")) {
+    return "bg-neutral-700";
+  }
+  if (lowerTags.includes("tech") || lowerTags.includes("code")) {
+    return "bg-blue-600";
+  }
+  if (lowerTags.includes("education") || lowerTags.includes("learning")) {
+    return "bg-purple-600";
+  }
+  if (lowerTags.includes("climate") || lowerTags.includes("environment")) {
+    return "bg-green-600";
+  }
+  if (lowerTags.includes("health") || lowerTags.includes("wellness")) {
+    return "bg-red-600";
+  }
+  if (lowerTags.includes("business") || lowerTags.includes("economic")) {
+    return "bg-orange-600";
+  }
+  if (lowerTags.includes("arts") || lowerTags.includes("culture")) {
+    return "bg-pink-600";
+  }
+  return "bg-neutral-700";
+}
 
 interface Event {
   id: string;
@@ -57,28 +150,21 @@ interface Instructor {
   avatarUrl?: string;
 }
 
-interface ConnectedCommunity {
-  id: string;
-  name: string;
-  subtitle: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-export default function LocalArcadePage() {
-  const [arcadeName] = useState("London Yoga Collective");
-  const [hostedBy] = useState("Latika Yoga Studio");
-  const [arcadeDescription] = useState(
-    "Empowering mothers, teachers, and seekers through weekly sessions across the city"
-  );
-  const [city] = useState("London");
-  const [tags] = useState(["#wellbeing", "#prenatal", "#mindfulmovement", "#community"]);
+export default function LocalArcadePage({ arcade }: LocalArcadePageProps) {
+  // Use arcade data if provided, otherwise use defaults
+  const arcadeName = arcade?.name || "Community Arcade";
+  const hostedBy = arcade?.host?.name || "Community Host";
+  const arcadeDescription = arcade?.description || "A community space for meaningful discussions and collaboration.";
+  const city = "Boston";
+  const tags = arcade?.tags || ["Community", "Discussion"];
+  const memberCount = arcade?._count?.memberships || 0;
+  const postCount = arcade?._count?.posts || 0;
 
   const [stats] = useState({
-    members: 532,
-    weeklySessions: 12,
-    locations: 8,
-    founded: 2022,
+    members: memberCount,
+    posts: postCount,
+    events: 3,
+    founded: 2023,
   });
 
   const [events] = useState<Event[]>([
@@ -249,13 +335,23 @@ export default function LocalArcadePage() {
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent p-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-neutral-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">LYC</span>
+              <div className={`w-12 h-12 ${getIconBgColor(arcadeName, tags)} rounded-lg flex items-center justify-center`}>
+                {getArcadeIcon(arcadeName, tags)}
               </div>
               <p className="text-white/90 text-sm">Hosted by {hostedBy}</p>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">{arcadeName}</h1>
             <p className="text-lg text-white/90 mb-6 max-w-2xl">{arcadeDescription}</p>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {tags.slice(0, 4).map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
             <div className="flex items-center space-x-4">
               <button className="bg-white text-neutral-900 px-6 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
                 Join Arcade
@@ -297,6 +393,14 @@ export default function LocalArcadePage() {
                   </span>
                 ))}
               </div>
+              <div className="mt-6 flex items-center gap-4">
+                <button className="bg-neutral-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-800 transition-colors">
+                  Join Arcade
+                </button>
+                <button className="border border-neutral-300 text-neutral-900 px-6 py-3 rounded-lg font-medium hover:bg-neutral-50 transition-colors">
+                  Learn More
+                </button>
+              </div>
             </div>
 
             {/* Community Stats */}
@@ -305,15 +409,15 @@ export default function LocalArcadePage() {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-700">Members</span>
-                  <span className="text-neutral-900 font-semibold">{stats.members}</span>
+                  <span className="text-neutral-900 font-semibold">{stats.members.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-neutral-700">Weekly Sessions</span>
-                  <span className="text-neutral-900 font-semibold">{stats.weeklySessions}</span>
+                  <span className="text-neutral-700">Posts</span>
+                  <span className="text-neutral-900 font-semibold">{stats.posts}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-neutral-700">Locations</span>
-                  <span className="text-neutral-900 font-semibold">{stats.locations}</span>
+                  <span className="text-neutral-700">Upcoming Events</span>
+                  <span className="text-neutral-900 font-semibold">{stats.events}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-700">Founded</span>

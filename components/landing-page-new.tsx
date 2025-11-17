@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Users, Search, Landmark, GraduationCap, Leaf, Clock, Heart, MessageCircle, Share2, Bot } from "lucide-react";
+import { AnimatedRootsLogo } from "./CSLogos/animated-logos";
+import { SequentialBloomLogo } from "./CSLogos/animated-logos";
 
 // Featured Arcade Card Component
 interface FeaturedArcadeProps {
@@ -231,8 +233,8 @@ export default function LandingPage() {
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4 md:space-x-8">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-neutral-700 rounded-lg flex items-center justify-center">
-                <Users className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                <AnimatedRootsLogo size={32} />
               </div>
               <span className="text-xl font-semibold text-neutral-900">Central Square</span>
             </Link>
@@ -306,7 +308,12 @@ export default function LandingPage() {
         <section className="py-12 md:py-16 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">Featured Arcades</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 flex items-center gap-3">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                  <SequentialBloomLogo size={32} />
+                </div>
+                Featured Arcades
+              </h2>
               <Link href="/discover" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 View All
               </Link>
@@ -345,7 +352,12 @@ export default function LandingPage() {
         <section className="py-12 md:py-16 px-6 bg-neutral-50">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">Recent Discussions</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 flex items-center gap-3">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                  <SequentialBloomLogo size={32} />
+                </div>
+                Recent Discussions
+              </h2>
               <div className="flex items-center space-x-2">
                 <button className="px-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-700 hover:bg-neutral-50 transition-colors">
                   All Topics

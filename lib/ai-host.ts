@@ -64,10 +64,16 @@ function generateMockAIResponse(
 ): string {
   const lastMessage = messages[messages.length - 1]?.content.toLowerCase() || "";
   const messageCount = messages.length;
+  const allUserMessages = messages.filter(m => m.role === "user").map(m => m.content.toLowerCase()).join(" ");
 
   // First message - greeting
   if (messageCount === 1) {
-    return `Hello! I'm your AI Host, and I'm here to help you discover communities on Central Square. ${userProfile ? `Nice to meet you, ${userProfile.name}! ` : ""}What are you interested in? What topics or communities would you like to explore?`;
+    const greetings = [
+      `👋 Hello! I'm your AI Host, and I'm here to help you discover communities on Central Square. ${userProfile ? `Nice to meet you, ${userProfile.name}! ` : ""}What are you interested in? What topics or communities would you like to explore?`,
+      `Hey there! ${userProfile ? `I'm ${userProfile.name}'s AI Host, ` : ""}I'm here to help you find amazing communities that match your interests. What brings you to Central Square today?`,
+      `Welcome! ${userProfile ? `${userProfile.name}, ` : ""}I'm your AI Host and I'd love to help you discover communities. What are you passionate about?`,
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
   }
 
   // Detect interests from user messages
@@ -76,29 +82,91 @@ function generateMockAIResponse(
     ...messages.filter(m => m.role === "user").map(m => m.content.toLowerCase())
   ].join(" ").toLowerCase();
 
-  if (interests.includes("ai") || interests.includes("artificial intelligence")) {
-    return "That's great! AI is such an exciting field. Are you more interested in AI ethics, AI development, or AI applications? I can help you find Arcades that match your specific interests.";
+  // Sustainability/Climate responses
+  if (lastMessage.includes("sustainability") || lastMessage.includes("climate") || lastMessage.includes("environment") || lastMessage.includes("green")) {
+    const responses = [
+      "Great choice! Sustainability is such an important topic. I found several sustainability groups in your area:\n\n**Green City Collective** - Local urban gardening and clean energy advocacy (📍 2.3 miles away)\n\n**Climate Action Network** - Community organizing for climate policy (📍 1.8 miles away)\n\nWould you like me to show you upcoming events from these groups?",
+      "That's wonderful! Climate action communities are really active right now. Are you more interested in local community gardens, policy advocacy, or clean energy initiatives?",
+      "Excellent! I can help you find sustainability-focused Arcades. What aspect interests you most - urban gardening, renewable energy, or climate policy?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  if (interests.includes("climate") || interests.includes("environment")) {
-    return "Climate and environment are really important topics! Are you looking for communities focused on climate action, sustainability, or environmental research?";
+  // AI/Tech responses
+  if (lastMessage.includes("ai") || lastMessage.includes("artificial intelligence") || lastMessage.includes("tech") || lastMessage.includes("technology")) {
+    const responses = [
+      "That's exciting! AI and tech communities are thriving on Central Square. Are you interested in AI ethics, development, or practical applications? I can help you find Arcades that match.",
+      "Tech communities are great! What specific area draws you in - AI ethics, software development, or emerging technologies?",
+      "Awesome! There are some fascinating tech and AI Arcades. Are you looking for communities focused on ethical AI, building projects, or discussing the future of technology?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  if (interests.includes("education") || interests.includes("learning")) {
-    return "Education is wonderful! Are you interested in educational technology, teaching methods, or learning communities?";
+  // Local/Arcades responses
+  if (lastMessage.includes("local") || lastMessage.includes("find") || lastMessage.includes("arcade") || lastMessage.includes("community")) {
+    const responses = [
+      "I'd be happy to help you find local Arcades! What city or area are you in? Or are you looking for communities around a specific topic?",
+      "Local communities are where great things happen! What topics interest you? I can help you find Arcades in your area.",
+      "Finding the right Arcade is important! Are you looking for something in your city, or are you open to global communities too?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  // Generic responses based on message count
-  if (messageCount <= 3) {
-    return "That sounds interesting! Can you tell me more about what you're looking for? What kind of communities or topics excite you?";
+  // People/Connections responses
+  if (lastMessage.includes("people") || lastMessage.includes("connect") || lastMessage.includes("meet") || lastMessage.includes("network")) {
+    const responses = [
+      "Connecting with like-minded people is one of the best parts of Central Square! What kind of people are you hoping to meet? What shared interests or values matter to you?",
+      "I love helping people connect! What brings you here - are you looking for collaborators, mentors, or just interesting conversations?",
+      "Meeting new people is exciting! What topics or activities would help you find the right connections?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  if (messageCount <= 5) {
-    return "Thanks for sharing! Based on what you've told me, I'm learning about your interests. What values are important to you in a community?";
+  // Education responses
+  if (lastMessage.includes("education") || lastMessage.includes("learn") || lastMessage.includes("teach") || lastMessage.includes("school")) {
+    const responses = [
+      "Education communities are wonderful! Are you interested in educational technology, teaching methods, or learning communities?",
+      "Learning never stops! What aspect of education excites you - ed tech, pedagogy, or lifelong learning?",
+      "Education is such a powerful topic! Are you looking for communities focused on K-12, higher ed, or adult learning?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  // Generic responses based on message count and context
+  if (messageCount === 2) {
+    const responses = [
+      "That sounds interesting! Can you tell me more about what you're looking for? What kind of communities or topics excite you?",
+      "I'd love to learn more! What drew you to explore communities on Central Square?",
+      "Tell me more! What are you hoping to find or contribute to in a community?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  if (messageCount === 3) {
+    const responses = [
+      "Thanks for sharing! I'm starting to understand your interests better. What values are important to you in a community?",
+      "This is helpful! What kind of activities or discussions would you want to see in an Arcade?",
+      "Great! Based on what you've shared, I'm learning about your interests. Are you looking for something local or global?",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  if (messageCount === 4) {
+    const responses = [
+      "Perfect! I'm getting a good sense of what you're looking for. Are you ready to explore some Arcades that might be a great fit?",
+      "Wonderful! I've learned enough to start making some recommendations. Want to see what I've found?",
+      "Excellent! I think I have enough information to suggest some communities. Check out your recommendations!",
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
   // After enough messages, suggest checking recommendations
-  return "I've learned a lot about your interests! Why don't you check out your personalized recommendations? I've found some Arcades that might be a great fit for you. Click 'View Recommendations' to see them!";
+  const closingResponses = [
+    "I've learned a lot about your interests! Why don't you check out your personalized recommendations? I've found some Arcades that might be a great fit for you. Click 'View Recommendations' to see them!",
+    "Based on our conversation, I have some exciting Arcades to show you! Check out your recommendations - I think you'll find some communities that really match what you're looking for.",
+    "Perfect! I've gathered enough information to personalize some recommendations for you. Head over to your recommendations page to see what I've found!",
+  ];
+  return closingResponses[Math.floor(Math.random() * closingResponses.length)];
 }
 
 /**

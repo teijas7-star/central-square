@@ -27,6 +27,8 @@ import {
   Globe2,
   Activity,
 } from "lucide-react";
+import { AnimatedRootsLogo } from "./CSLogos/animated-logos";
+import { SequentialBloomLogo } from "./CSLogos/animated-logos";
 
 interface HighlightCard {
   id: string;
@@ -171,52 +173,18 @@ export default function GlobalAgora() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center">
-                  <Users className="w-5 h-4 text-white" />
-                </div>
-                <span className="text-lg font-semibold text-neutral-900">Central Square</span>
-              </Link>
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link href="/" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  My City
-                </Link>
-                <Link
-                  href="/agora"
-                  className="text-neutral-900 border-b-2 border-neutral-900 pb-1 font-medium"
-                >
-                  Global Agora
-                </Link>
-                <Link href="/discover" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  Arcades
-                </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  Events
-                </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
-                  People
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/signin"
-                className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors"
-              >
-                Join Conversation
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-neutral-700 via-neutral-600 to-neutral-900 py-24 overflow-hidden">
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/earth-from-space.png"
+            alt="Earth from space"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
+        </div>
         <div className="absolute inset-0 opacity-20">
           <div className="absolute right-32 top-20 w-32 h-32 border border-white rounded-full opacity-20"></div>
           <div className="absolute left-16 bottom-24 w-24 h-24 border border-white rounded-full opacity-15"></div>
@@ -252,7 +220,12 @@ export default function GlobalAgora() {
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-            <h2 className="text-3xl font-bold text-neutral-900">Global Highlights</h2>
+            <h2 className="text-3xl font-bold text-neutral-900 flex items-center gap-3">
+              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                <SequentialBloomLogo size={32} />
+              </div>
+              Global Highlights
+            </h2>
             <div className="flex flex-wrap gap-2">
               <button className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors">
                 Arts
@@ -314,7 +287,12 @@ export default function GlobalAgora() {
       {/* Global Arcades Directory */}
       <section className="py-12 bg-neutral-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Global Arcades Directory</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Global Arcades Directory
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {globalArcades.map((arcade) => (
               <div
@@ -358,7 +336,12 @@ export default function GlobalAgora() {
       {/* Across the Cities */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Across the Cities</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Across the Cities
+          </h2>
           <div className="bg-neutral-100 rounded-lg p-8">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {cities.map((city) => (
@@ -387,7 +370,12 @@ export default function GlobalAgora() {
       {/* Global Voices */}
       <section className="py-12 bg-neutral-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8">Global Voices</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Global Voices
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {voices.map((voice) => (
               <div key={voice.id} className="text-center">
@@ -408,7 +396,12 @@ export default function GlobalAgora() {
       {/* The Pulse */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-neutral-900 mb-8 text-center">The Pulse</h2>
+          <h2 className="text-3xl font-bold text-neutral-900 mb-8 text-center flex items-center justify-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            The Pulse
+          </h2>
           <div className="max-w-3xl mx-auto">
             <div className="flex flex-wrap justify-center gap-3 mb-4">
               {pulseThemes.map((theme, idx) => (
@@ -490,7 +483,7 @@ export default function GlobalAgora() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/arcades" className="hover:text-white">
+                  <Link href="/global/arcades" className="hover:text-white">
                     Global Arcades
                   </Link>
                 </li>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatedRootsLogo } from "./CSLogos/animated-logos";
 
 export default function FigmaLoginFrame() {
   const [email, setEmail] = useState("");
@@ -43,8 +44,16 @@ export default function FigmaLoginFrame() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-400 via-neutral-500 to-neutral-900 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[448px]">
+      <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/images/city-square.png)' }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-400/80 via-neutral-500/80 to-neutral-900/90"></div>
+        </div>
+        
+        <div className="w-full max-w-[448px] relative z-10">
           <div className="bg-white rounded-xl shadow-lg p-8 text-center mb-5">
             <div className="mb-6">
               <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -106,15 +115,22 @@ export default function FigmaLoginFrame() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-400 via-neutral-500 to-neutral-900 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[448px]">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/images/city-square.png)' }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-400/80 via-neutral-500/80 to-neutral-900/90"></div>
+      </div>
+      
+      <div className="w-full max-w-[448px] relative z-10">
         <div className="bg-white rounded-xl shadow-lg p-8 mb-5">
           <div className="text-center mb-8">
+            {/* Logo */}
             <div className="flex justify-center mb-6">
-              <div className="w-12 h-12 bg-neutral-700 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2h5m6-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-                </svg>
+              <div className="w-16 h-16 flex items-center justify-center">
+                <AnimatedRootsLogo size={64} />
               </div>
             </div>
             
@@ -126,8 +142,8 @@ export default function FigmaLoginFrame() {
               Enter your email to receive a magic link.
             </p>
             
-            <p className="text-xs text-neutral-500">
-              No passwords, no ads — just community.
+            <p className="text-xs text-blue-600 font-medium">
+              Secure access • Verified profiles • Your community space
             </p>
           </div>
 

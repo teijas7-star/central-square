@@ -1,27 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  LayoutDashboard,
-  Calendar,
-  Users,
-  MessageSquare,
-  Link2,
-  BarChart3,
-  Settings,
-  Plus,
-  Bell,
-  User,
   MapPin,
   TrendingUp,
   UserPlus,
   ChevronRight,
   CheckCircle,
   Clock,
-  Globe,
+  Calendar,
+  Users,
+  MessageSquare,
+  Link2,
+  User,
 } from "lucide-react";
+import ArcadeDashboardLayout from "./ArcadeDashboardLayout";
 
 interface StatCard {
   id: string;
@@ -60,11 +55,34 @@ interface Member {
   activity: string;
 }
 
-export default function HostDashboard() {
-  const [arcadeName] = useState("Central Square Arcade");
-  const [city] = useState("Boston, MA");
-  const [hostName] = useState("Latika");
-  const [activeTab, setActiveTab] = useState("overview");
+interface HostDashboardProps {
+  arcadeId: string;
+  arcadeName?: string;
+  city?: string;
+}
+
+export default function HostDashboard({ arcadeId, arcadeName = "Central Square Arcade", city = "Boston, MA" }: HostDashboardProps) {
+  const [hostName, setHostName] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/profiles");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile && data.profile.name) {
+            setHostName(data.profile.name);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProfile();
+  }, []);
 
   const [stats] = useState<StatCard[]>([
     {
@@ -171,105 +189,13 @@ export default function HostDashboard() {
     },
   ]);
 
-  const navItems = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "events", label: "Events", icon: Calendar },
-    { id: "members", label: "Members", icon: Users },
-    { id: "feed", label: "Feed", icon: MessageSquare },
-    { id: "collaborations", label: "Collaborations", icon: Link2 },
-    { id: "insights", label: "Insights", icon: BarChart3 },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
-
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-neutral-200 flex-shrink-0">
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? "bg-neutral-100 text-neutral-900"
-                        : "text-neutral-600 hover:bg-neutral-50"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Global Sync */}
-        <div className="px-4 pt-4 border-t border-neutral-200">
-          <div className="bg-neutral-50 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 bg-neutral-800 rounded-full flex items-center justify-center">
-                  <Globe className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-sm font-medium text-neutral-700">Global Sync</span>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" defaultChecked />
-                <div className="w-8 h-4 bg-neutral-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-neutral-800"></div>
-              </label>
-            </div>
-            <p className="text-xs text-neutral-500 leading-relaxed">
-              Connected to Climate Action Network
-            </p>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Header */}
-        <header className="bg-white border-b border-neutral-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center">
-                <span className="text-white text-xs font-semibold">CSA</span>
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-neutral-800">{arcadeName}</h1>
-                <p className="text-sm text-neutral-500">{city}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <button className="bg-neutral-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors flex items-center space-x-2">
-                <Plus className="w-4 h-4" />
-                <span>Create Event</span>
-              </button>
-              <button className="bg-neutral-100 text-neutral-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-200 transition-colors flex items-center space-x-2">
-                <MessageSquare className="w-4 h-4" />
-                <span>Post Update</span>
-              </button>
-              <button className="text-neutral-600 hover:text-neutral-900">
-                <Bell className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-neutral-300 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-neutral-600" />
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="p-6">
+    <ArcadeDashboardLayout arcadeId={arcadeId} arcadeName={arcadeName} city={city}>
+      <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-neutral-800 mb-2">
-              Welcome back, {hostName}
+              Welcome back, {loading ? "..." : hostName || "Teijas"}
             </h2>
             <p className="text-neutral-600">Here's your Arcade at a glance</p>
           </div>
@@ -355,8 +281,7 @@ export default function HostDashboard() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </ArcadeDashboardLayout>
   );
 }
 

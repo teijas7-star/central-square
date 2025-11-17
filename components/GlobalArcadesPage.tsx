@@ -33,6 +33,8 @@ import {
   Grid3x3,
   List as ListIcon,
 } from "lucide-react";
+import { AnimatedRootsLogo } from "./CSLogos/animated-logos";
+import { SequentialBloomLogo } from "./CSLogos/animated-logos";
 
 interface GlobalArcade {
   id: string;
@@ -179,10 +181,10 @@ export default function GlobalArcadesPage() {
       <header className="bg-white border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center">
-                  <Users className="w-5 h-4 text-white" />
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                  <AnimatedRootsLogo size={32} />
                 </div>
                 <span className="text-lg font-semibold text-neutral-900">Central Square</span>
               </Link>
@@ -199,10 +201,10 @@ export default function GlobalArcadesPage() {
                 >
                   Arcades
                 </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
+                <Link href="/events" className="text-neutral-600 hover:text-neutral-900 font-medium">
                   Events
                 </Link>
-                <Link href="#" className="text-neutral-600 hover:text-neutral-900 font-medium">
+                <Link href="/people" className="text-neutral-600 hover:text-neutral-900 font-medium">
                   People
                 </Link>
               </nav>
@@ -318,7 +320,12 @@ export default function GlobalArcadesPage() {
         <section className="py-12 bg-neutral-50">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-neutral-900">Featured Global Arcades</h2>
+              <h2 className="text-2xl font-bold text-neutral-900 flex items-center gap-3">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                  <SequentialBloomLogo size={32} />
+                </div>
+                Featured Global Arcades
+              </h2>
               <Link
                 href="#all-arcades"
                 className="text-neutral-600 hover:text-neutral-900 text-sm font-medium flex items-center"
@@ -340,7 +347,10 @@ export default function GlobalArcadesPage() {
       <section id="all-arcades" className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-neutral-900">
+            <h2 className="text-2xl font-bold text-neutral-900 flex items-center gap-3">
+              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                <SequentialBloomLogo size={32} />
+              </div>
               All Global Arcades
               {filteredArcades.length !== globalArcades.length && (
                 <span className="text-neutral-600 font-normal ml-2">
@@ -382,7 +392,12 @@ export default function GlobalArcadesPage() {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-neutral-800 to-neutral-900 text-white">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Want to Start a Global Arcade?</h2>
+          <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <SequentialBloomLogo size={32} />
+            </div>
+            Want to Start a Global Arcade?
+          </h2>
           <p className="text-xl text-neutral-300 mb-10 max-w-2xl mx-auto">
             Create a cross-city organization that connects communities worldwide around shared purpose.
           </p>

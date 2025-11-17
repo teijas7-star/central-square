@@ -1,4 +1,4 @@
-# Central Square Platform - UI Architecture Map
+ Central Square Platform - UI Architecture Map
 
 **Last Updated:** 2025-01-XX  
 **Framework:** Next.js 16 (App Router) + React 18 + TypeScript
