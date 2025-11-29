@@ -58,7 +58,7 @@ export default function Nav() {
         }
         // 401 means not authenticated, which is fine
         if (res.status === 401) {
-          return null;
+        return null;
         }
         // For other errors, try to parse error message
         return res.json().catch(() => null);
@@ -202,7 +202,7 @@ export default function Nav() {
                 placeholder="Search communities, people, events..."
                 className={`block w-full ${isDarkNavPage ? 'bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-400 focus:ring-neutral-600' : 'bg-neutral-50 border-neutral-200 text-neutral-900 placeholder:text-neutral-500 focus:ring-neutral-900'} border rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
               />
-            </div>
+          </div>
           </form>
         )}
         
@@ -217,7 +217,7 @@ export default function Nav() {
                 {(isAgoraPage || isCityPage) && (
                   <Link href="/signin" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkNavPage ? 'bg-white text-neutral-900 hover:bg-neutral-100' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}>
                     Join
-                  </Link>
+        </Link>
                 )}
               </div>
             </>
@@ -227,15 +227,15 @@ export default function Nav() {
                 <>
                   {/* Standardized signed-in navigation: Profile, AI Host, Sign Out */}
                   <Link href="/profile" className={`hover:underline ${isDarkNavPage ? 'text-white hover:text-neutral-300' : 'text-neutral-900 dark:text-white'}`}>
-                    Profile
-                  </Link>
+                        Profile
+                      </Link>
                   <Link href="/ai-host" className={`hover:underline ${isDarkNavPage ? 'text-white hover:text-neutral-300' : 'text-neutral-900 dark:text-white'}`}>
                     AI Host
                   </Link>
                   <button onClick={handleSignOut} className={`hover:underline ${isDarkNavPage ? 'text-white hover:text-neutral-300' : 'text-neutral-900 dark:text-white'}`}>
-                    Sign Out
-                  </button>
-                </>
+                        Sign Out
+                      </button>
+                    </>
               ) : (
                 <>
                   {isAgoraPage || isCityPage ? (
@@ -243,10 +243,10 @@ export default function Nav() {
                       <div className="flex items-center space-x-4">
                         <Link href="/signin" className={`text-sm font-medium ${isDarkNavPage ? 'text-white hover:text-neutral-300' : 'text-neutral-600 hover:text-neutral-900'}`}>
                           Sign In
-                        </Link>
+                      </Link>
                         <Link href="/signin" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkNavPage ? 'bg-white text-neutral-900 hover:bg-neutral-100' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}>
                           Join
-                        </Link>
+                      </Link>
                       </div>
                     </>
                   ) : (

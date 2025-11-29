@@ -10,6 +10,7 @@ import {
   Share2,
   ThumbsUp,
   TrendingUp,
+  LayoutDashboard,
 } from "lucide-react";
 import { SequentialBloomLogo } from "./CSLogos/animated-logos";
 
@@ -51,6 +52,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"hosted" | "member">("hosted");
+  const [dashboardUrl, setDashboardUrl] = useState<string | null>(null);
 
   // Filler data to showcase the design
   const conversations: Conversation[] = [
@@ -133,6 +135,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     loadProfile();
+    loadDashboardUrl();
   }, []);
 
   const loadProfile = async () => {
@@ -154,6 +157,26 @@ export default function ProfilePage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadDashboardUrl = async () => {
+    try {
+      const res = await fetch("/api/users/hosted-arcades");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.arcades && data.arcades.length > 0) {
+          // Use the first hosted arcade's dashboard
+          setDashboardUrl(`/arcades/${data.arcades[0].id}/dashboard`);
+        } else {
+          // Fallback to the provided dashboard URL if no hosted arcades
+          setDashboardUrl("/arcades/cmhelmt0y0001w0yd16mmoi0y/dashboard");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load dashboard URL", error);
+      // Fallback to the provided dashboard URL
+      setDashboardUrl("/arcades/cmhelmt0y0001w0yd16mmoi0y/dashboard");
     }
   };
 
@@ -182,8 +205,20 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Profile Header */}
-      <section className="bg-gradient-to-r from-neutral-100 to-neutral-200 border-b border-neutral-200">
+      <section className="bg-gradient-to-r from-neutral-100 to-neutral-200 border-b border-neutral-200 relative">
         <div className="max-w-7xl mx-auto px-6 py-12">
+          {/* Top Right: Dashboard Icon */}
+          {dashboardUrl && (
+            <div className="absolute top-6 right-6">
+              <Link
+                href={dashboardUrl}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 transition-colors shadow-sm"
+                title="Go to Dashboard"
+              >
+                <LayoutDashboard className="w-5 h-5" />
+              </Link>
+            </div>
+          )}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             {/* Left: Avatar and Info */}
             <div className="flex items-start gap-6">
