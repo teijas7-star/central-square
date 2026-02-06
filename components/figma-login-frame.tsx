@@ -21,16 +21,43 @@ export default function FigmaLoginFrame() {
         body: JSON.stringify({ email }),
       });
       
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
+      
+      try {
+        if (contentType && contentType.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          console.error("Non-JSON response:", text);
+          data = { error: text || "Unknown error occurred" };
+        }
+      } catch (parseError: any) {
+        console.error("Failed to parse response:", parseError);
+        data = { error: "Failed to parse server response" };
+      }
       
       if (!res.ok) {
-        console.error("Magic link error:", data);
-        alert(`Error: ${data.error || "Failed to send magic link"}`);
+        const errorDetails = {
+          status: res.status,
+          statusText: res.statusText,
+          error: data.error,
+          details: data.details,
+          fullResponse: data,
+          contentType: contentType
+        };
+        console.error("Magic link error:", errorDetails);
+        alert(`Error: ${data.error || `Failed to send magic link (${res.status})`}`);
       } else {
         setSent(true);
       }
     } catch (err: any) {
-      console.error("Unexpected error:", err);
+      console.error("Unexpected error:", {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+        fullError: err
+      });
       alert(`Error: ${err.message || "Failed to send magic link. Please check your connection."}`);
     } finally {
       setSending(false);

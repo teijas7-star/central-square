@@ -43,7 +43,7 @@ fi
 # Check 4: Environment Variables
 echo ""
 echo "4️⃣ Checking environment variables..."
-ENV_VARS=("NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_ANON_KEY" "DATABASE_URL")
+ENV_VARS=("NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY" "DATABASE_URL")
 MISSING=0
 for var in "${ENV_VARS[@]}"; do
   if grep -q "^${var}=" .env.local 2>/dev/null; then

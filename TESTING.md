@@ -6,7 +6,7 @@ Before testing, verify these are set up:
 
 - [ ] **Environment Variables**: Check `.env.local` has:
   - `NEXT_PUBLIC_SUPABASE_URL`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
   - `DATABASE_URL` (Supabase PostgreSQL connection string)
   - `UPSTASH_REDIS_URL` (optional, for rate limiting)
   - `UPSTASH_REDIS_TOKEN` (optional)
