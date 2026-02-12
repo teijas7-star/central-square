@@ -1,5 +1,5 @@
 import "../global.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { View, Text, ActivityIndicator, Platform } from "react-native";
@@ -26,6 +26,7 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const { initialize, isLoading } = useAuthStore();
+  const [forceShow, setForceShow] = useState(false);
 
   useEffect(() => {
     // Initialize auth state on app load
@@ -36,9 +37,16 @@ export default function RootLayout() {
       }
     };
     initApp();
+
+    // Force show app after 2 seconds regardless of auth state (for development)
+    const timer = setTimeout(() => {
+      setForceShow(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
   }, [initialize]);
 
-  if (isLoading) {
+  if (isLoading && !forceShow) {
     // Show loading screen (visible on web, splash screen on native)
     return (
       <View style={{
