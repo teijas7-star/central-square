@@ -62,7 +62,6 @@ export default function ArcadeDashboardLayout({
   };
 
   const handleArcadeChange = (newArcadeId: string) => {
-    // Get the current section from pathname
     const currentSection = pathname?.split("/").pop() || "dashboard";
     router.push(`/arcades/${newArcadeId}/${currentSection}`);
     setIsDropdownOpen(false);
@@ -74,7 +73,7 @@ export default function ArcadeDashboardLayout({
     { id: "members", label: "Members", icon: Users, path: `${basePath}/members` },
     { id: "feed", label: "Feed", icon: MessageSquare, path: `${basePath}/feed` },
     { id: "collaborations", label: "Collaborations", icon: Link2, path: `${basePath}/collaborations` },
-    { id: "insights", label: "Insights", icon: BarChart3, path: `${basePath}/insights` },
+    { id: "insights", label: "Intelligence", icon: BarChart3, path: `${basePath}/insights` },
     { id: "settings", label: "Settings", icon: Settings, path: `${basePath}/settings` },
   ];
 
@@ -86,21 +85,21 @@ export default function ArcadeDashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-[var(--burg-deep)] flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-neutral-200 flex-shrink-0 flex flex-col">
+      <aside className="w-64 bg-[var(--burg-deep)] border-r border-[var(--burg-800)] flex-shrink-0 flex flex-col">
         <div className="p-4 flex flex-col flex-1">
           {/* Arcade Context Card */}
           <div className="mb-4">
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full bg-white border border-neutral-200 rounded-lg p-3 hover:bg-neutral-50 transition-colors text-left"
+                className="w-full bg-[var(--burg-900)] border border-[var(--burg-800)] rounded-lg p-3 hover:bg-[var(--burg-800)] transition-colors text-left"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-xs font-semibold">
+                    <div className="w-10 h-10 bg-[var(--cream)] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-[var(--burg-deep)] text-xs font-semibold">
                         {arcadeName
                           .split(" ")
                           .map((word) => word[0])
@@ -110,12 +109,12 @@ export default function ArcadeDashboardLayout({
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-neutral-900 truncate">{arcadeName}</p>
-                      <p className="text-xs text-neutral-500 truncate">{city}</p>
+                      <p className="text-sm font-medium text-[var(--cream)] truncate">{arcadeName}</p>
+                      <p className="text-xs text-[var(--burg-400)] truncate">{city}</p>
                     </div>
                   </div>
                   <ChevronDown
-                    className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ${
+                    className={`w-4 h-4 text-[var(--burg-400)] transition-transform flex-shrink-0 ${
                       isDropdownOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -129,35 +128,35 @@ export default function ArcadeDashboardLayout({
                     className="fixed inset-0 z-10"
                     onClick={() => setIsDropdownOpen(false)}
                   />
-                  <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-2 w-80 bg-[var(--burg-900)] border border-[var(--burg-800)] rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                     <div className="p-2">
                       {/* Create Arcade Button */}
                       <Link
                         href="/arcades/create"
                         onClick={() => setIsDropdownOpen(false)}
-                        className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-neutral-50 transition-colors border border-neutral-200 mb-2"
+                        className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-[var(--burg-800)] transition-colors border border-[var(--burg-800)] mb-2"
                       >
-                        <div className="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Plus className="w-5 h-5 text-neutral-600" />
+                        <div className="w-10 h-10 bg-[var(--burg-800)] rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Plus className="w-5 h-5 text-[var(--burg-300)]" />
                         </div>
                         <div className="flex-1 text-left">
-                          <p className="text-sm font-medium text-neutral-900">Create New Arcade</p>
-                          <p className="text-xs text-neutral-500">Start a new community</p>
+                          <p className="text-sm font-medium text-[var(--cream)]">Create New Arcade</p>
+                          <p className="text-xs text-[var(--burg-400)]">Start a new community</p>
                         </div>
                       </Link>
 
                       {/* Divider */}
                       {hostedArcades.length > 0 && (
-                        <div className="border-t border-neutral-200 my-2" />
+                        <div className="border-t border-[var(--burg-800)] my-2" />
                       )}
 
                       {/* Arcade List */}
                       {loading ? (
-                        <div className="px-3 py-4 text-center text-sm text-neutral-500">
+                        <div className="px-3 py-4 text-center text-sm text-[var(--burg-400)]">
                           Loading arcades...
                         </div>
                       ) : hostedArcades.length === 0 ? (
-                        <div className="px-3 py-4 text-center text-sm text-neutral-500">
+                        <div className="px-3 py-4 text-center text-sm text-[var(--burg-400)]">
                           No arcades found
                         </div>
                       ) : (
@@ -168,12 +167,12 @@ export default function ArcadeDashboardLayout({
                               onClick={() => handleArcadeChange(arcade.id)}
                               className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors text-left ${
                                 arcade.id === arcadeId
-                                  ? "bg-neutral-100 border border-neutral-300"
-                                  : "hover:bg-neutral-50"
+                                  ? "bg-[var(--burg-800)] border border-[var(--burg-700)]"
+                                  : "hover:bg-[var(--burg-800)]"
                               }`}
                             >
-                              <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-white text-xs font-semibold">
+                              <div className="w-10 h-10 bg-[var(--cream)] rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span className="text-[var(--burg-deep)] text-xs font-semibold">
                                   {arcade.name
                                     .split(" ")
                                     .map((word) => word[0])
@@ -183,17 +182,17 @@ export default function ArcadeDashboardLayout({
                                 </span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-neutral-900 truncate">
+                                <p className="text-sm font-medium text-[var(--cream)] truncate">
                                   {arcade.name}
                                 </p>
                                 {arcade.description && (
-                                  <p className="text-xs text-neutral-500 truncate">
+                                  <p className="text-xs text-[var(--burg-400)] truncate">
                                     {arcade.description}
                                   </p>
                                 )}
                               </div>
                               {arcade.id === arcadeId && (
-                                <div className="w-2 h-2 bg-neutral-900 rounded-full flex-shrink-0" />
+                                <div className="w-2 h-2 bg-[var(--cream)] rounded-full flex-shrink-0" />
                               )}
                             </button>
                           ))}
@@ -210,14 +209,14 @@ export default function ArcadeDashboardLayout({
           <div className="mb-4 space-y-2">
             <Link
               href={`${basePath}/events?create=true`}
-              className="w-full bg-neutral-800 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-[var(--cream)] text-[var(--burg-deep)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--cream-dark)] transition-colors flex items-center justify-center space-x-2"
             >
               <Plus className="w-4 h-4" />
               <span>Create Event</span>
             </Link>
             <Link
               href={`${basePath}/feed?create=true`}
-              className="w-full bg-white border border-neutral-200 text-neutral-700 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-transparent border border-[var(--burg-800)] text-[var(--burg-300)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--burg-900)] transition-colors flex items-center justify-center space-x-2"
             >
               <MessageSquare className="w-4 h-4" />
               <span>Post Update</span>
@@ -236,8 +235,8 @@ export default function ArcadeDashboardLayout({
                       href={item.path}
                       className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                         active
-                          ? "bg-neutral-100 text-neutral-900"
-                          : "text-neutral-600 hover:bg-neutral-50"
+                          ? "bg-[var(--burg-800)] text-[var(--cream)]"
+                          : "text-[var(--burg-400)] hover:bg-[var(--burg-900)] hover:text-[var(--burg-300)]"
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -250,21 +249,21 @@ export default function ArcadeDashboardLayout({
           </nav>
 
           {/* Global Sync */}
-          <div className="pt-4 border-t border-neutral-200 mt-auto">
-            <div className="bg-neutral-50 rounded-lg p-3">
+          <div className="pt-4 border-t border-[var(--burg-800)] mt-auto">
+            <div className="bg-[var(--burg-900)] rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-neutral-800 rounded-full flex items-center justify-center">
-                    <Globe className="w-3 h-3 text-white" />
+                  <div className="w-6 h-6 bg-[var(--cream)] rounded-full flex items-center justify-center">
+                    <Globe className="w-3 h-3 text-[var(--burg-deep)]" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-700">Global Sync</span>
+                  <span className="text-sm font-medium text-[var(--burg-300)]">Global Sync</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-8 h-4 bg-neutral-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-neutral-800"></div>
+                  <div className="w-8 h-4 bg-[var(--burg-700)] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--burg-600)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--burg-800)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--burg-400)] after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--cream)] peer-checked:after:bg-[var(--burg-deep)]"></div>
                 </label>
               </div>
-              <p className="text-xs text-neutral-500 leading-relaxed">
+              <p className="text-xs text-[var(--burg-500)] leading-relaxed">
                 Connected to Climate Action Network
               </p>
             </div>
@@ -273,11 +272,9 @@ export default function ArcadeDashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-neutral-50">
-        {/* Page Content */}
+      <main className="flex-1 overflow-auto bg-[var(--burg-deep)]">
         {children}
       </main>
     </div>
   );
 }
-

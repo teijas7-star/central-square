@@ -14,15 +14,15 @@ export const BrandMotion = {
   // Easing curves that match the organic root growth concept
   easing: {
     // Sharp entrance, gentle exit (like roots finding their path)
-    rootGrowth: [0.4, 0.0, 0.2, 1],
+    rootGrowth: [0.4, 0.0, 0.2, 1] as [number, number, number, number],
     // Bouncy growth (like roots establishing themselves)
-    rootSettle: [0.68, -0.55, 0.265, 1.55],
+    rootSettle: [0.68, -0.55, 0.265, 1.55] as [number, number, number, number],
     // Natural breathing motion
-    organic: [0.25, 0.46, 0.45, 0.94],
+    organic: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     // Smooth connection building
-    connection: [0.4, 0.0, 0.6, 1],
+    connection: [0.4, 0.0, 0.6, 1] as [number, number, number, number],
     // Sharp attention-grabbing pulse
-    pulse: [0.6, -0.28, 0.735, 0.045]
+    pulse: [0.6, -0.28, 0.735, 0.045] as [number, number, number, number]
   },
   
   // Stagger delays for sequential animations
@@ -151,44 +151,48 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    const params = soundParams[soundType];
-    
-    oscillator.type = params.type;
-    oscillator.frequency.setValueAtTime(params.frequency, ctx.currentTime);
-    
+    const params = soundParams[soundType] as Record<string, unknown>;
+
+    oscillator.type = params.type as OscillatorType;
+    oscillator.frequency.setValueAtTime(params.frequency as number, ctx.currentTime);
+
     // Special effects for certain sound types
+    const freq = params.frequency as number;
+    const dur = params.duration as number;
+    const vol = params.volume as number;
+
     if (params.pitchBend) {
       oscillator.frequency.exponentialRampToValueAtTime(
-        params.frequency * 1.5, 
-        ctx.currentTime + params.duration
+        freq * 1.5,
+        ctx.currentTime + dur
       );
     }
-    
+
     if (params.chord) {
       // Play harmonic for success sound
       const harmonic = ctx.createOscillator();
       harmonic.connect(gainNode);
       harmonic.type = 'sine';
-      harmonic.frequency.setValueAtTime(params.frequency * 1.5, ctx.currentTime);
+      harmonic.frequency.setValueAtTime(freq * 1.5, ctx.currentTime);
       harmonic.start(ctx.currentTime);
-      harmonic.stop(ctx.currentTime + params.duration);
+      harmonic.stop(ctx.currentTime + dur);
     }
 
     // Volume envelope
     gainNode.gain.setValueAtTime(0, ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(params.volume, ctx.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
     
     if (params.pulse) {
       // Create pulsing effect
-      gainNode.gain.setValueAtTime(params.volume, ctx.currentTime + 0.1);
-      gainNode.gain.linearRampToValueAtTime(params.volume * 0.3, ctx.currentTime + 0.15);
-      gainNode.gain.linearRampToValueAtTime(params.volume, ctx.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(vol, ctx.currentTime + 0.1);
+      gainNode.gain.linearRampToValueAtTime(vol * 0.3, ctx.currentTime + 0.15);
+      gainNode.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.2);
     }
-    
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + params.duration);
+
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
 
     oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + params.duration);
+    oscillator.stop(ctx.currentTime + dur);
   };
 
   const toggleSound = () => {

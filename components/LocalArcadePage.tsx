@@ -150,6 +150,14 @@ interface Instructor {
   avatarUrl?: string;
 }
 
+interface ConnectedCommunity {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
 export default function LocalArcadePage({ arcade }: LocalArcadePageProps) {
   // Use arcade data if provided, otherwise use defaults
   const arcadeName = arcade?.name || "Community Arcade";

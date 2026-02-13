@@ -21,6 +21,7 @@ import {
   Building2,
   Leaf,
   Clock,
+  MessageCircle,
 } from "lucide-react";
 
 interface MyArcade {

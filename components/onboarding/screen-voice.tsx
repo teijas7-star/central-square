@@ -17,7 +17,7 @@ const transcriptLines = [
   },
   {
     speaker: "user",
-    text: "I run Design Circle SF — it's a design community with about 200 members. We do monthly meetups, portfolio reviews, and mentorship.",
+    text: "I run Design Circle SF \u2014 it's a design community with about 200 members. We do monthly meetups, portfolio reviews, and mentorship.",
   },
   {
     speaker: "ai",
@@ -25,13 +25,61 @@ const transcriptLines = [
   },
   {
     speaker: "user",
-    text: "Honestly it's a mess — WhatsApp for comms, Eventbrite for events, Instagram for reach, Google Sheets for tracking everything.",
+    text: "Honestly it's a mess \u2014 WhatsApp for comms, Eventbrite for events, Instagram for reach, Google Sheets for tracking everything.",
   },
   {
     speaker: "ai",
     text: "Got it. That's exactly what we're here to fix. One more question...",
   },
 ];
+
+/* Expanding ring animation for mic listening state */
+function PulseRings() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0 rounded-full border border-red-400/30"
+          initial={{ scale: 1, opacity: 0.6 }}
+          animate={{ scale: 1.6 + i * 0.3, opacity: 0 }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            delay: i * 0.4,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+/* Floating particle dots when recording */
+function MicParticles() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-visible">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute bottom-0 left-1/2 w-1 h-1 rounded-full bg-red-400/60"
+          initial={{ y: 0, x: 0, opacity: 0 }}
+          animate={{
+            y: [-10, -40 - Math.random() * 20],
+            x: [(Math.random() - 0.5) * 30, (Math.random() - 0.5) * 50],
+            opacity: [0, 0.8, 0],
+          }}
+          transition={{
+            duration: 1.5 + Math.random() * 0.5,
+            repeat: Infinity,
+            delay: i * 0.25,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
   const [isListening, setIsListening] = useState(false);
@@ -94,29 +142,31 @@ export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
     <div className="flex-1 flex flex-col px-6 pt-4 pb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <button
+        <motion.button
           onClick={onBack}
-          className="p-2 -ml-2 rounded-xl hover:bg-[var(--cs-gray-100)] transition-colors"
+          className="p-2 -ml-2 rounded-xl hover:bg-[var(--burg-900)] transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="w-5 h-5 text-[var(--cs-gray-600)]" />
-        </button>
+          <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
+        </motion.button>
 
         {/* Timer */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--cs-gray-100)]">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--burg-900)]">
           <div
             className="w-2 h-2 rounded-full"
             style={{
               background:
                 phase === "user-speaking"
-                  ? "var(--cs-error)"
-                  : "var(--cs-success)",
+                  ? "#ef4444"
+                  : "#22c55e",
               animation:
                 phase === "user-speaking"
                   ? "ai-pulse 1s ease-in-out infinite"
                   : "none",
             }}
           />
-          <span className="text-xs font-medium text-[var(--cs-gray-600)]">
+          <span className="text-xs font-medium text-[var(--burg-300)]">
             {phase === "done" ? "Done" : "Recording"}
           </span>
         </div>
@@ -124,13 +174,24 @@ export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
         <div className="w-9" /> {/* Spacer for alignment */}
       </div>
 
-      {/* AI Avatar - smaller during conversation */}
+      {/* AI Avatar - tilts/leans based on speaker */}
       <div className="flex justify-center mb-6">
-        <AIHostAvatar
-          size="lg"
-          speaking={phase === "ai-speaking"}
-          listening={phase === "user-speaking"}
-        />
+        <motion.div
+          animate={
+            phase === "ai-speaking"
+              ? { rotate: [0, -2, 0, 2, 0], scale: 1.02 }
+              : phase === "user-speaking"
+                ? { rotate: 3, scale: 0.97 }
+                : { rotate: 0, scale: 1 }
+          }
+          transition={{ duration: 1.5, repeat: phase === "ai-speaking" ? Infinity : 0, ease: "easeInOut" }}
+        >
+          <AIHostAvatar
+            size="lg"
+            speaking={phase === "ai-speaking"}
+            listening={phase === "user-speaking"}
+          />
+        </motion.div>
       </div>
 
       {/* Transcript area */}
@@ -142,34 +203,33 @@ export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${line.speaker === "user" ? "justify-end" : "justify-start"}`}
+              drag="x"
+              dragConstraints={{ left: -8, right: 8 }}
+              dragElastic={0.1}
+              whileDrag={{ scale: 1.01 }}
             >
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                   line.speaker === "ai"
-                    ? "bg-white border border-[var(--cs-gray-100)] rounded-tl-sm"
-                    : "rounded-tr-sm text-white"
+                    ? "bg-[var(--burg-900)] border border-[var(--burg-800)] rounded-tl-sm"
+                    : "rounded-tr-sm bg-[var(--cream)]"
                 }`}
-                style={
-                  line.speaker === "user"
-                    ? { background: "linear-gradient(135deg, #FF6B35, #EA580C)" }
-                    : {}
-                }
               >
                 {/* Label */}
                 <span
                   className={`text-[10px] font-semibold uppercase tracking-wider block mb-1 ${
                     line.speaker === "ai"
-                      ? "text-[var(--cs-orange-500)]"
-                      : "text-orange-200"
+                      ? "text-[var(--gold)]"
+                      : "text-[var(--burg-700)]"
                   }`}
                 >
                   {line.speaker === "ai" ? "AI Host" : "You"}
                 </span>
                 <p
-                  className={`text-sm leading-relaxed ${
+                  className={`text-sm leading-relaxed font-light ${
                     line.speaker === "ai"
-                      ? "text-[var(--cs-gray-700)]"
-                      : "text-white"
+                      ? "text-[var(--burg-300)]"
+                      : "text-[var(--burg-deep)]"
                   }`}
                 >
                   {i === currentLine ? displayedText : line.text}
@@ -192,7 +252,7 @@ export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-2 h-2 rounded-full bg-[var(--cs-gray-300)]"
+                className="w-2 h-2 rounded-full bg-[var(--burg-600)]"
                 style={{
                   animation: `typing-dot 1.4s ease-in-out ${i * 0.2}s infinite`,
                 }}
@@ -206,31 +266,44 @@ export function ScreenVoice({ onBack, onComplete }: ScreenVoiceProps) {
       <div className="flex flex-col items-center gap-3">
         {phase !== "done" ? (
           <>
-            {/* Mic button */}
-            <motion.button
-              className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
-                isListening ? "bg-red-500" : "bg-[var(--cs-orange-500)]"
-              }`}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsListening(!isListening)}
-            >
-              {isListening ? (
-                <Pause className="w-7 h-7 text-white" />
-              ) : (
-                <Mic className="w-7 h-7 text-white" />
-              )}
-            </motion.button>
-            <span className="text-xs text-[var(--cs-gray-400)]">
+            {/* Mic button with pulse rings and particles */}
+            <div className="relative">
+              {isListening && <PulseRings />}
+              {isListening && <MicParticles />}
+              <motion.button
+                className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
+                  isListening ? "bg-red-500" : "bg-[var(--cream)]"
+                }`}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => setIsListening(!isListening)}
+                animate={isListening ? {
+                  boxShadow: [
+                    "0 0 0px 0px rgba(239, 68, 68, 0.3)",
+                    "0 0 20px 4px rgba(239, 68, 68, 0.15)",
+                    "0 0 0px 0px rgba(239, 68, 68, 0.3)",
+                  ],
+                } : {}}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {isListening ? (
+                  <Pause className="w-7 h-7 text-white" />
+                ) : (
+                  <Mic className="w-7 h-7 text-[var(--burg-deep)]" />
+                )}
+              </motion.button>
+            </div>
+            <span className="text-xs text-[var(--burg-300)]">
               {isListening ? "Listening..." : "Tap to speak"}
             </span>
           </>
         ) : (
           <motion.button
             onClick={onComplete}
-            className="w-full py-4 rounded-2xl font-semibold text-white text-base"
-            style={{ background: "linear-gradient(135deg, #FF6B35, #EA580C)" }}
+            className="w-full py-4 rounded-2xl font-semibold text-[var(--burg-deep)] text-base bg-[var(--cream)] hover:bg-[var(--cream-dark)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             Continue

@@ -94,6 +94,7 @@ export default function CityFeed({ city = "Boston" }: CityFeedProps) {
         avatarUrl: "https://api.dicebear.com/7.x/notionists/svg?seed=Elena",
       },
       type: "event",
+      content: "Excited to share this upcoming community event!",
       eventDetails: {
         title: "Roxbury Community Tech Workshop",
         description:

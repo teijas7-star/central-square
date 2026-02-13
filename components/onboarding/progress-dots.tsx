@@ -17,10 +17,10 @@ export function ProgressDots({ total, current }: ProgressDotsProps) {
           style={{
             background:
               i === current
-                ? "var(--cs-orange-500)"
+                ? "var(--cream)"
                 : i < current
-                  ? "var(--cs-orange-300)"
-                  : "var(--cs-gray-200)",
+                  ? "var(--burg-600)"
+                  : "var(--burg-800)",
           }}
           animate={{
             width: i === current ? 24 : 8,

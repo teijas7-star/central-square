@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { MobileShell } from "@/components/onboarding/mobile-shell";
 import { ProgressDots } from "@/components/onboarding/progress-dots";
@@ -41,6 +42,7 @@ const stepOrder: Step[] = [
 const stepIndex = (step: Step) => stepOrder.indexOf(step);
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("landing");
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
 
@@ -170,10 +172,7 @@ export default function OnboardingPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                style={{
-                  background: "linear-gradient(135deg, #FF6B35, #4A90E2)",
-                }}
+                className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-[var(--cream)]"
               >
                 <svg
                   width="40"
@@ -183,7 +182,7 @@ export default function OnboardingPage() {
                 >
                   <path
                     d="M12 20L18 26L28 14"
-                    stroke="white"
+                    stroke="var(--burg-deep)"
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -191,15 +190,15 @@ export default function OnboardingPage() {
                 </svg>
               </motion.div>
               <motion.h2
-                className="text-2xl font-bold text-[var(--cs-gray-900)] text-center"
+                className="font-serif lowercase text-2xl text-[var(--cream)] text-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                Welcome to Design Circle SF!
+                welcome to design circle sf!
               </motion.h2>
               <motion.p
-                className="text-[var(--cs-gray-500)] text-center mt-2 text-sm"
+                className="text-[var(--burg-300)] text-center mt-2 text-sm font-light"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -207,14 +206,12 @@ export default function OnboardingPage() {
                 Your Arcade is live. Let&apos;s make something great together.
               </motion.p>
               <motion.button
-                className="mt-8 px-8 py-4 rounded-2xl font-semibold text-white text-base"
-                style={{
-                  background: "linear-gradient(135deg, #FF6B35, #EA580C)",
-                }}
+                className="mt-8 px-8 py-4 rounded-2xl font-semibold text-[var(--burg-deep)] text-base bg-[var(--cream)] hover:bg-[var(--cream-dark)]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => router.push("/intelligence")}
               >
                 Enter My Arcade
               </motion.button>

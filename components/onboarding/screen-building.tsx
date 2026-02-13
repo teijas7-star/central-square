@@ -98,15 +98,15 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
 
       {/* Title */}
       <motion.h2
-        className="text-xl font-bold text-[var(--cs-gray-900)] text-center mb-2"
+        className="font-serif lowercase text-xl text-[var(--cream)] text-center mb-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        Building your Arcade
+        building your arcade
       </motion.h2>
       <motion.p
-        className="text-sm text-[var(--cs-gray-500)] text-center mb-8"
+        className="text-sm text-[var(--burg-300)] text-center mb-8 font-light"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -116,21 +116,18 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
 
       {/* Progress bar */}
       <div className="w-full max-w-xs mb-8">
-        <div className="h-2 rounded-full bg-[var(--cs-gray-100)] overflow-hidden">
+        <div className="h-2 rounded-full bg-[var(--burg-800)] overflow-hidden">
           <motion.div
-            className="h-full rounded-full"
-            style={{
-              background: "linear-gradient(90deg, #FF6B35, #4A90E2)",
-            }}
+            className="h-full rounded-full bg-[var(--cream)]"
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5 }}
           />
         </div>
         <div className="flex justify-between mt-2">
-          <span className="text-xs text-[var(--cs-gray-400)]">
+          <span className="text-xs text-[var(--burg-500)]">
             {Math.round(progress)}%
           </span>
-          <span className="text-xs text-[var(--cs-gray-400)]">
+          <span className="text-xs text-[var(--burg-500)]">
             {currentStep + 1}/{buildSteps.length}
           </span>
         </div>
@@ -155,14 +152,14 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
               >
                 <div
                   className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    isCurrent ? "bg-[var(--cs-orange-100)]" : "bg-[var(--cs-gray-100)]"
+                    isCurrent ? "bg-[var(--burg-800)]" : "bg-[var(--burg-900)]"
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 ${
                       isCurrent
-                        ? "text-[var(--cs-orange-500)]"
-                        : "text-[var(--cs-gray-400)]"
+                        ? "text-[var(--cream)]"
+                        : "text-[var(--burg-600)]"
                     }`}
                   />
                 </div>
@@ -170,8 +167,8 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
                   <span
                     className={`text-sm block truncate ${
                       isCurrent
-                        ? "font-semibold text-[var(--cs-gray-900)]"
-                        : "text-[var(--cs-gray-400)]"
+                        ? "font-semibold text-[var(--cream)]"
+                        : "text-[var(--burg-600)]"
                     }`}
                   >
                     {step.label}
@@ -180,14 +177,14 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
                     <motion.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-xs text-[var(--cs-gray-500)]"
+                      className="text-xs text-[var(--burg-400)]"
                     >
                       {step.detail}
                     </motion.span>
                   )}
                 </div>
                 {!isCurrent && i < currentStep && (
-                  <div className="w-5 h-5 rounded-full bg-[var(--cs-success)] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-[var(--gold)] flex items-center justify-center">
                     <svg
                       width="12"
                       height="12"

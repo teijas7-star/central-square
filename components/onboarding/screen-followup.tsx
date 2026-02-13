@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
 import { ArrowLeft, Check } from "lucide-react";
 import { AIHostAvatar } from "./ai-host-avatar";
 
@@ -51,9 +51,35 @@ const questions: Question[] = [
   },
 ];
 
+/* Blinking cursor component for typewriter effect */
+function BlinkingCursor() {
+  return (
+    <motion.span
+      className="inline-block w-0.5 h-4 bg-[var(--cream)] ml-1 align-middle"
+      animate={{ opacity: [1, 1, 0, 0, 1] }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear", times: [0, 0.49, 0.5, 0.99, 1] }}
+    />
+  );
+}
+
+/* Progress bar shimmer effect */
+function ProgressShimmer() {
+  return (
+    <motion.div
+      className="absolute inset-0 rounded-full pointer-events-none"
+      style={{
+        background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)",
+      }}
+      animate={{ x: ["-100%", "200%"] }}
+      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
+    />
+  );
+}
+
 export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [prevCanProceed, setPrevCanProceed] = useState(false);
 
   const question = questions[currentQ];
   const selectedAnswers = answers[question.id] || [];
@@ -82,33 +108,47 @@ export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
 
   const canProceed = selectedAnswers.length > 0;
 
+  // Detect when canProceed flips to true for bounce trigger
+  const [shouldBounce, setShouldBounce] = useState(false);
+  useEffect(() => {
+    if (canProceed && !prevCanProceed) {
+      setShouldBounce(true);
+      const timer = setTimeout(() => setShouldBounce(false), 600);
+      return () => clearTimeout(timer);
+    }
+    setPrevCanProceed(canProceed);
+  }, [canProceed, prevCanProceed]);
+
   return (
     <div className="flex-1 flex flex-col px-6 pt-4 pb-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <button
+        <motion.button
           onClick={() => (currentQ > 0 ? setCurrentQ(currentQ - 1) : onBack())}
-          className="p-2 -ml-2 rounded-xl hover:bg-[var(--cs-gray-100)] transition-colors"
+          className="p-2 -ml-2 rounded-xl hover:bg-[var(--burg-900)] transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="w-5 h-5 text-[var(--cs-gray-600)]" />
-        </button>
-        <span className="text-sm font-medium text-[var(--cs-gray-400)]">
+          <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
+        </motion.button>
+        <span className="text-sm font-medium text-[var(--cream)]">
           {currentQ + 1} of {questions.length}
         </span>
         <div className="w-9" />
       </div>
 
-      {/* Progress bar */}
-      <div className="h-1 rounded-full bg-[var(--cs-gray-100)] mb-8 overflow-hidden">
+      {/* Progress bar with shimmer */}
+      <div className="h-1 rounded-full bg-[var(--burg-800)] mb-8 overflow-hidden relative">
         <motion.div
-          className="h-full rounded-full"
-          style={{ background: "linear-gradient(90deg, #FF6B35, #4A90E2)" }}
+          className="h-full rounded-full bg-[var(--cream)] relative overflow-hidden"
           animate={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
           transition={{ duration: 0.3 }}
-        />
+        >
+          <ProgressShimmer />
+        </motion.div>
       </div>
 
-      {/* AI Avatar + Question */}
+      {/* AI Avatar + Question with typewriter cursor */}
       <div className="flex items-start gap-3 mb-8">
         <AIHostAvatar size="sm" />
         <AnimatePresence mode="wait">
@@ -117,13 +157,14 @@ export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white rounded-2xl rounded-tl-sm border border-[var(--cs-gray-100)] px-4 py-3 flex-1"
+            className="bg-[var(--burg-900)] rounded-2xl rounded-tl-sm border border-[var(--burg-800)] px-4 py-3 flex-1"
           >
-            <p className="text-base font-semibold text-[var(--cs-gray-900)]">
+            <p className="font-serif text-base text-[var(--cream)]">
               {question.question}
+              <BlinkingCursor />
             </p>
             {question.multi && (
-              <p className="text-xs text-[var(--cs-gray-400)] mt-1">
+              <p className="text-xs text-[var(--burg-400)] mt-1">
                 Select all that apply
               </p>
             )}
@@ -146,30 +187,55 @@ export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
               <motion.button
                 key={option}
                 onClick={() => toggleAnswer(option)}
-                className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
                   isSelected
-                    ? "border-[var(--cs-orange-400)] bg-[var(--cs-orange-50)]"
-                    : "border-[var(--cs-gray-100)] bg-white hover:border-[var(--cs-gray-200)]"
+                    ? "border-[var(--cream)] bg-[var(--burg-800)]"
+                    : "border-[var(--burg-800)] bg-[var(--burg-900)]"
                 }`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: "inset 3px 0 0 0 var(--burg-600)",
+                }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div
-                  className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
+                {/* Checkbox with spring animation */}
+                <motion.div
+                  className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors ${
                     isSelected
-                      ? "border-[var(--cs-orange-500)] bg-[var(--cs-orange-500)]"
-                      : "border-[var(--cs-gray-300)]"
+                      ? "border-[var(--cream)] bg-[var(--cream)]"
+                      : "border-[var(--burg-500)]"
                   }`}
+                  animate={isSelected ? {
+                    scale: [1, 1.3, 0.9, 1.05, 1],
+                  } : {
+                    scale: 1,
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    ease: "easeOut",
+                  }}
                 >
-                  {isSelected && <Check className="w-4 h-4 text-white" />}
-                </div>
+                  <AnimatePresence>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                      >
+                        <Check className="w-4 h-4 text-[var(--burg-deep)]" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
                 <span
-                  className={`text-sm font-medium ${
+                  className={`text-sm font-light ${
                     isSelected
-                      ? "text-[var(--cs-gray-900)]"
-                      : "text-[var(--cs-gray-600)]"
+                      ? "text-[var(--cream)]"
+                      : "text-[var(--burg-300)]"
                   }`}
                 >
                   {option}
@@ -180,13 +246,22 @@ export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Continue button */}
+      {/* Continue button with bounce when canProceed becomes true */}
       <motion.button
         onClick={handleNext}
         disabled={!canProceed}
-        className="w-full mt-6 py-4 rounded-2xl font-semibold text-white text-base disabled:opacity-40 transition-all"
-        style={{ background: "linear-gradient(135deg, #FF6B35, #EA580C)" }}
-        whileTap={{ scale: 0.98 }}
+        className="w-full mt-6 py-4 rounded-2xl font-semibold text-[var(--burg-deep)] text-base disabled:opacity-40 transition-all bg-[var(--cream)] hover:bg-[var(--cream-dark)]"
+        whileHover={canProceed ? { scale: 1.02 } : {}}
+        whileTap={canProceed ? { scale: 0.98 } : {}}
+        animate={shouldBounce ? {
+          y: [0, -6, 0, -3, 0],
+        } : {
+          y: 0,
+        }}
+        transition={shouldBounce ? {
+          duration: 0.5,
+          ease: "easeOut",
+        } : {}}
       >
         {currentQ < questions.length - 1 ? "Next" : "Build My Arcade"}
       </motion.button>
