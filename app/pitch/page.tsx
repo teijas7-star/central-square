@@ -190,7 +190,7 @@ function Slide01Title() {
           central<br />square
         </h1>
         <p style={{ fontSize: 22, fontWeight: 300, color: "#bbb", marginTop: 24, maxWidth: 480 }}>
-          The digital public square for real human connection
+          The online crossroads for human connection &amp; conversation
         </p>
         <div style={{ marginTop: 48, fontSize: 13, fontWeight: 600, color: T.orange, letterSpacing: "0.1em" }}>
           SEED ROUND &middot; $3M
@@ -307,7 +307,7 @@ function Slide04({ n, total }: { n: number; total: number }) {
     <SlideLayout eyebrow="THE INSIGHT" slideNum={n} total={total}>
       <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 40 }}>
         <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 48, fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.02em", color: T.textPrimary, margin: 0, maxWidth: 600, textTransform: "lowercase" as const }}>
-          community needs a place to live
+          community needs<br />a place to live
         </h2>
         <div style={{ display: "flex", gap: 60, width: "100%" }}>
           <div style={{ flex: "0 0 35%" }}>
@@ -347,6 +347,58 @@ function Slide04({ n, total }: { n: number; total: number }) {
                 <marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d={`M0,0 L6,3 L0,6`} fill={`${T.orange}50`} /></marker>
               </defs>
             </svg>
+          </div>
+        </div>
+      </div>
+    </SlideLayout>
+  );
+}
+
+/* SLIDE 4b (NEW): What are the Arcades? */
+function SlideArcadesExplainer({ n, total }: { n: number; total: number }) {
+  return (
+    <SlideLayout eyebrow="THE PLATFORM" slideNum={n} total={total}>
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 40 }}>
+        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 48, fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.02em", color: T.textPrimary, margin: 0, maxWidth: 700, textTransform: "lowercase" as const }}>
+          a public square surrounded by private spaces
+        </h2>
+        <div style={{ display: "flex", gap: 32, width: "100%" }}>
+          {/* Central Square */}
+          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "28px 24px", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: T.orange }} />
+            <div style={{ fontSize: 12, textTransform: "uppercase" as const, letterSpacing: "0.15em", color: T.orange, marginBottom: 12, fontWeight: 600 }}>THE CENTRAL SQUARE</div>
+            <div style={{ fontSize: 18, fontWeight: 600, color: T.textPrimary, marginBottom: 12 }}>The public space</div>
+            <div style={{ fontSize: 14, color: T.textSecondary, lineHeight: 1.6, fontWeight: 300, marginBottom: 16 }}>
+              Like a real-world urban square — a freewheeling public space where everyone can come and go, engage freely in discourse, discover communities, and connect with others.
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+              {["Open to all", "Public discourse", "Discovery", "Cross-community"].map((tag, i) => (
+                <span key={i} style={{ fontSize: 11, color: T.orange, background: `${T.orange}12`, border: `1px solid ${T.orange}25`, borderRadius: 4, padding: "4px 10px" }}>{tag}</span>
+              ))}
+            </div>
+          </div>
+          {/* Arcades */}
+          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "28px 24px", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: T.blue }} />
+            <div style={{ fontSize: 12, textTransform: "uppercase" as const, letterSpacing: "0.15em", color: T.blue, marginBottom: 12, fontWeight: 600 }}>THE ARCADES</div>
+            <div style={{ fontSize: 18, fontWeight: 600, color: T.textPrimary, marginBottom: 12 }}>Private gathering spaces</div>
+            <div style={{ fontSize: 14, color: T.textSecondary, lineHeight: 1.6, fontWeight: 300, marginBottom: 16 }}>
+              Located on the streets surrounding the Square. Organizations of all kinds create Arcades — private discourse spaces where their community gathers, organizes, and thrives.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "Enterprise", desc: "Adobe, Microsoft-scale community programs", color: T.blue },
+                { label: "Professional", desc: "Design, tech, creative industry networks", color: T.purple },
+                { label: "Institutional", desc: "Aspen Institute, universities, civic orgs", color: T.green },
+                { label: "Community groups", desc: "Neighborhood orgs, local meetups, interest groups", color: T.amber },
+              ].map((cat, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <div style={{ width: 6, height: 6, borderRadius: 3, background: cat.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: T.textPrimary, fontWeight: 500 }}>{cat.label}</span>
+                  <span style={{ fontSize: 12, color: T.textMuted }}>{cat.desc}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -418,11 +470,11 @@ function Slide06({ n, total }: { n: number; total: number }) {
     <SlideLayout eyebrow="GO-TO-MARKET" slideNum={n} total={total}>
       <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 40 }}>
         <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 44, fontWeight: 400, lineHeight: 1.1, letterSpacing: "-0.02em", color: T.textPrimary, margin: 0, maxWidth: 700, textTransform: "lowercase" as const }}>
-          start with real-world communities already meeting
+          start with existing real-world communities
         </h2>
         <div style={{ display: "flex", gap: 48, width: "100%" }}>
           <div style={{ flex: "0 0 40%" }}>
-            {[{ label: "Enterprise", desc: "Adobe, Microsoft-scale community programs" }, { label: "Professional", desc: "Design, tech, creative industry networks" }, { label: "Multi-chapter", desc: "Aspen Institute, civic organizations" }].map((item, i) => (
+            {[{ label: "Enterprise", desc: "Adobe, Microsoft-scale community programs" }, { label: "Professional", desc: "Design, tech, creative industry networks" }, { label: "Institutional", desc: "Aspen Institute, civic organizations" }, { label: "Community groups", desc: "Neighborhood orgs, local meetups, interest groups" }].map((item, i) => (
               <div key={i} style={{ borderLeft: `3px solid ${T.green}`, paddingLeft: 16, marginBottom: 24 }}>
                 <div style={{ fontSize: 16, fontWeight: 600, color: T.textPrimary, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 14, color: T.textSecondary, fontWeight: 300 }}>{item.desc}</div>
@@ -612,7 +664,7 @@ function Slide11({ n, total }: { n: number; total: number }) {
           <div style={{ flex: "0 0 66%", display: "flex", gap: 16 }}>
             {[
               { name: "Adobe", desc: "2.4M community members", type: "Enterprise", logo: <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,2 2,30 12,30" fill="#FF0000" /><polygon points="16,2 30,30 20,30" fill="#FF0000" /><polygon points="16,16 10,30 22,30" fill="#FF0000" /></svg> },
-              { name: "Aspen Institute Spain", desc: "Civic leadership network", type: "Institutional", logo: <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 20,14 30,14 22,20 25,30 16,24 7,30 10,20 2,14 12,14" fill={T.amber} /></svg> },
+              { name: "Aspen Institute", desc: "Spain, UK & Worldwide", type: "Institutional", logo: <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 20,14 30,14 22,20 25,30 16,24 7,30 10,20 2,14 12,14" fill={T.amber} /></svg> },
               { name: "Wakelet", desc: "Education community platform", type: "Enterprise", logo: <svg width="32" height="32" viewBox="0 0 32 32"><text x="4" y="24" fontSize="22" fontWeight="700" fill={T.blue} fontFamily="sans-serif">W</text></svg> },
             ].map((p, i) => (
               <div key={i} style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "28px 20px" }}>
@@ -626,8 +678,8 @@ function Slide11({ n, total }: { n: number; total: number }) {
           <div style={{ flex: "0 0 34%" }}>
             <div style={{ background: T.card, border: `1px dashed ${T.border}`, borderRadius: 12, padding: "28px 20px", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <div style={{ fontSize: 11, textTransform: "uppercase" as const, letterSpacing: "0.12em", color: T.orange, marginBottom: 12 }}>IN CONVERSATION</div>
-              <div style={{ fontSize: 18, fontWeight: 600, color: T.textPrimary, marginBottom: 8, fontFamily: "var(--font-serif)" }}>Aspen Institute UK</div>
-              <div style={{ fontSize: 13, color: T.textSecondary }}>Expanding institutional partnerships across European civic networks</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: T.textPrimary, marginBottom: 8, fontFamily: "var(--font-serif)" }}>Expanding partnerships</div>
+              <div style={{ fontSize: 13, color: T.textSecondary }}>Active discussions with enterprise and institutional community programs globally</div>
             </div>
           </div>
         </div>
@@ -692,7 +744,7 @@ function Slide13({ n, total }: { n: number; total: number }) {
         <div style={{ display: "flex", gap: 24 }}>
           {[
             { name: "Teijas", role: "CEO", bio: "Community builder. Product leader. Built and managed communities across 4 continents. Led product at multiple startups.", resp: "Product, execution, customer relationships" },
-            { name: "William Powers", role: "COO", bio: "Co-founder of BlueFin Labs (sold to Twitter). 20+ years operations and strategy at the intersection of data, media, and communities.", resp: "Vision, institutional partnerships, data strategy" },
+            { name: "William Powers", role: "COO", bio: "Visiting Scholar for Humanistic Technologies, Max Planck Center for Humans and Machines (Berlin). 20+ years operations and strategy at the intersection of data, media, and communities.", resp: "Vision, institutional partnerships, data strategy" },
           ].map((p, i) => (
             <div key={i} style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "28px 24px" }}>
               <div style={{ width: 48, height: 48, borderRadius: 24, background: `${T.orange}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 12, color: T.orange }}>{p.name[0]}</div>
@@ -733,7 +785,7 @@ function Slide14({ n, total }: { n: number; total: number }) {
     <SlideLayout eyebrow="VISION" slideNum={n} total={total}>
       <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 32 }}>
         <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 42, fontWeight: 400, lineHeight: 1.1, letterSpacing: "-0.02em", color: T.textPrimary, margin: 0, textTransform: "lowercase" as const }}>
-          from communities &#8594; to the civic layer of the internet
+          from communities to &#8594; the civic layer of the internet
         </h2>
         <div style={{ display: "flex", gap: 20, width: "100%" }}>
           {[
@@ -777,11 +829,11 @@ function Slide15({ n, total }: { n: number; total: number }) {
     <SlideLayout eyebrow="DATA MOAT" slideNum={n} total={total}>
       <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 32 }}>
         <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 42, fontWeight: 400, lineHeight: 1.1, letterSpacing: "-0.02em", color: T.textPrimary, margin: 0, textTransform: "lowercase" as const }}>
-          community intelligence: the data layer no one else has
+          Community Intelligence: the data layer no one else has
         </h2>
         <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 8, height: 8, borderRadius: 4, background: T.amber }} />
-          <span style={{ fontSize: 13, color: T.textSecondary }}>William Powers co-founded BlueFin Labs (sold to Twitter) — the data company that pioneered social TV analytics</span>
+          <div style={{ width: 8, height: 8, borderRadius: 4, background: T.orange }} />
+          <span style={{ fontSize: 13, color: T.textSecondary }}>Powered by <strong style={{ color: T.orange }}>William</strong> — our proprietary AI engine that turns every community interaction into actionable intelligence</span>
         </div>
         <div style={{ display: "flex", gap: 16, width: "100%" }}>
           {[
@@ -1055,7 +1107,7 @@ function Slide22({ n, total }: { n: number; total: number }) {
         </h2>
         <div style={{ display: "flex", gap: 0, alignItems: "flex-start", width: "100%" }}>
           {[
-            { stage: "Seed", val: "$30M", sub: "Post-money valuation", color: T.blue },
+            { stage: "Seed", val: "$30M", sub: "Pre-revenue valuation", color: T.blue },
             { stage: "Series A", val: "$80-100M", sub: "At $3M+ ARR", color: T.purple },
             { stage: "Series B", val: "$500M-1B", sub: "At $15M+ ARR", color: "#6B7280" },
             { stage: "EXIT", val: "$5B+", sub: "Category leadership", color: T.orange },
@@ -1270,7 +1322,7 @@ function Slide26({ n, total }: { n: number; total: number }) {
 
 /* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
 export default function PitchPage() {
-  const TOTAL = 26;
+  const TOTAL = 27;
   const [current, setCurrent] = useState(0);
   const [animKey, setAnimKey] = useState(0);
   const touchStartRef = useRef<number | null>(null);
@@ -1320,28 +1372,29 @@ export default function PitchPage() {
       case 1: return <Slide02 n={n} total={TOTAL} />;
       case 2: return <Slide03 n={n} total={TOTAL} />;
       case 3: return <Slide04 n={n} total={TOTAL} />;
-      case 4: return <Slide05 n={n} total={TOTAL} />;
-      case 5: return <Slide06 n={n} total={TOTAL} />;
-      case 6: return <Slide07 n={n} total={TOTAL} />;
-      case 7: return <Slide08 n={n} total={TOTAL} />;
-      case 8: return <Slide09 n={n} total={TOTAL} />;
-      case 9: return <Slide10 n={n} total={TOTAL} />;
-      case 10: return <Slide11 n={n} total={TOTAL} />;
-      case 11: return <Slide12 n={n} total={TOTAL} />;
-      case 12: return <Slide13 n={n} total={TOTAL} />;
-      case 13: return <Slide14 n={n} total={TOTAL} />;
-      case 14: return <Slide15 n={n} total={TOTAL} />;
-      case 15: return <Slide16 n={n} total={TOTAL} />;
-      case 16: return <Slide17 n={n} total={TOTAL} />;
-      case 17: return <Slide18 n={n} total={TOTAL} />;
-      case 18: return <Slide19 n={n} total={TOTAL} />;
-      case 19: return <Slide20 n={n} total={TOTAL} />;
-      case 20: return <Slide21 n={n} total={TOTAL} />;
-      case 21: return <Slide22 n={n} total={TOTAL} />;
-      case 22: return <Slide23 n={n} total={TOTAL} />;
-      case 23: return <Slide24 n={n} total={TOTAL} />;
-      case 24: return <Slide25 n={n} total={TOTAL} />;
-      case 25: return <Slide26 n={n} total={TOTAL} />;
+      case 4: return <SlideArcadesExplainer n={n} total={TOTAL} />;
+      case 5: return <Slide05 n={n} total={TOTAL} />;
+      case 6: return <Slide06 n={n} total={TOTAL} />;
+      case 7: return <Slide07 n={n} total={TOTAL} />;
+      case 8: return <Slide08 n={n} total={TOTAL} />;
+      case 9: return <Slide09 n={n} total={TOTAL} />;
+      case 10: return <Slide10 n={n} total={TOTAL} />;
+      case 11: return <Slide11 n={n} total={TOTAL} />;
+      case 12: return <Slide12 n={n} total={TOTAL} />;
+      case 13: return <Slide13 n={n} total={TOTAL} />;
+      case 14: return <Slide14 n={n} total={TOTAL} />;
+      case 15: return <Slide15 n={n} total={TOTAL} />;
+      case 16: return <Slide16 n={n} total={TOTAL} />;
+      case 17: return <Slide17 n={n} total={TOTAL} />;
+      case 18: return <Slide18 n={n} total={TOTAL} />;
+      case 19: return <Slide19 n={n} total={TOTAL} />;
+      case 20: return <Slide20 n={n} total={TOTAL} />;
+      case 21: return <Slide21 n={n} total={TOTAL} />;
+      case 22: return <Slide22 n={n} total={TOTAL} />;
+      case 23: return <Slide23 n={n} total={TOTAL} />;
+      case 24: return <Slide24 n={n} total={TOTAL} />;
+      case 25: return <Slide25 n={n} total={TOTAL} />;
+      case 26: return <Slide26 n={n} total={TOTAL} />;
       default: return null;
     }
   }
