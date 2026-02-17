@@ -2,16 +2,20 @@
 
 import { useState, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Target, Globe, Sparkles } from "lucide-react";
+import { Activity, Target, Globe, Sparkles, Bot, MessageSquare } from "lucide-react";
 import { ShimmerSweep } from "./shared";
 import { OperatorIntelligence } from "./OperatorIntelligence";
 import { SponsorIntelligence } from "./SponsorIntelligence";
 import { DiscourseIntelligence } from "./DiscourseIntelligence";
+import { BotCommandCenter } from "./BotCommandCenter";
+import { JarvisChat } from "./JarvisChat";
 
 const tabs = [
   { id: "operator", label: "Operator", icon: Activity },
   { id: "sponsor", label: "Sponsor", icon: Target },
-  { id: "discourse", label: "Live Discourse", icon: Globe },
+  { id: "discourse", label: "Discourse", icon: Globe },
+  { id: "bots", label: "Bots", icon: Bot },
+  { id: "william", label: "William", icon: MessageSquare },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -41,7 +45,7 @@ export function CommunityIntelligence() {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-[var(--burg-deep)]">
+    <div className="intel-constellation-bg intel-dot-grid intel-scan-line min-h-screen bg-[var(--burg-deep)] relative">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         {/* Title with shimmer */}
@@ -129,6 +133,8 @@ export function CommunityIntelligence() {
             {activeTab === "operator" && <OperatorIntelligence />}
             {activeTab === "sponsor" && <SponsorIntelligence />}
             {activeTab === "discourse" && <DiscourseIntelligence />}
+            {activeTab === "bots" && <BotCommandCenter />}
+            {activeTab === "william" && <JarvisChat />}
           </motion.div>
         </AnimatePresence>
       </div>

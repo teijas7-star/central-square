@@ -223,10 +223,10 @@ export function ScreenLanding({ onSelectRole }: ScreenLandingProps) {
           </div>
           <div className="flex-1 text-left">
             <span className="font-serif lowercase text-base text-[var(--cream)] block">
-              build a community
+              build my community
             </span>
             <span className="text-sm text-[var(--burg-300)] font-light">
-              I want to create or manage a community
+              I run a community and want to level it up
             </span>
           </div>
           <ArrowRight className="w-5 h-5 text-[var(--burg-400)] group-hover:text-[var(--cream)] transition-colors" />

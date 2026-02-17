@@ -96,7 +96,7 @@ export function ScreenAIIntro({ onBack, onContinue }: ScreenAIIntroProps) {
     {
       icon: MessageSquare,
       title: "Smart suggestions",
-      desc: "I'll recommend modules based on what communities like yours need",
+      desc: "I'll recommend modules and deploy AI bots based on your community",
     },
     {
       icon: BarChart3,
@@ -140,7 +140,7 @@ export function ScreenAIIntro({ onBack, onContinue }: ScreenAIIntroProps) {
             <Sparkles className="w-4 h-4 text-[var(--gold)]" />
           </motion.div>
           <span className="text-sm font-medium text-[var(--gold)]">
-            AI Community Host
+            AI Community Partner
           </span>
         </div>
       </motion.div>
@@ -156,7 +156,7 @@ export function ScreenAIIntro({ onBack, onContinue }: ScreenAIIntroProps) {
           hey! i&apos;m your ai host
         </h2>
         <p className="text-[var(--burg-300)] mt-2 text-base leading-relaxed font-light">
-          I&apos;ll help you build your community in about 90 seconds.
+          I&apos;ll build your community home in about 90 seconds.
           Just tell me about it — I&apos;ll handle the rest.
         </p>
       </motion.div>

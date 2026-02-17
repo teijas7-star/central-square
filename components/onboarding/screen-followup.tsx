@@ -263,7 +263,7 @@ export function ScreenFollowup({ onBack, onComplete }: ScreenFollowupProps) {
           ease: "easeOut",
         } : {}}
       >
-        {currentQ < questions.length - 1 ? "Next" : "Build My Arcade"}
+        {currentQ < questions.length - 1 ? "Next" : "Build My Community"}
       </motion.button>
     </div>
   );

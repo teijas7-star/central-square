@@ -21,7 +21,7 @@ const transcriptLines = [
   },
   {
     speaker: "ai",
-    text: "Love it! A design community with events, feedback sessions, and mentorship. How do you currently manage everything?",
+    text: "Love it! A design community with events, feedback, and mentorship. Where do your members currently hang out?",
   },
   {
     speaker: "user",
@@ -29,7 +29,7 @@ const transcriptLines = [
   },
   {
     speaker: "ai",
-    text: "Got it. That's exactly what we're here to fix. One more question...",
+    text: "Perfect \u2014 I'll build your home on Central Square and deploy AI bots across those channels. Best of both worlds.",
   },
 ];
 

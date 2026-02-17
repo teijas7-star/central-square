@@ -4,15 +4,12 @@ import { useState, useRef, useCallback } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
   ArrowLeft,
-  Home,
-  LayoutGrid,
-  Users,
+  Bot,
+  Activity,
   BarChart3,
-  Settings,
   MessageSquare,
-  Calendar,
+  Settings,
   Bell,
-  Plus,
   Sparkles,
 } from "lucide-react";
 import { AIHostAvatar } from "./ai-host-avatar";
@@ -73,7 +70,7 @@ function ParallaxCard({
   );
 }
 
-/* Shimmer sweep effect for the welcome banner */
+/* Shimmer sweep effect */
 function ShimmerSweep() {
   return (
     <motion.div
@@ -87,19 +84,70 @@ function ShimmerSweep() {
   );
 }
 
+/* Empty-state radial health ring (Whoop-inspired) */
+function EmptyHealthRing() {
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const progressPct = 12;
+  const dashOffset = circumference - (progressPct / 100) * circumference;
+
+  return (
+    <div className="flex items-center justify-center py-2">
+      <div className="relative">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          {/* Background dashed ring */}
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="var(--burg-800)"
+            strokeWidth="6"
+            strokeDasharray="6 4"
+          />
+          {/* Progress arc */}
+          <motion.circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="var(--cream)"
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference}
+            animate={{ strokeDashoffset: dashOffset }}
+            transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
+            transform="rotate(-90 50 50)"
+          />
+        </svg>
+        {/* Center text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <motion.span
+            className="text-lg font-bold text-[var(--burg-500)]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            —
+          </motion.span>
+          <span className="text-[9px] text-[var(--burg-500)]">/ 100</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
-  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
 
   const tabs = [
-    { icon: Home, label: "Home", active: true },
-    { icon: LayoutGrid, label: "Modules", active: false },
-    { icon: Users, label: "Members", active: false },
+    { icon: Activity, label: "Health", active: true },
+    { icon: Bot, label: "Bots", active: false },
     { icon: BarChart3, label: "Insights", active: false },
+    { icon: MessageSquare, label: "Outreach", active: false },
     { icon: Settings, label: "Settings", active: false },
   ];
-
-  const activeTabLabel = hoveredTab || "Home";
 
   return (
     <div className="flex-1 flex flex-col">
@@ -115,7 +163,7 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
             <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
           </motion.button>
           <span className="text-sm font-medium text-[var(--cream)]">
-            Preview
+            Control Center
           </span>
           <div className="w-9" />
         </div>
@@ -131,18 +179,18 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
             <div className="flex items-center gap-1.5 mb-1">
               <Sparkles className="w-3.5 h-3.5 text-[var(--gold)]" />
               <span className="text-xs font-semibold text-[var(--gold)]">
-                Your Arcade is ready!
+                Your intelligence engine is ready!
               </span>
             </div>
             <p className="text-sm text-[var(--burg-300)] font-light">
-              Here&apos;s a preview of Design Circle SF. You can customize
-              everything from your dashboard.
+              Here&apos;s your Control Center. Once bots deploy, data flows in
+              and these charts come alive.
             </p>
           </div>
         </motion.div>
       </div>
 
-      {/* Mock Arcade preview with parallax tilt */}
+      {/* Control Center preview with parallax tilt */}
       <ParallaxCard
         className="flex-1 mx-4 rounded-t-2xl border border-[var(--burg-800)] border-b-0 bg-[var(--burg-900)] overflow-hidden shadow-xl flex flex-col"
         initial={{ opacity: 0, y: 40 }}
@@ -160,36 +208,36 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
                 Design Circle SF
               </span>
               <span className="text-[10px] text-[var(--burg-400)]">
-                214 members
+                AI Intelligence Hub
               </span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Bell className="w-4.5 h-4.5 text-[var(--burg-400)]" />
-            <Settings className="w-4.5 h-4.5 text-[var(--burg-400)]" />
+            <Bell className="w-4 h-4 text-[var(--burg-400)]" />
+            <Settings className="w-4 h-4 text-[var(--burg-400)]" />
           </div>
         </div>
 
-        {/* Content preview */}
+        {/* Content */}
         <div className="p-4 space-y-3 flex-1">
-          {/* Welcome banner with shimmer sweep */}
+          {/* Welcome banner */}
           <div className="relative p-4 rounded-xl bg-[var(--cream)] text-[var(--burg-deep)] overflow-hidden">
             <ShimmerSweep />
             <span className="text-xs font-medium opacity-70">
-              Welcome to your Arcade
+              Your AI partner is ready
             </span>
             <p className="text-sm font-semibold mt-1">
-              Get started by inviting your first members
+              Deploy bots to start gathering intelligence
             </p>
           </div>
 
-          {/* Quick actions with hover scale and glow */}
+          {/* Quick actions — bot-oriented */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: MessageSquare, label: "Post" },
-              { icon: Calendar, label: "Event" },
-              { icon: Users, label: "Invite" },
-              { icon: Plus, label: "More" },
+              { icon: Bot, label: "Deploy" },
+              { icon: BarChart3, label: "Poll" },
+              { icon: MessageSquare, label: "Message" },
+              { icon: Activity, label: "Health" },
             ].map((action) => (
               <motion.div
                 key={action.label}
@@ -208,104 +256,74 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
             ))}
           </div>
 
-          {/* Module cards */}
-          <div className="space-y-2">
-            {/* Upcoming events */}
-            <div className="p-3 rounded-xl border border-[var(--burg-800)]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[var(--gold)] uppercase tracking-wider">
-                  Upcoming Events
+          {/* Community Health Ring (empty state, Whoop-inspired) */}
+          <div className="p-3 rounded-xl border border-[var(--burg-800)]">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-[var(--gold)] uppercase tracking-wider">
+                Community Health
+              </span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span className="text-[10px] text-amber-400 font-medium">
+                  Ready
                 </span>
-                <Calendar className="w-3.5 h-3.5 text-[var(--burg-400)]" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[var(--burg-800)] flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold text-[var(--cream)]">
-                    FEB
-                  </span>
-                  <span className="text-sm font-bold text-[var(--cream)] leading-none">
-                    15
-                  </span>
-                </div>
-                <div>
-                  <span className="text-sm font-semibold text-[var(--cream)] block">
-                    Portfolio Review Night
-                  </span>
-                  <span className="text-xs text-[var(--burg-400)]">
-                    7:00 PM &middot; 24 RSVPs
-                  </span>
-                </div>
               </div>
             </div>
+            <EmptyHealthRing />
+            <p className="text-[10px] text-[var(--burg-500)] text-center">
+              Deploy bots to start scoring
+            </p>
+          </div>
 
-            {/* Community Health with interactive bars */}
-            <div className="p-3 rounded-xl border border-[var(--burg-800)] overflow-hidden relative">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-[var(--gold)] uppercase tracking-wider">
-                  Community Health
+          {/* Bot Activity (empty state) */}
+          <div className="p-3 rounded-xl border border-[var(--burg-800)] overflow-hidden relative">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-[var(--gold)] uppercase tracking-wider">
+                Bot Activity
+              </span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span className="text-[10px] text-amber-400 font-medium">
+                  Ready
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] text-emerald-400 font-medium">Live</span>
+              </div>
+            </div>
+            <div className="flex items-end gap-4">
+              {/* Muted placeholder bars */}
+              <div className="flex-1">
+                <div className="flex items-end gap-[3px] mb-1.5 h-9">
+                  {[15, 20, 10, 25, 18, 30, 8].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      className="flex-1 rounded-t-sm bg-[var(--burg-700)]"
+                      initial={{ height: 0 }}
+                      animate={{ height: `${h}%` }}
+                      transition={{
+                        delay: 0.5 + i * 0.08,
+                        duration: 0.5,
+                        ease: "easeOut",
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[9px] text-[var(--burg-500)]">Mon</span>
+                  <span className="text-[9px] text-[var(--burg-500)]">Today</span>
                 </div>
               </div>
-              <div className="flex items-end gap-4">
-                {/* Gradient bar chart with hover interaction */}
-                <div className="flex-1">
-                  <div className="flex items-end gap-[3px] mb-1.5 h-9">
-                    {[40, 55, 35, 65, 50, 75, 90].map((h, i) => (
-                      <motion.div
-                        key={i}
-                        className="flex-1 rounded-t-sm cursor-pointer"
-                        style={{
-                          background:
-                            i === 6
-                              ? "linear-gradient(to top, var(--gold), var(--cream))"
-                              : i >= 4
-                                ? "linear-gradient(to top, var(--burg-700), var(--burg-500))"
-                                : "var(--burg-700)",
-                        }}
-                        initial={{ height: 0 }}
-                        animate={{
-                          height: hoveredBarIndex === i ? `${Math.min(h + 20, 100)}%` : `${h}%`,
-                        }}
-                        transition={
-                          hoveredBarIndex === i
-                            ? { type: "spring", stiffness: 300, damping: 20 }
-                            : { delay: 0.5 + i * 0.08, duration: 0.5, ease: "easeOut" }
-                        }
-                        onHoverStart={() => setHoveredBarIndex(i)}
-                        onHoverEnd={() => setHoveredBarIndex(null)}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[9px] text-[var(--burg-500)]">Mon</span>
-                    <span className="text-[9px] text-[var(--burg-500)]">Today</span>
-                  </div>
-                </div>
-                {/* Score */}
-                <div className="text-right pb-1">
-                  <motion.span
-                    className="text-2xl font-bold text-[var(--cream)] block leading-none"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.9, type: "spring" }}
-                  >
-                    92
-                  </motion.span>
-                  <motion.div
-                    className="flex items-center gap-0.5 justify-end mt-0.5"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.1 }}
-                  >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M5 2L8 6H2L5 2Z" fill="#22c55e" />
-                    </svg>
-                    <span className="text-[10px] font-semibold text-emerald-400">+12%</span>
-                  </motion.div>
-                </div>
+              {/* Empty score */}
+              <div className="text-right pb-1">
+                <motion.span
+                  className="text-2xl font-bold text-[var(--burg-500)] block leading-none"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.9, type: "spring" }}
+                >
+                  —
+                </motion.span>
+                <span className="text-[10px] text-[var(--burg-600)] mt-0.5 block">
+                  awaiting data
+                </span>
               </div>
             </div>
           </div>
@@ -364,7 +382,7 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          Looks great — let&apos;s invite people!
+          Looks great — let&apos;s deploy your bots!
         </motion.button>
       </div>
     </div>

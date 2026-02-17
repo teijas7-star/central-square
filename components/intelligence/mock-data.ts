@@ -392,3 +392,427 @@ export const discourseData = {
     activeTopics: { value: 127, trend: 15, label: "Active Topics", prefix: "" },
   },
 };
+
+// ============= BOT COMMAND CENTER TYPES =============
+
+export interface BotPlatformStatus {
+  id: string;
+  platform: "whatsapp" | "instagram" | "eventbrite";
+  name: string;
+  status: "live" | "paused" | "disconnected";
+  membersReached: number;
+  lastActivity: string;
+  messagesSent: number;
+  responsesReceived: number;
+}
+
+export interface BotPoll {
+  id: string;
+  question: string;
+  platform: "whatsapp" | "instagram" | "eventbrite" | "all";
+  sentAt: string;
+  responseCount: number;
+  totalReached: number;
+  responseRate: number;
+  results: { option: string; count: number; percentage: number }[];
+  status: "active" | "completed";
+}
+
+export interface BotMemberIntelligence {
+  id: string;
+  name: string;
+  avatar: string;
+  source: "whatsapp" | "instagram" | "eventbrite";
+  interests: string[];
+  engagementScore: number;
+  responsesGiven: number;
+  lastInteraction: string;
+  readyToOnboard: boolean;
+}
+
+export interface BotActivity {
+  date: string;
+  messagesSent: number;
+  responsesReceived: number;
+  pollsCreated: number;
+}
+
+// ============= BOT COMMAND CENTER DATA =============
+
+export const botCommandData = {
+  summaryStats: {
+    activeBots: { value: 3, trend: 2, label: "Active Bots" },
+    questionsSent: { value: 47, trend: 12, label: "Questions Sent" },
+    responsesCollected: { value: 312, trend: 34, label: "Responses" },
+    avgResponseRate: { value: 87, trend: 5, label: "Response Rate" },
+  },
+
+  platformStatus: [
+    {
+      id: "wa-1",
+      platform: "whatsapp" as const,
+      name: "Design Circle SF Group",
+      status: "live" as const,
+      membersReached: 156,
+      lastActivity: "2 min ago",
+      messagesSent: 34,
+      responsesReceived: 198,
+    },
+    {
+      id: "ig-1",
+      platform: "instagram" as const,
+      name: "@designcirclesf",
+      status: "live" as const,
+      membersReached: 2400,
+      lastActivity: "15 min ago",
+      messagesSent: 8,
+      responsesReceived: 67,
+    },
+    {
+      id: "eb-1",
+      platform: "eventbrite" as const,
+      name: "Design Circle SF Events",
+      status: "live" as const,
+      membersReached: 890,
+      lastActivity: "1 hour ago",
+      messagesSent: 5,
+      responsesReceived: 47,
+    },
+  ] as BotPlatformStatus[],
+
+  recentPolls: [
+    {
+      id: "p1",
+      question: "What type of events do you want this month?",
+      platform: "whatsapp" as const,
+      sentAt: "2 hours ago",
+      responseCount: 89,
+      totalReached: 156,
+      responseRate: 57,
+      results: [
+        { option: "Workshop on AI tools", count: 34, percentage: 38 },
+        { option: "Portfolio review night", count: 28, percentage: 31 },
+        { option: "Networking mixer", count: 18, percentage: 20 },
+        { option: "Design systems talk", count: 9, percentage: 10 },
+      ],
+      status: "completed" as const,
+    },
+    {
+      id: "p2",
+      question: "Best day of the week for meetups?",
+      platform: "all" as const,
+      sentAt: "1 day ago",
+      responseCount: 134,
+      totalReached: 312,
+      responseRate: 43,
+      results: [
+        { option: "Thursday", count: 52, percentage: 39 },
+        { option: "Wednesday", count: 38, percentage: 28 },
+        { option: "Tuesday", count: 28, percentage: 21 },
+        { option: "Friday", count: 16, percentage: 12 },
+      ],
+      status: "completed" as const,
+    },
+    {
+      id: "p3",
+      question: "What design tools are you exploring?",
+      platform: "instagram" as const,
+      sentAt: "3 days ago",
+      responseCount: 42,
+      totalReached: 67,
+      responseRate: 63,
+      results: [
+        { option: "Figma AI features", count: 18, percentage: 43 },
+        { option: "Framer", count: 11, percentage: 26 },
+        { option: "Webflow", count: 8, percentage: 19 },
+        { option: "Rive", count: 5, percentage: 12 },
+      ],
+      status: "completed" as const,
+    },
+  ] as BotPoll[],
+
+  memberIntelligence: [
+    {
+      id: "mi1",
+      name: "Sarah Chen",
+      avatar: "SC",
+      source: "whatsapp" as const,
+      interests: ["AI Design", "Design Systems", "Figma"],
+      engagementScore: 92,
+      responsesGiven: 12,
+      lastInteraction: "2 hours ago",
+      readyToOnboard: true,
+    },
+    {
+      id: "mi2",
+      name: "Marcus Rodriguez",
+      avatar: "MR",
+      source: "whatsapp" as const,
+      interests: ["Frontend Dev", "React", "Motion Design"],
+      engagementScore: 85,
+      responsesGiven: 9,
+      lastInteraction: "4 hours ago",
+      readyToOnboard: true,
+    },
+    {
+      id: "mi3",
+      name: "Priya Patel",
+      avatar: "PP",
+      source: "instagram" as const,
+      interests: ["UX Research", "Portfolio", "Career Growth"],
+      engagementScore: 78,
+      responsesGiven: 7,
+      lastInteraction: "1 day ago",
+      readyToOnboard: true,
+    },
+    {
+      id: "mi4",
+      name: "James Wilson",
+      avatar: "JW",
+      source: "whatsapp" as const,
+      interests: ["Startup Design", "Branding", "Freelancing"],
+      engagementScore: 71,
+      responsesGiven: 5,
+      lastInteraction: "2 days ago",
+      readyToOnboard: false,
+    },
+    {
+      id: "mi5",
+      name: "Aisha Khan",
+      avatar: "AK",
+      source: "eventbrite" as const,
+      interests: ["Motion Design", "3D Design", "AR/VR"],
+      engagementScore: 65,
+      responsesGiven: 4,
+      lastInteraction: "3 days ago",
+      readyToOnboard: false,
+    },
+  ] as BotMemberIntelligence[],
+
+  activityTrend: [
+    { date: "Mon", messagesSent: 8, responsesReceived: 42, pollsCreated: 1 },
+    { date: "Tue", messagesSent: 5, responsesReceived: 28, pollsCreated: 0 },
+    { date: "Wed", messagesSent: 12, responsesReceived: 67, pollsCreated: 2 },
+    { date: "Thu", messagesSent: 6, responsesReceived: 34, pollsCreated: 1 },
+    { date: "Fri", messagesSent: 9, responsesReceived: 51, pollsCreated: 1 },
+    { date: "Sat", messagesSent: 4, responsesReceived: 18, pollsCreated: 0 },
+    { date: "Sun", messagesSent: 3, responsesReceived: 12, pollsCreated: 0 },
+  ] as BotActivity[],
+};
+
+// ============= JARVIS CONVERSATIONAL AI TYPES =============
+
+export interface JarvisDataCard {
+  type: "metric" | "members" | "trend" | "comparison";
+  title: string;
+  data: Record<string, any>;
+}
+
+export interface JarvisMessage {
+  id: string;
+  role: "jarvis" | "user";
+  content: string;
+  timestamp: string;
+  dataCards?: JarvisDataCard[];
+}
+
+export interface SuggestedQuestion {
+  id: string;
+  text: string;
+  category: "health" | "engagement" | "members" | "events" | "growth";
+}
+
+// ============= JARVIS CONVERSATIONAL AI DATA =============
+
+export const jarvisData = {
+  welcomeThread: [
+    {
+      id: "j1",
+      role: "jarvis" as const,
+      content:
+        "Hey! I\u2019ve been analyzing Design Circle SF all week. A few things jumped out \u2014 your engagement dipped 12% since last Tuesday, but your event RSVPs are actually up 18%. Want me to dig into what\u2019s happening?",
+      timestamp: "Just now",
+    },
+    {
+      id: "j2",
+      role: "user" as const,
+      content: "Yeah, why did engagement drop?",
+      timestamp: "Just now",
+    },
+    {
+      id: "j3",
+      role: "jarvis" as const,
+      content:
+        "Looks like it\u2019s a posting gap \u2014 your top 3 contributors (Sarah C., Marcus W., Lena K.) all went quiet after the portfolio review event. That event generated 47 posts in 48 hours, then\u2026 crickets. This is actually a common pattern \u2014 high-energy events create a \u2018hangover\u2019 where members feel the bar was set too high for casual posts.",
+      timestamp: "Just now",
+      dataCards: [
+        {
+          type: "members" as const,
+          title: "Top Contributors \u2014 Post Frequency",
+          data: {
+            members: [
+              { name: "Sarah C.", avatar: "SC", before: [8, 12, 15, 11, 14], after: [3, 1, 0, 1, 0] },
+              { name: "Marcus W.", avatar: "MW", before: [6, 9, 7, 10, 8], after: [2, 1, 1, 0, 0] },
+              { name: "Lena K.", avatar: "LK", before: [5, 7, 8, 6, 9], after: [1, 0, 2, 0, 0] },
+            ],
+          },
+        },
+        {
+          type: "trend" as const,
+          title: "Engagement This Week",
+          data: {
+            values: [82, 91, 94, 72, 58, 51, 48],
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            direction: "down" as const,
+          },
+        },
+      ],
+    },
+    {
+      id: "j4",
+      role: "jarvis" as const,
+      content:
+        "My recommendation: Drop a casual prompt in WhatsApp \u2014 something low-stakes like \u2018Show us your desk setup this week.\u2019 It re-opens the door without the pressure of matching that portfolio review energy. I\u2019ve seen this work in 73% of similar communities.",
+      timestamp: "Just now",
+    },
+  ] as JarvisMessage[],
+
+  suggestedQuestions: [
+    { id: "sq1", text: "Who are my most at-risk members right now?", category: "health" as const },
+    { id: "sq2", text: "What type of content gets the most engagement?", category: "engagement" as const },
+    { id: "sq3", text: "How does our retention compare to similar communities?", category: "growth" as const },
+    { id: "sq4", text: "What should I do differently this month?", category: "health" as const },
+    { id: "sq5", text: "Which members should I personally reach out to?", category: "members" as const },
+    { id: "sq6", text: "What\u2019s the best time to post for my community?", category: "engagement" as const },
+  ] as SuggestedQuestion[],
+
+  mockResponses: {
+    sq1: {
+      content:
+        "You have 3 members showing strong churn signals right now. David Park hasn\u2019t engaged in 14 days and missed the last 2 events \u2014 that\u2019s unusual for someone who attended 8 in a row. Nadia Okafor\u2019s posting dropped 80% this month, and Tom Liu stopped responding to polls entirely after being your most active pollster.",
+      dataCards: [
+        {
+          type: "members" as const,
+          title: "At-Risk Members",
+          data: {
+            members: [
+              { name: "David Park", avatar: "DP", stat: "14 days inactive", risk: 82 },
+              { name: "Nadia Okafor", avatar: "NO", stat: "80% post drop", risk: 71 },
+              { name: "Tom Liu", avatar: "TL", stat: "0 poll responses", risk: 65 },
+            ],
+          },
+        },
+        {
+          type: "metric" as const,
+          title: "Community Health Score",
+          data: { value: 74, trend: -3, label: "Health Score" },
+        },
+      ],
+    },
+    sq2: {
+      content:
+        "Your portfolio shares get 3.2x more engagement than any other content type. Members spend an average of 4.2 minutes on portfolio posts vs 0.8 minutes on general discussion. But here\u2019s what\u2019s interesting \u2014 \u2018hot take\u2019 style posts about design tools get the most comments per post, even though they reach fewer people.",
+      dataCards: [
+        {
+          type: "comparison" as const,
+          title: "Engagement by Content Type",
+          data: {
+            items: [
+              { label: "Portfolio shares", value: 89, color: "var(--gold)" },
+              { label: "Hot takes / opinions", value: 72, color: "var(--cream)" },
+              { label: "Event recaps", value: 54, color: "var(--burg-400)" },
+              { label: "General discussion", value: 28, color: "var(--burg-600)" },
+            ],
+          },
+        },
+      ],
+    },
+    sq3: {
+      content:
+        "Your 30-day retention is 68%, which puts you in the top 25% of design communities your size. The average for communities with 150\u2013250 members is 54%. Where you\u2019re falling behind is event-to-member conversion \u2014 you\u2019re at 12% vs the top performers at 28%. People come to events but don\u2019t always stick around in the community afterward.",
+      dataCards: [
+        {
+          type: "comparison" as const,
+          title: "You vs Similar Communities",
+          data: {
+            items: [
+              { label: "30-day retention", yours: 68, avg: 54, unit: "%" },
+              { label: "Weekly active rate", yours: 42, avg: 35, unit: "%" },
+              { label: "Event conversion", yours: 12, avg: 20, unit: "%" },
+              { label: "Post frequency", yours: 8.4, avg: 5.2, unit: "/wk" },
+            ],
+          },
+        },
+      ],
+    },
+    sq4: {
+      content:
+        "Three things I\u2019d change this month: First, your Thursday events consistently outperform other days by 40% \u2014 move your monthly mixer from Wednesday. Second, you\u2019re over-indexing on announcements (60% of posts) and under-indexing on member spotlights \u2014 flip that ratio. Third, start a \u2018Design of the Day\u2019 thread in WhatsApp. Low-effort, high-engagement \u2014 similar communities saw a 25% bump in daily active members.",
+      dataCards: [
+        {
+          type: "trend" as const,
+          title: "Projected Impact",
+          data: {
+            values: [74, 74, 76, 78, 81, 84, 87],
+            labels: ["Now", "Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5", "Wk 6"],
+            direction: "up" as const,
+          },
+        },
+      ],
+    },
+    sq5: {
+      content:
+        "I\u2019d personally reach out to 4 members this week. Sarah Chen has been your top contributor for 3 months \u2014 a quick thank you DM goes a long way. David Park is at-risk (14 days silent) \u2014 a casual check-in could save him. Priya Patel just attended her first event and posted twice \u2014 she\u2019s in the \u2018golden window\u2019 for deep engagement. And Marcus Rodriguez has been sharing your events externally \u2014 he\u2019s a natural ambassador.",
+      dataCards: [
+        {
+          type: "members" as const,
+          title: "Recommended Outreach",
+          data: {
+            members: [
+              { name: "Sarah Chen", avatar: "SC", stat: "Top contributor \u2014 thank her", risk: 0 },
+              { name: "David Park", avatar: "DP", stat: "At-risk \u2014 check in", risk: 82 },
+              { name: "Priya Patel", avatar: "PP", stat: "New & active \u2014 welcome her", risk: 0 },
+              { name: "Marcus Rodriguez", avatar: "MR", stat: "Ambassador \u2014 empower him", risk: 0 },
+            ],
+          },
+        },
+      ],
+    },
+    sq6: {
+      content:
+        "Your community is most active between 10\u201311am and 7\u20139pm PST. Tuesday and Thursday mornings get 2.3x more engagement than other time slots. The worst time? Sunday mornings \u2014 less than 5% of your members are online. For events, Thursday 7pm is your sweet spot (your poll data confirms this too \u2014 39% chose Thursday).",
+      dataCards: [
+        {
+          type: "trend" as const,
+          title: "Activity by Hour (Avg)",
+          data: {
+            values: [5, 8, 22, 45, 78, 92, 85, 62, 38, 25, 48, 71, 88, 95, 82, 55, 30, 12],
+            labels: ["6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"],
+            direction: "up" as const,
+          },
+        },
+      ],
+    },
+  } as Record<string, { content: string; dataCards?: JarvisDataCard[] }>,
+
+  genericResponse: {
+    content:
+      "That\u2019s a great question. Based on your community data, here\u2019s what I\u2019m seeing \u2014 your community has been growing steadily at 8% month-over-month, with strong engagement from your core group. The biggest opportunity I see is converting event attendees into daily active members. Want me to dive deeper into any specific area?",
+    dataCards: [
+      {
+        type: "metric" as const,
+        title: "Community Snapshot",
+        data: { value: 74, trend: 3, label: "Health Score" },
+      },
+      {
+        type: "trend" as const,
+        title: "Growth Trend (6 months)",
+        data: {
+          values: [120, 135, 148, 162, 178, 194],
+          labels: ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
+          direction: "up" as const,
+        },
+      },
+    ],
+  } as { content: string; dataCards?: JarvisDataCard[] },
+};

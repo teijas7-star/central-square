@@ -13,7 +13,8 @@ import { ScreenFollowup } from "@/components/onboarding/screen-followup";
 import { ScreenBuilding } from "@/components/onboarding/screen-building";
 import { ScreenModules } from "@/components/onboarding/screen-modules";
 import { ScreenPreview } from "@/components/onboarding/screen-preview";
-import { ScreenInvite } from "@/components/onboarding/screen-invite";
+import { ScreenBotConnect } from "@/components/onboarding/screen-bot-connect";
+import { ScreenBotPollDemo } from "@/components/onboarding/screen-bot-poll-demo";
 
 type Step =
   | "landing"
@@ -24,7 +25,8 @@ type Step =
   | "building"
   | "modules"
   | "preview"
-  | "invite"
+  | "bot-connect"
+  | "bot-poll-demo"
   | "complete";
 
 const stepOrder: Step[] = [
@@ -36,7 +38,8 @@ const stepOrder: Step[] = [
   "building",
   "modules",
   "preview",
-  "invite",
+  "bot-connect",
+  "bot-poll-demo",
 ];
 
 const stepIndex = (step: Step) => stepOrder.indexOf(step);
@@ -155,12 +158,19 @@ export default function OnboardingPage() {
           {step === "preview" && (
             <ScreenPreview
               onBack={goBack}
-              onContinue={() => goTo("invite")}
+              onContinue={() => goTo("bot-connect")}
             />
           )}
 
-          {step === "invite" && (
-            <ScreenInvite
+          {step === "bot-connect" && (
+            <ScreenBotConnect
+              onBack={goBack}
+              onContinue={() => goTo("bot-poll-demo")}
+            />
+          )}
+
+          {step === "bot-poll-demo" && (
+            <ScreenBotPollDemo
               onBack={goBack}
               onComplete={() => setStep("complete")}
             />
@@ -195,7 +205,7 @@ export default function OnboardingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                welcome to design circle sf!
+                your community is live!
               </motion.h2>
               <motion.p
                 className="text-[var(--burg-300)] text-center mt-2 text-sm font-light"
@@ -203,7 +213,7 @@ export default function OnboardingPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                Your Arcade is live. Let&apos;s make something great together.
+                Your home is ready and AI bots are gathering intelligence.
               </motion.p>
               <motion.button
                 className="mt-8 px-8 py-4 rounded-2xl font-semibold text-[var(--burg-deep)] text-base bg-[var(--cream)] hover:bg-[var(--cream-dark)]"
@@ -213,7 +223,7 @@ export default function OnboardingPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push("/intelligence")}
               >
-                Enter My Arcade
+                Enter Your Community
               </motion.button>
             </div>
           )}

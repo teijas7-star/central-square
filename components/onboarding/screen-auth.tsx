@@ -41,7 +41,7 @@ export function ScreenAuth({ onBack, onAuth }: ScreenAuthProps) {
           let&apos;s get you started
         </h2>
         <p className="text-[var(--burg-300)] mt-2 text-base font-light">
-          Quick sign in so we can save your community.
+          Quick sign in so we can save your progress.
         </p>
       </motion.div>
 

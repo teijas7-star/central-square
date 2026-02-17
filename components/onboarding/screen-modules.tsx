@@ -7,16 +7,15 @@ import {
   MessageSquare,
   Calendar,
   Image,
-  BookOpen,
   BarChart3,
   Users,
-  Compass,
-  ShoppingBag,
   Link2,
   Sparkles,
   Check,
   Plus,
   ChevronRight,
+  Activity,
+  Heart,
 } from "lucide-react";
 import { AIHostAvatar } from "./ai-host-avatar";
 import { AnimatedRootsLogo } from "../CSLogos/animated-logos";
@@ -32,73 +31,73 @@ interface Module {
   name: string;
   desc: string;
   recommended: boolean;
-  category: "core" | "growth" | "integration";
+  category: "core" | "outreach" | "intelligence";
 }
 
 const modules: Module[] = [
   {
-    id: "comms",
-    icon: MessageSquare,
-    name: "Communication",
-    desc: "Announcements, threads, DMs",
+    id: "health",
+    icon: Activity,
+    name: "Community Health",
+    desc: "Health scoring, retention signals",
     recommended: true,
     category: "core",
+  },
+  {
+    id: "sentiment",
+    icon: Heart,
+    name: "Sentiment Analysis",
+    desc: "Conversation tone, satisfaction",
+    recommended: true,
+    category: "core",
+  },
+  {
+    id: "polls",
+    icon: BarChart3,
+    name: "Bot Outreach",
+    desc: "Polls, surveys, Q&A across platforms",
+    recommended: true,
+    category: "outreach",
+  },
+  {
+    id: "dms",
+    icon: MessageSquare,
+    name: "Personalized Messaging",
+    desc: "DMs based on member profiles",
+    recommended: true,
+    category: "outreach",
   },
   {
     id: "events",
     icon: Calendar,
-    name: "Events",
-    desc: "Meetups, RSVPs, reminders",
+    name: "Event Intelligence",
+    desc: "Preferences, optimal timing, RSVPs",
     recommended: true,
-    category: "core",
+    category: "intelligence",
   },
   {
     id: "content",
     icon: Image,
-    name: "Content",
-    desc: "Portfolio showcases, galleries",
+    name: "Content Analysis",
+    desc: "What resonates, engagement patterns",
     recommended: true,
-    category: "core",
+    category: "intelligence",
   },
   {
-    id: "learning",
-    icon: BookOpen,
-    name: "Learning",
-    desc: "Workshops, resources, mentorship",
-    recommended: true,
-    category: "core",
+    id: "sync",
+    icon: Link2,
+    name: "Cross-Platform Sync",
+    desc: "Unified view across all channels",
+    recommended: false,
+    category: "intelligence",
   },
   {
-    id: "members",
+    id: "member-intel",
     icon: Users,
-    name: "Member Directory",
-    desc: "Profiles, skills, connections",
-    recommended: true,
-    category: "core",
-  },
-  {
-    id: "insights",
-    icon: BarChart3,
-    name: "Insights",
-    desc: "Engagement analytics, health scores",
-    recommended: true,
-    category: "growth",
-  },
-  {
-    id: "discovery",
-    icon: Compass,
-    name: "Discovery",
-    desc: "Public page, member acquisition",
+    name: "Member Profiles",
+    desc: "Auto-built profiles from bot data",
     recommended: false,
-    category: "growth",
-  },
-  {
-    id: "commerce",
-    icon: ShoppingBag,
-    name: "Commerce",
-    desc: "Tickets, merch, sponsorships",
-    recommended: false,
-    category: "growth",
+    category: "intelligence",
   },
 ];
 
@@ -229,7 +228,7 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
           <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
         </motion.button>
         <span className="text-sm font-medium text-[var(--cream)]">
-          Modules
+          Your Modules
         </span>
         <div className="w-9" />
       </div>
@@ -255,8 +254,8 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
             </span>
           </div>
           <p className="text-sm text-[var(--burg-300)] font-light">
-            Based on design communities like yours, I&apos;ve pre-selected the modules
-            that work best. You can customize anytime.
+            Based on communities like yours, I&apos;ve pre-selected the modules
+            that will have the most impact. You can customize anytime.
           </p>
         </motion.div>
       </div>
@@ -264,7 +263,7 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
       {/* Modules grid */}
       <div className="flex-1 overflow-y-auto -mx-6 px-6">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Core Modules
+          Intelligence Core
         </h3>
         <div className="grid grid-cols-2 gap-2 mb-6">
           {modules
@@ -273,17 +272,26 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
         </div>
 
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Growth Modules
+          Bot Capabilities
         </h3>
         <div className="grid grid-cols-2 gap-2 mb-6">
           {modules
-            .filter((m) => m.category === "growth")
-            .map((mod, i) => renderModuleCard(mod, i, 0.3))}
+            .filter((m) => m.category === "outreach")
+            .map((mod, i) => renderModuleCard(mod, i, 0.2))}
+        </div>
+
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
+          Data &amp; Analysis
+        </h3>
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {modules
+            .filter((m) => m.category === "intelligence")
+            .map((mod, i) => renderModuleCard(mod, i, 0.4))}
         </div>
 
         {/* Integrations with hover slide-right */}
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Connected Integrations
+          Bot Channels &amp; Integrations
         </h3>
         <div className="space-y-2 mb-4">
           {integrations.map((int) => (
@@ -364,7 +372,7 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
             {activeModules.length}
           </motion.span>
         </AnimatePresence>
-        <span> modules</span>
+        <span> capabilities</span>
       </motion.button>
     </div>
   );

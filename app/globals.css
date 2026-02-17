@@ -14,20 +14,20 @@ body,
 /* ===== CENTRAL SQUARE DESIGN SYSTEM ===== */
 
 :root {
-  /* === Burgundy Palette — "Own Burgundy" === */
-  --burg-deep: #2D1B1E;
-  --burg-900: #3D2327;
-  --burg-800: #4E2D33;
-  --burg-700: #6B3A42;
-  --burg-600: #8C4F5A;
-  --burg-500: #A66572;
-  --burg-400: #C08891;
-  --burg-300: #D4A5AD;
-  --burg-200: #E2C0C7;
-  --cream: #F5EDE0;
-  --cream-dark: #E8DDD0;
-  --gold: #C9A96E;
-  --gold-muted: #A68B55;
+  /* === Futuristic Tech Palette === */
+  --burg-deep: #0A0A0A;
+  --burg-900: #141414;
+  --burg-800: #1E1E1E;
+  --burg-700: #2A2A2A;
+  --burg-600: #444444;
+  --burg-500: #666666;
+  --burg-400: #999999;
+  --burg-300: #B8B8B8;
+  --burg-200: #D4D4D4;
+  --cream: #F0F0F0;
+  --cream-dark: #D4D4D4;
+  --gold: #E86C3A;
+  --gold-muted: #C55A2E;
 
   /* Semantic (unchanged) */
   --cs-success: #22C55E;
@@ -67,8 +67,8 @@ body,
 }
 
 @keyframes ai-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(245, 237, 224, 0.15); }
-  50% { box-shadow: 0 0 40px rgba(245, 237, 224, 0.25), 0 0 20px rgba(201, 169, 110, 0.15); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240, 240, 240, 0.08); }
+  50% { box-shadow: 0 0 40px rgba(240, 240, 240, 0.15), 0 0 20px rgba(232, 108, 58, 0.12); }
 }
 
 @keyframes voice-ring {
@@ -116,4 +116,96 @@ body,
 @supports not (height: 100dvh) {
   .h-screen-safe { height: 100vh; }
   .min-h-screen-safe { min-height: 100vh; }
+}
+
+/* ===== FUTURISTIC TECH — DECORATIVE EFFECTS ===== */
+
+/* ── Constellation / Network Background Pattern ── */
+.intel-constellation-bg {
+  position: relative;
+}
+
+.intel-constellation-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(232, 108, 58, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 85% 75%, rgba(74, 158, 222, 0.03) 0%, transparent 50%);
+}
+
+/* ── Dot Grid Decorative Pattern (right edge) ── */
+.intel-dot-grid::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  background-image: radial-gradient(circle, #666 0.8px, transparent 0.8px);
+  background-size: 16px 16px;
+  mask-image: linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+/* ── Scanning Line Animation ── */
+@keyframes intel-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.intel-scan-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(232, 108, 58, 0.4) 30%,
+    rgba(232, 108, 58, 0.8) 50%,
+    rgba(232, 108, 58, 0.4) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(232, 108, 58, 0.3);
+  animation: intel-scan 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Data Pulse Animation ── */
+@keyframes intel-data-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.animate-data-pulse {
+  animation: intel-data-pulse 4s ease-in-out infinite;
+}
+
+/* ── Glow Effect Utilities ── */
+.intel-glow-orange {
+  box-shadow: 0 0 20px rgba(232, 108, 58, 0.15);
+}
+
+.intel-glow-orange-strong {
+  box-shadow: 0 0 30px rgba(232, 108, 58, 0.25), 0 0 60px rgba(232, 108, 58, 0.08);
 }

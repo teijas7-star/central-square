@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageSquare,
-  Calendar,
-  Users,
   BarChart3,
   Palette,
   Link2,
-  Star,
   Sparkles,
+  Brain,
+  Bot,
+  Activity,
 } from "lucide-react";
 import { AIHostAvatar } from "./ai-host-avatar";
 
@@ -21,43 +21,43 @@ interface ScreenBuildingProps {
 const buildSteps = [
   {
     icon: Palette,
-    label: "Setting up Design Circle SF",
-    detail: "Creating your community identity",
+    label: "Creating your community home",
+    detail: "Design Circle SF — your space, your rules",
   },
   {
-    icon: MessageSquare,
-    label: "Adding Communication module",
-    detail: "Announcements, threads, DMs",
+    icon: Brain,
+    label: "Training AI on your voice",
+    detail: "Learning your tone, language, and style",
   },
   {
-    icon: Calendar,
-    label: "Adding Events module",
-    detail: "Monthly meetups, portfolio reviews",
-  },
-  {
-    icon: Users,
-    label: "Configuring member roles",
-    detail: "Mentors, reviewers, members",
+    icon: Bot,
+    label: "Deploying community bots",
+    detail: "Connecting to WhatsApp, Instagram, Eventbrite",
   },
   {
     icon: Link2,
-    label: "Connecting integrations",
-    detail: "WhatsApp, Instagram, Eventbrite",
+    label: "Setting up cross-platform sync",
+    detail: "One home for all your fragmented tools",
+  },
+  {
+    icon: Activity,
+    label: "Calibrating community health engine",
+    detail: "Sentiment, engagement, retention scoring",
   },
   {
     icon: BarChart3,
-    label: "Enabling insights engine",
-    detail: "Cross-module engagement scoring",
+    label: "Building your dashboard",
+    detail: "Intelligence + community ops in one place",
   },
   {
-    icon: Star,
-    label: "Setting up discovery page",
-    detail: "Help new members find you",
+    icon: MessageSquare,
+    label: "Enabling personalized outreach",
+    detail: "DMs, polls, surveys across platforms",
   },
   {
     icon: Sparkles,
-    label: "Finishing touches",
-    detail: "Your Arcade is almost ready!",
+    label: "Activating your AI partner",
+    detail: "Your community is almost ready!",
   },
 ];
 
@@ -103,7 +103,7 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        building your arcade
+        building your community
       </motion.h2>
       <motion.p
         className="text-sm text-[var(--burg-300)] text-center mb-8 font-light"
@@ -111,7 +111,7 @@ export function ScreenBuilding({ onComplete }: ScreenBuildingProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        Configuring everything based on our conversation
+        Your AI partner is setting everything up
       </motion.p>
 
       {/* Progress bar */}
