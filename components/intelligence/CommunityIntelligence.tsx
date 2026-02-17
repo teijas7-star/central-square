@@ -15,7 +15,7 @@ const tabs = [
   { id: "sponsor", label: "Sponsor", icon: Target },
   { id: "discourse", label: "Discourse", icon: Globe },
   { id: "bots", label: "Bots", icon: Bot },
-  { id: "william", label: "William", icon: MessageSquare },
+  { id: "ellie", label: "Ellie", icon: MessageSquare },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -134,7 +134,7 @@ export function CommunityIntelligence() {
             {activeTab === "sponsor" && <SponsorIntelligence />}
             {activeTab === "discourse" && <DiscourseIntelligence />}
             {activeTab === "bots" && <BotCommandCenter />}
-            {activeTab === "william" && <JarvisChat />}
+            {activeTab === "ellie" && <JarvisChat />}
           </motion.div>
         </AnimatePresence>
       </div>

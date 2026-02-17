@@ -34,7 +34,7 @@ export async function getOrCreateAIHost(userId: string, userName: string) {
     aiHost = await prisma.aIHost.create({
       data: {
         userId,
-        name: `${userName}'s AI Host`,
+        name: "Ellie",
       },
     });
   }
@@ -69,9 +69,9 @@ function generateMockAIResponse(
   // First message - greeting
   if (messageCount === 1) {
     const greetings = [
-      `👋 Hello! I'm your AI Host, and I'm here to help you discover communities on Central Square. ${userProfile ? `Nice to meet you, ${userProfile.name}! ` : ""}What are you interested in? What topics or communities would you like to explore?`,
-      `Hey there! ${userProfile ? `I'm ${userProfile.name}'s AI Host, ` : ""}I'm here to help you find amazing communities that match your interests. What brings you to Central Square today?`,
-      `Welcome! ${userProfile ? `${userProfile.name}, ` : ""}I'm your AI Host and I'd love to help you discover communities. What are you passionate about?`,
+      `👋 Hello! I'm Ellie, and I'm here to help you discover communities on Central Square. ${userProfile ? `Nice to meet you, ${userProfile.name}! ` : ""}What are you interested in? What topics or communities would you like to explore?`,
+      `Hey there! ${userProfile ? `${userProfile.name}, I'm Ellie! ` : "I'm Ellie! "}I'm here to help you find amazing communities that match your interests. What brings you to Central Square today?`,
+      `Welcome! ${userProfile ? `${userProfile.name}, ` : ""}I'm Ellie and I'd love to help you discover communities. What are you passionate about?`,
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
@@ -182,7 +182,7 @@ export async function generateAIResponse(
     return generateMockAIResponse(messages, userProfile);
   }
 
-  const systemPrompt = `You are an AI Host helping users discover communities on Central Square, a platform that connects people in meaningful ways.
+  const systemPrompt = `You are Ellie, an AI Host helping users discover communities on Central Square, a platform that connects people in meaningful ways.
 
 Your role:
 - Have friendly, natural conversations with users

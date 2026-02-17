@@ -297,7 +297,7 @@ function AIChatMockup() {
         <div style={{ width: 24, height: 24, borderRadius: 12, background: `${T.orange}20`, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 10, height: 10, borderRadius: 5, background: T.orange }} />
         </div>
-        <span style={{ fontSize: 12, color: T.textPrimary, fontWeight: 500 }}>William</span>
+        <span style={{ fontSize: 12, color: T.textPrimary, fontWeight: 500 }}>Ellie</span>
         <span style={{ fontSize: 10, color: T.green, marginLeft: "auto" }}>&#9679; Online</span>
       </div>
 
@@ -328,7 +328,7 @@ function AIChatMockup() {
           maxWidth: "85%",
           animation: "partnerSlideRight 0.5s ease 0.8s both",
         }}>
-          <div style={{ fontSize: 10, color: T.orange, fontWeight: 600, marginBottom: 4 }}>William</div>
+          <div style={{ fontSize: 10, color: T.orange, fontWeight: 600, marginBottom: 4 }}>Ellie</div>
           <div style={{ fontSize: 12, color: "#D1D5DB", lineHeight: 1.5 }}>
             Setting up your Arcade with event management, member directory, and sponsor matching for design-focused brands.
           </div>
@@ -344,7 +344,7 @@ function AIChatMockup() {
           maxWidth: "85%",
           animation: "partnerSlideRight 0.5s ease 1.3s both",
         }}>
-          <div style={{ fontSize: 10, color: T.orange, fontWeight: 600, marginBottom: 4 }}>William</div>
+          <div style={{ fontSize: 10, color: T.orange, fontWeight: 600, marginBottom: 4 }}>Ellie</div>
           <div style={{ fontSize: 12, color: "#D1D5DB", lineHeight: 1.5 }}>
             Deploying agents to your WhatsApp group and Instagram now&hellip; Your Arcade will be live in 30 seconds.
           </div>
@@ -559,7 +559,7 @@ export default function PartnerPage() {
             {/* Feature cards */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { title: "AI-Powered Onboarding", desc: "Describe your community in 60 seconds. William configures everything.", icon: "&#9889;", color: T.orange },
+                { title: "AI-Powered Onboarding", desc: "Describe your community in 60 seconds. Ellie configures everything.", icon: "&#9889;", color: T.orange },
                 { title: "Cross-Platform Agents", desc: "Deploy to WhatsApp, Instagram, Eventbrite. Zero migration.", icon: "&#9883;", color: T.blue },
                 { title: "Community Intelligence", desc: "Health scoring, engagement patterns, churn prediction.", icon: "&#9733;", color: T.green },
                 { title: "Sponsor Matching", desc: "Automated brand-community fit. Real ROI metrics.", icon: "&#9830;", color: T.purple },

@@ -8,7 +8,7 @@
 
 ## What Central Square Is
 
-A B2B2C community operations platform. Think "Shopify for real-world communities" — community operators (run clubs, design circles, professional networks) get a unified hub instead of stitching together 6+ tools. An AI host called William helps with onboarding, intelligence, and coaching.
+A B2B2C community operations platform. Think "Shopify for real-world communities" — community operators (run clubs, design circles, professional networks) get a unified hub instead of stitching together 6+ tools. An AI host called Ellie helps with onboarding, intelligence, and coaching.
 
 **Live URL:** https://central-square.vercel.app
 **Repo:** https://github.com/teijas7-star/central-square
@@ -46,7 +46,7 @@ A B2B2C community operations platform. Think "Shopify for real-world communities
 - **Invites:** Token-based invite system with expiration for private arcades.
 - **Moderation:** Report posts, soft-delete, banned-word filter.
 
-### AI Host — William (PARTIAL)
+### AI Host — Ellie (PARTIAL)
 - **Chat interface:** Full conversation UI, messages persisted to DB.
 - **Preference learning:** After 4+ messages, extracts user interests/values/goals from conversation.
 - **Recommendations:** Matches user preferences to arcades using tag-overlap algorithm, returns top 5 with confidence scores.
@@ -212,7 +212,7 @@ SUPABASE_SERVICE_ROLE_KEY = For admin operations
 
 1. **Get env vars on Vercel** — 5 min, just pasting values into dashboard
 2. **Verify core flows on production** — sign in, create arcade, post, AI host
-3. **Add OpenAI API key** — enables real William AI responses
+3. **Add OpenAI API key** — enables real Ellie AI responses
 4. **Onboard 3-5 design partners** — test with real communities using the `/partner` page as intro
 
 ## Medium-Term (where help would be huge)

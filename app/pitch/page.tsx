@@ -418,7 +418,7 @@ function Slide05({ n, total }: { n: number; total: number }) {
           <div style={{ flex: 1, position: "relative", zIndex: 2 }}>
             <div style={{ background: "linear-gradient(90deg, #0a0a0a 60%, transparent)", position: "relative", zIndex: 1 }}>
               {[
-                { num: "01", label: "Describe your community to William" },
+                { num: "01", label: "Describe your community to Ellie" },
                 { num: "02", label: "AI generates your Arcade configuration" },
                 { num: "03", label: "Sponsor matching runs automatically" },
                 { num: "04", label: "Go live with full intelligence stack" },
@@ -444,7 +444,7 @@ function Slide05({ n, total }: { n: number; total: number }) {
               </div>
               {/* AI transcription */}
               <div style={{ background: `${T.orange}08`, border: `1px solid ${T.orange}20`, borderRadius: 8, padding: "12px 16px" }}>
-                <span style={{ fontSize: 11, color: T.orange }}>William AI</span>
+                <span style={{ fontSize: 11, color: T.orange }}>Ellie AI</span>
                 <div style={{ fontSize: 13, color: T.textSecondary, marginTop: 4 }}>Setting up &ldquo;SF Design Collective&rdquo; with event management, member directory, and sponsor matching...</div>
               </div>
               {/* Sponsor matching */}
@@ -833,7 +833,7 @@ function Slide15({ n, total }: { n: number; total: number }) {
         </h2>
         <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 8, height: 8, borderRadius: 4, background: T.orange }} />
-          <span style={{ fontSize: 13, color: T.textSecondary }}>Powered by <strong style={{ color: T.orange }}>William</strong> — our proprietary AI engine that turns every community interaction into actionable intelligence</span>
+          <span style={{ fontSize: 13, color: T.textSecondary }}>Powered by <strong style={{ color: T.orange }}>Ellie</strong> — our proprietary AI engine that turns every community interaction into actionable intelligence</span>
         </div>
         <div style={{ display: "flex", gap: 16, width: "100%" }}>
           {[
@@ -876,12 +876,12 @@ function Slide16({ n, total }: { n: number; total: number }) {
           <div style={{ flex: 1 }}>
             <BulletList items={[
               "60-second setup — talk, don't fill forms",
-              "William understands your community type and deploys instantly",
+              "Ellie understands your community type and deploys instantly",
               "AI agents configure channels, onboarding flows, and analytics automatically",
             ]} />
             <div style={{ marginTop: 24, background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "16px 20px" }}>
               <div style={{ fontSize: 12, color: T.orange, marginBottom: 8 }}>KEY INSIGHT</div>
-              <div style={{ fontSize: 14, color: T.textSecondary, fontStyle: "italic" }}>&ldquo;Zero configuration required. Describe your community and William handles the rest.&rdquo;</div>
+              <div style={{ fontSize: 14, color: T.textSecondary, fontStyle: "italic" }}>&ldquo;Zero configuration required. Describe your community and Ellie handles the rest.&rdquo;</div>
             </div>
           </div>
           <div style={{ flex: 1 }}>
@@ -892,7 +892,7 @@ function Slide16({ n, total }: { n: number; total: number }) {
                 { from: "ai", text: "Deploying AI agents to your WhatsApp group and Instagram now... Your Arcade will be live in 30 seconds." },
               ].map((msg, i) => (
                 <div key={i} style={{ background: msg.from === "ai" ? `${T.orange}10` : "#222", border: `1px solid ${msg.from === "ai" ? `${T.orange}30` : T.border}`, borderRadius: 8, padding: "12px 16px", fontSize: 13, color: msg.from === "ai" ? T.textPrimary : T.textSecondary, alignSelf: msg.from === "user" ? "flex-end" : "flex-start", maxWidth: "90%" }}>
-                  {msg.from === "ai" && <span style={{ fontSize: 11, color: T.orange, display: "block", marginBottom: 4 }}>William</span>}
+                  {msg.from === "ai" && <span style={{ fontSize: 11, color: T.orange, display: "block", marginBottom: 4 }}>Ellie</span>}
                   {msg.text}
                 </div>
               ))}
@@ -950,7 +950,7 @@ function Slide18({ n, total }: { n: number; total: number }) {
           {[
             { phase: "Day 1", title: "Deploy", desc: "AI agents go live on WhatsApp, Instagram, Eventbrite — zero migration required", color: T.orange },
             { phase: "Week 1", title: "Collect 312 data points", desc: "Member interactions, event RSVPs, content engagement all captured automatically", color: T.blue },
-            { phase: "Month 1", title: "Intelligence", desc: "William generates first actionable insights: churn risks, growth opportunities, sponsor matches", color: T.green },
+            { phase: "Month 1", title: "Intelligence", desc: "Ellie generates first actionable insights: churn risks, growth opportunities, sponsor matches", color: T.green },
             { phase: "Month 3+", title: "Full Flywheel", desc: "Compounding intelligence, automated operations, predictive community management", color: T.purple },
           ].map((step, i) => (
             <div key={i} style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
@@ -998,7 +998,7 @@ function Slide19({ n, total }: { n: number; total: number }) {
           <div style={{ display: "flex", gap: 16 }}>
             {[
               { num: "04", name: "Bot Intelligence", desc: "Autonomous AI agents across WhatsApp, Instagram, and events — collecting data and executing tasks 24/7", color: T.purple },
-              { num: "05", name: "William AI Coach", desc: "Proactive recommendations, automated execution, pattern recognition across all community interactions", color: T.amber },
+              { num: "05", name: "Ellie AI Coach", desc: "Proactive recommendations, automated execution, pattern recognition across all community interactions", color: T.amber },
             ].map((p, i) => (
               <div key={i} style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderLeft: `3px solid ${p.color}`, borderRadius: 8, padding: "24px 20px" }}>
                 <div style={{ fontSize: 32, fontWeight: 200, color: p.color, marginBottom: 8, fontFamily: "var(--font-serif)" }}>{p.num}</div>

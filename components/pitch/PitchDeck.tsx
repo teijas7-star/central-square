@@ -431,7 +431,7 @@ function Slide4_Solution() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.65 }}
         >
-          William — AI Community Intelligence
+          Ellie — AI Community Intelligence
         </motion.span>
         <PitchCard borderColor="var(--gold)" delay={0.7} className="w-full text-left">
           <div className="flex items-center gap-3">
@@ -567,7 +567,7 @@ function Slide7_Onboarding() {
               }`}
             >
               {m.role === "ai" && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--gold)] block mb-1">William</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--gold)] block mb-1">Ellie</span>
               )}
               {m.text}
             </div>
@@ -674,7 +674,7 @@ function Slide9_Dashboard() {
   );
 }
 
-function Slide10_William() {
+function Slide10_Ellie() {
   const msgs = [
     { role: "ai", text: "Your engagement dipped 12% since last Tuesday, but event RSVPs are actually up 18%. Want me to dig into what\u2019s happening?" },
     { role: "user", text: "Yeah, why did engagement drop?" },
@@ -684,7 +684,7 @@ function Slide10_William() {
   return (
     <div className="flex flex-col items-center text-center h-full justify-center">
       <SlideLabel>product</SlideLabel>
-      <SlideTitle>william — your AI community coach</SlideTitle>
+      <SlideTitle>ellie — your AI community coach</SlideTitle>
       <div className="flex flex-col gap-2.5 max-w-md w-full mt-6">
         {msgs.map((m, i) => (
           <motion.div
@@ -702,7 +702,7 @@ function Slide10_William() {
               }`}
             >
               {m.role === "ai" && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--gold)] block mb-1">William</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--gold)] block mb-1">Ellie</span>
               )}
               {m.text}
             </div>
@@ -818,7 +818,7 @@ function Slide13_Pillars() {
     { n: 2, icon: Target, name: "Sponsor Intelligence", desc: "ROI tracking, conversion funnels, revenue attribution", color: "#4A9EDE" },
     { n: 3, icon: Globe, name: "Discourse Intelligence", desc: "Sentiment analysis, trending topics, cross-community trends", color: "#22C55E" },
     { n: 4, icon: Bot, name: "Bot Command Center", desc: "Multi-platform AI agents, poll deployment, member intelligence", color: "#8B5CF6" },
-    { n: 5, icon: MessageSquare, name: "William AI Coach", desc: "Conversational AI that tells operators what to do, not just what happened", color: "var(--gold)" },
+    { n: 5, icon: MessageSquare, name: "Ellie AI Coach", desc: "Conversational AI that tells operators what to do, not just what happened", color: "var(--gold)" },
   ];
   return (
     <div className="flex flex-col items-center text-center h-full justify-center">
@@ -1258,7 +1258,7 @@ const slides = [
   Slide7_Onboarding,
   Slide8_BotDeploy,
   Slide9_Dashboard,
-  Slide10_William,
+  Slide10_Ellie,
   Slide11_ColdStart,
   Slide12_Flywheel,
   Slide13_Pillars,

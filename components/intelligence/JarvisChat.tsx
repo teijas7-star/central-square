@@ -41,7 +41,7 @@ function TypingIndicator() {
       <div className="bg-[var(--burg-900)] border border-[var(--burg-800)] rounded-2xl rounded-tl-sm px-4 py-3">
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--gold)] block mb-1">
-            William
+            Ellie
           </span>
         </div>
         <div className="flex gap-1 pt-1">
@@ -348,7 +348,7 @@ function MessageBubble({ message }: { message: JarvisMessage }) {
             isJarvis ? "text-[var(--gold)]" : "text-[var(--burg-700)]"
           }`}
         >
-          {isJarvis ? "William" : "You"}
+          {isJarvis ? "Ellie" : "You"}
         </span>
 
         {/* Message text */}
@@ -402,7 +402,7 @@ function QuestionPill({
 }
 
 /* ══════════════════════════════════════════════════
-   MAIN EXPORT: WilliamChat
+   MAIN EXPORT: EllieChat
    ══════════════════════════════════════════════════ */
 
 export function JarvisChat() {
@@ -516,7 +516,7 @@ export function JarvisChat() {
 
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 180px)" }}>
-      {/* William Header */}
+      {/* Ellie Header */}
       <motion.div
         className="flex items-center gap-3 pb-4 mb-2"
         initial={{ opacity: 0, y: -10 }}
