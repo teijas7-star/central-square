@@ -213,7 +213,7 @@ export default function OnboardingPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                Your home is ready and AI bots are gathering intelligence.
+                Your home is ready and integrations are gathering intelligence.
               </motion.p>
               <motion.button
                 className="mt-8 px-8 py-4 rounded-2xl font-semibold text-[var(--burg-deep)] text-base bg-[var(--cream)] hover:bg-[var(--cream-dark)]"

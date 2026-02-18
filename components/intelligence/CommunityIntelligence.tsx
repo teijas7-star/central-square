@@ -14,7 +14,7 @@ const tabs = [
   { id: "operator", label: "Operator", icon: Activity },
   { id: "sponsor", label: "Sponsor", icon: Target },
   { id: "discourse", label: "Discourse", icon: Globe },
-  { id: "bots", label: "Bots", icon: Bot },
+  { id: "integrations", label: "Integrations", icon: Bot },
   { id: "ellie", label: "Ellie", icon: MessageSquare },
 ] as const;
 
@@ -133,7 +133,7 @@ export function CommunityIntelligence() {
             {activeTab === "operator" && <OperatorIntelligence />}
             {activeTab === "sponsor" && <SponsorIntelligence />}
             {activeTab === "discourse" && <DiscourseIntelligence />}
-            {activeTab === "bots" && <BotCommandCenter />}
+            {activeTab === "integrations" && <BotCommandCenter />}
             {activeTab === "ellie" && <JarvisChat />}
           </motion.div>
         </AnimatePresence>

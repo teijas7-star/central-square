@@ -441,7 +441,7 @@ export interface BotActivity {
 
 export const botCommandData = {
   summaryStats: {
-    activeBots: { value: 3, trend: 2, label: "Active Bots" },
+    activeBots: { value: 3, trend: 2, label: "Active Integrations" },
     questionsSent: { value: 47, trend: 12, label: "Questions Sent" },
     responsesCollected: { value: 312, trend: 34, label: "Responses" },
     avgResponseRate: { value: 87, trend: 5, label: "Response Rate" },

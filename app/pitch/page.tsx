@@ -997,7 +997,7 @@ function Slide19({ n, total }: { n: number; total: number }) {
           {/* Row 2: 2 cards */}
           <div style={{ display: "flex", gap: 16 }}>
             {[
-              { num: "04", name: "Bot Intelligence", desc: "Autonomous AI agents across WhatsApp, Instagram, and events — collecting data and executing tasks 24/7", color: T.purple },
+              { num: "04", name: "Integration Intelligence", desc: "Autonomous AI agents across WhatsApp, Instagram, and events — collecting data and executing tasks 24/7", color: T.purple },
               { num: "05", name: "Ellie AI Coach", desc: "Proactive recommendations, automated execution, pattern recognition across all community interactions", color: T.amber },
             ].map((p, i) => (
               <div key={i} style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderLeft: `3px solid ${p.color}`, borderRadius: 8, padding: "24px 20px" }}>

@@ -241,7 +241,7 @@ export function ScreenBotPollDemo({
           <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
         </motion.button>
         <span className="text-sm font-medium text-[var(--cream)]">
-          Bot Demo
+          Live Demo
         </span>
         <motion.button
           onClick={onComplete}
@@ -289,7 +289,7 @@ export function ScreenBotPollDemo({
                     </span>
                   </div>
                   <p className="text-sm text-[var(--burg-300)] font-light">
-                    Ask your community a question! Watch the bot gather
+                    Ask your community a question! Watch us gather
                     responses and turn them into intelligence.
                   </p>
                 </motion.div>
@@ -364,10 +364,10 @@ export function ScreenBotPollDemo({
 
               {/* Chat mock */}
               <div className="bg-[var(--burg-900)] border border-[var(--burg-800)] rounded-2xl p-4 space-y-3 min-h-[200px]">
-                {/* Bot message */}
+                {/* CS message */}
                 <ChatBubble
-                  name="CS Bot"
-                  avatar="🤖"
+                  name="Central Square"
+                  avatar="CS"
                   text={`📊 Poll from Design Circle SF:\n"${question}"\n\nReply with your preference!`}
                   isBot
                   index={0}

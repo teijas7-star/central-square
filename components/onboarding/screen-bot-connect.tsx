@@ -34,7 +34,7 @@ const platforms: Platform[] = [
     icon: MessageSquare,
     emoji: "💬",
     placeholder: "Paste group invite link...",
-    actionLabel: "Deploy Bot",
+    actionLabel: "Connect",
   },
   {
     id: "instagram",
@@ -58,7 +58,7 @@ type DeployPhase = "idle" | "connecting" | "deploying" | "live";
 
 const deploySteps: Record<string, string> = {
   connecting: "Connecting...",
-  deploying: "Deploying bot...",
+  deploying: "Setting up integration...",
   live: "Live!",
 };
 
@@ -160,7 +160,7 @@ function PlatformCard({
               {platform.name}
             </span>
             {isDeployed && (
-              <span className="text-[10px] text-emerald-400">Bot deployed</span>
+              <span className="text-[10px] text-emerald-400">Connected</span>
             )}
           </div>
         </div>
@@ -260,7 +260,7 @@ export function ScreenBotConnect({ onBack, onContinue }: ScreenBotConnectProps) 
           <ArrowLeft className="w-5 h-5 text-[var(--burg-400)]" />
         </motion.button>
         <span className="text-sm font-medium text-[var(--cream)]">
-          Bot Connect
+          Connect Channels
         </span>
         <motion.button
           onClick={onContinue}
@@ -288,11 +288,11 @@ export function ScreenBotConnect({ onBack, onContinue }: ScreenBotConnectProps) 
           <div className="flex items-center gap-1.5 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-[var(--gold)]" />
             <span className="text-xs font-semibold text-[var(--gold)]">
-              Bot Intelligence
+              Channel Intelligence
             </span>
           </div>
           <p className="text-sm text-[var(--burg-300)] font-light">
-            Let&apos;s deploy your community bots. They&apos;ll gather intelligence
+            Let&apos;s connect your community channels. They&apos;ll gather intelligence
             from your existing channels — no need for members to switch platforms.
           </p>
         </motion.div>
@@ -301,7 +301,7 @@ export function ScreenBotConnect({ onBack, onContinue }: ScreenBotConnectProps) 
       {/* Platform cards */}
       <div className="flex-1 overflow-y-auto -mx-6 px-6">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Deploy Bots
+          Connect Channels
         </h3>
         <div className="space-y-3">
           {platforms.map((platform, i) => (
@@ -338,7 +338,7 @@ export function ScreenBotConnect({ onBack, onContinue }: ScreenBotConnectProps) 
             {deployedPlatforms.length}
           </motion.span>
         </AnimatePresence>
-        <span> bots</span>
+        <span> integrations</span>
       </motion.button>
     </div>
   );

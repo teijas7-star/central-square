@@ -54,7 +54,7 @@ const modules: Module[] = [
   {
     id: "polls",
     icon: BarChart3,
-    name: "Bot Outreach",
+    name: "Outreach",
     desc: "Polls, surveys, Q&A across platforms",
     recommended: true,
     category: "outreach",
@@ -95,7 +95,7 @@ const modules: Module[] = [
     id: "member-intel",
     icon: Users,
     name: "Member Profiles",
-    desc: "Auto-built profiles from bot data",
+    desc: "Auto-built profiles from integration data",
     recommended: false,
     category: "intelligence",
   },
@@ -272,7 +272,7 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
         </div>
 
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Bot Capabilities
+          Outreach Capabilities
         </h3>
         <div className="grid grid-cols-2 gap-2 mb-6">
           {modules
@@ -291,7 +291,7 @@ export function ScreenModules({ onBack, onContinue }: ScreenModulesProps) {
 
         {/* Integrations with hover slide-right */}
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)] mb-3">
-          Bot Channels &amp; Integrations
+          Connected Channels &amp; Integrations
         </h3>
         <div className="space-y-2 mb-4">
           {integrations.map((int) => (

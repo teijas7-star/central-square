@@ -404,7 +404,7 @@ export function BotCommandCenter() {
 
       {/* Row 2: Platform Status */}
       <IntelligenceCard delay={0.15}>
-        <SectionHeader title="Platform Status" subtitle="Connected bot channels" delay={0.2} />
+        <SectionHeader title="Platform Status" subtitle="Connected channels" delay={0.2} />
         <div className="space-y-2">
           {botCommandData.platformStatus.map((p, i) => (
             <PlatformStatusCard key={p.id} platform={p} index={i} />

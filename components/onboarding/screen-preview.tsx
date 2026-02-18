@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
   ArrowLeft,
-  Bot,
+  Link,
   Activity,
   BarChart3,
   MessageSquare,
@@ -143,7 +143,7 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
 
   const tabs = [
     { icon: Activity, label: "Health", active: true },
-    { icon: Bot, label: "Bots", active: false },
+    { icon: Link, label: "Integrations", active: false },
     { icon: BarChart3, label: "Insights", active: false },
     { icon: MessageSquare, label: "Outreach", active: false },
     { icon: Settings, label: "Settings", active: false },
@@ -183,7 +183,7 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
               </span>
             </div>
             <p className="text-sm text-[var(--burg-300)] font-light">
-              Here&apos;s your Control Center. Once bots deploy, data flows in
+              Here&apos;s your Control Center. Once integrations connect, data flows in
               and these charts come alive.
             </p>
           </div>
@@ -227,14 +227,14 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
               Your AI partner is ready
             </span>
             <p className="text-sm font-semibold mt-1">
-              Deploy bots to start gathering intelligence
+              Connect integrations to start gathering intelligence
             </p>
           </div>
 
-          {/* Quick actions — bot-oriented */}
+          {/* Quick actions */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: Bot, label: "Deploy" },
+              { icon: Link, label: "Connect" },
               { icon: BarChart3, label: "Poll" },
               { icon: MessageSquare, label: "Message" },
               { icon: Activity, label: "Health" },
@@ -271,15 +271,15 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
             </div>
             <EmptyHealthRing />
             <p className="text-[10px] text-[var(--burg-500)] text-center">
-              Deploy bots to start scoring
+              Connect integrations to start scoring
             </p>
           </div>
 
-          {/* Bot Activity (empty state) */}
+          {/* Integration Activity (empty state) */}
           <div className="p-3 rounded-xl border border-[var(--burg-800)] overflow-hidden relative">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-[var(--gold)] uppercase tracking-wider">
-                Bot Activity
+                Integration Activity
               </span>
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -382,7 +382,7 @@ export function ScreenPreview({ onBack, onContinue }: ScreenPreviewProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          Looks great — let&apos;s deploy your bots!
+          Looks great — let&apos;s connect your integrations!
         </motion.button>
       </div>
     </div>

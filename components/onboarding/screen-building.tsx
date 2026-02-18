@@ -9,7 +9,7 @@ import {
   Link2,
   Sparkles,
   Brain,
-  Bot,
+  Link,
   Activity,
 } from "lucide-react";
 import { AIHostAvatar } from "./ai-host-avatar";
@@ -30,9 +30,9 @@ const buildSteps = [
     detail: "Learning your tone, language, and style",
   },
   {
-    icon: Bot,
-    label: "Deploying community bots",
-    detail: "Connecting to WhatsApp, Instagram, Eventbrite",
+    icon: Link,
+    label: "Connecting integrations",
+    detail: "Linking WhatsApp, Instagram, Eventbrite",
   },
   {
     icon: Link2,

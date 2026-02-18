@@ -29,7 +29,7 @@ const transcriptLines = [
   },
   {
     speaker: "ai",
-    text: "Perfect \u2014 I'll build your home on Central Square and deploy AI bots across those channels. Best of both worlds.",
+    text: "Perfect \u2014 I'll build your home on Central Square and connect your existing channels as integrations. Best of both worlds.",
   },
 ];
 

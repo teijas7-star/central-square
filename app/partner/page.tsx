@@ -361,7 +361,7 @@ function AIChatMockup() {
 /* ─────────────────────────── FLYWHEEL DIAGRAM ─────────────────────────── */
 function FlywheelDiagram() {
   const steps = [
-    { label: "Bots collect", sub: "WhatsApp, IG, Eventbrite", color: T.orange, angle: 0 },
+    { label: "Integrations collect", sub: "WhatsApp, IG, Eventbrite", color: T.orange, angle: 0 },
     { label: "AI insights", sub: "patterns & predictions", color: T.blue, angle: 90 },
     { label: "Operators act", sub: "events, outreach, content", color: T.green, angle: 180 },
     { label: "Better outcomes", sub: "retention & growth", color: T.purple, angle: 270 },

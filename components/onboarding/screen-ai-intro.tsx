@@ -96,7 +96,7 @@ export function ScreenAIIntro({ onBack, onContinue }: ScreenAIIntroProps) {
     {
       icon: MessageSquare,
       title: "Smart suggestions",
-      desc: "I'll recommend modules and deploy AI bots based on your community",
+      desc: "I'll recommend modules and set up integrations based on your community",
     },
     {
       icon: BarChart3,
