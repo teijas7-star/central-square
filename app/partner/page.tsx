@@ -361,7 +361,7 @@ function AIChatMockup() {
 /* ─────────────────────────── FLYWHEEL DIAGRAM ─────────────────────────── */
 function FlywheelDiagram() {
   const steps = [
-    { label: "Integrations collect", sub: "WhatsApp, IG, Eventbrite", color: T.orange, angle: 0 },
+    { label: "AI Agents collect", sub: "WhatsApp, IG, Eventbrite", color: T.orange, angle: 0 },
     { label: "AI insights", sub: "patterns & predictions", color: T.blue, angle: 90 },
     { label: "Operators act", sub: "events, outreach, content", color: T.green, angle: 180 },
     { label: "Better outcomes", sub: "retention & growth", color: T.purple, angle: 270 },
@@ -600,7 +600,7 @@ export default function PartnerPage() {
             fontSize: 36, fontWeight: 400, lineHeight: 1.15, color: T.textPrimary,
             margin: 0, marginBottom: 32, textTransform: "lowercase" as const,
           }}>
-            describe your community. william handles the rest.
+            describe your community. ellie handles the rest.
           </h2>
 
           <div style={{ display: "flex", gap: 32 }}>
