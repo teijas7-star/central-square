@@ -512,4 +512,102 @@ All intelligence screens share this structure:
 
 ---
 
-*Each prompt creates one screen. Paste them into Figma Make in order. The onboarding flow is 11 mobile screens (390×844), plus 5 desktop intelligence dashboard screens (1280×900) — one for each tab.*
+## DISCORD AGENT — OPERATOR DASHBOARD
+
+This screen shows the operator's view for managing a Discord integration. It redesigns Nick's functional prototype into the Central Square design system.
+
+---
+
+### Screen 17: Discord Agent — Operator Dashboard
+
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
+>
+> **Left sidebar (260px wide, fixed, dark #111111, border-right 1px #333):**
+>
+> Top: "WORKSPACE" label (grey uppercase, small, 10px, tracking-widest) + green status dot on the right.
+>
+> Below: "Communities" heading in cream (18px, bold).
+>
+> Community list — 2 stacked cards:
+> 1. "Design Circle SF" — "#1 · ADMIN" badge in grey below — card has light left border (orange) indicating active/selected
+> 2. "Indie Music LA" — "#2 · ADMIN" badge — inactive, no border highlight
+> Each card: dark #1A1A1A, rounded 12px, padding, hover: border lightens.
+>
+> Divider line (#333).
+>
+> "NEW COMMUNITY" label (grey uppercase, small).
+> Input field: placeholder "Community name" (dark bg, lighter border). Below it: full-width orange (#E86C3A) button "Create Community" with rounded corners.
+>
+> Divider line (#333).
+>
+> 2 navigation buttons stacked (dark cards, full-width):
+> - "Onboarding Demo" with play icon
+> - "Intelligence Hub" with activity icon
+>
+> ---
+>
+> **Main content area (right of sidebar, full remaining width):**
+>
+> **Row 1 — Stats bar (4-column grid, full-width):**
+> 4 metric cards, each dark #1A1A1A with 1px #333 border:
+> 1. "MESSAGES · 30D" (orange uppercase label, 10px) → large "847" (cream, 28px bold)
+> 2. "ACTIVE SENDERS · 30D" → "156"
+> 3. "POLLS SENT · 30D" → "12"
+> 4. "LINKED SERVERS" → "1" + green status dot
+>
+> **Row 2 — Two-column layout:**
+>
+> **Left column (55% width):**
+>
+> **Card 1: Link Discord Server**
+> Dark card, title "Link Discord Server" in cream (18px bold). Subtitle: "Authorize the bot in Discord. The selected server will be linked automatically." in grey.
+>
+> Below: Orange outlined button "Authorize Bot & Link Server" with Discord logo icon on left.
+>
+> Subtitle below button: "This flow links only the server you pick during Discord authorization." in muted grey (12px).
+>
+> **Connected server card** (nested, darker #141414, rounded):
+> Discord logo (small, grey) → "Design Circle SF" server name in cream (bold) → server ID "145776800599481..." in muted grey below. Green "● Connected" badge on the right.
+>
+> **Card 2: Send Discord Poll**
+> Dark card, title "Send Discord Poll" in cream (18px bold). Subtitle: "Send to one linked server channel. Votes are captured from reaction activity." in grey.
+>
+> Form fields stacked:
+> 1. Select dropdown: server name "Design Circle SF" with chevron-down → dark bg, lighter border
+> 2. Select dropdown: channel "#general" with chevron-down + "Reload" button (small, outlined) on the right
+> 3. Text input: placeholder "Poll question" → dark bg, lighter border
+> 4. Textarea: "Yes\nNo" (default options, one per line) → dark bg, lighter border, taller (80px)
+> 5. Small preview text: "Options preview: Yes · No" in muted grey
+> 6. Full-width orange (#E86C3A) button "Queue Poll" with send icon
+>
+> **Right column (45% width):**
+>
+> **Card 3: Intelligence Snapshot**
+> Dark card, title "Intelligence Snapshot" in cream (18px bold). Right side: outlined button "Run Analysis" in cream text.
+>
+> "LATEST" label (orange uppercase, 10px).
+>
+> Content: Either analysis results OR empty state:
+> - **Empty state:** "No snapshot yet. Run analysis after message or poll activity is captured." in grey centered text. Subtle dashed border circle with brain icon in center (muted).
+> - **With data:** Summary text block showing AI-generated analysis, sentiment score pill (green/amber), key topics as pills/tags, recommended actions list.
+>
+> **Card 4: Recent Polls**
+> Dark card, title "Recent Polls" in cream (18px bold).
+>
+> Poll list — 2 items stacked:
+> 1. Orange left border → **"What events do you want this month?"** in cream → "Design Circle SF · 89 voters · 134 votes" in grey → "2026-02-18 14:30 UTC" timestamp → Results: "Workshops: 42 votes" | "Talks: 28 votes" | "Social: 12 votes" — each with horizontal bar (cream fill, proportional width)
+> 2. Another poll card with similar structure
+>
+> **Card 5: Recent Community Messages**
+> Dark card, title "Recent Community Messages" in cream (18px bold).
+>
+> Message list — 3 items stacked:
+> 1. Grey left border + "OUTBOUND · MESSAGE" label (grey uppercase, 10px) → Message preview: "📊 **What events do you want this month?** React to vote: 1️⃣ Workshops 2️⃣ Talks" in cream → Message ID + timestamp in muted grey below
+> 2. Green left border + "INBOUND · MESSAGE" → Member message preview in cream → sender info + timestamp
+> 3. Another message with appropriate border color
+>
+> Each message card: dark #1A1A1A, slight hover effect, border-left colored by type (orange = outbound, green = inbound, grey = system).
+
+---
+
+*Each prompt creates one screen. Paste them into Figma Make in order. The onboarding flow is 11 mobile screens (390×844), plus 5 desktop intelligence dashboard screens (1280×900), plus 1 Discord agent dashboard (1280×900) — 17 screens total.*
