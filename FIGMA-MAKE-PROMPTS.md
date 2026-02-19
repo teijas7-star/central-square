@@ -1,6 +1,6 @@
 # Figma Make Prompts — Onboarding & Intelligence Flows
 
-Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iPhone 15 Pro). Intelligence dashboard screens are 1280×900 (desktop).
+Paste each prompt into Figma Make one at a time. All screens are desktop (1280×900).
 
 **Global design system for ALL screens:**
 - Background: #0A0A0A (near black)
@@ -15,7 +15,6 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 - Serif font: Playfair Display (for headlines)
 - Sans font: Inter (for body text)
 - All headlines are lowercase
-- iOS status bar at top (mobile only): 9:41, signal bars, wifi, battery
 
 ---
 
@@ -23,9 +22,7 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 1: Landing
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
->
-> **iOS status bar** at top with "9:41" left, signal/wifi/battery icons right. White text on dark.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
 > **Center-top:** A geometric logo made of 4 diagonal lines radiating from a center dot (like a compass or asterisk). Cream colored (#F5EDE0), about 80px.
 >
@@ -53,9 +50,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 2: Auth
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar. Below it, a row of 9 progress dots — first dot filled (wider, cream), rest are small grey dots. Back arrow (←) on the left.
+> **Top:** A row of 9 progress dots — first dot filled (wider, cream), rest are small grey dots. Back arrow (←) on the left.
 >
 > **Header:** Large serif headline "let's get you started" in lowercase, cream. Subtitle below: "Quick sign in so we can save your progress." in grey.
 >
@@ -71,9 +68,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 3: AI Intro
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (2nd dot active), back arrow.
+> **Top:** Progress dots (2nd dot active), back arrow.
 >
 > **Center-top:** The same compass/asterisk logo inside a grey circle (100px) with a subtle glowing ring around it. Below the circle, an orange badge/pill: "✨ AI Community Partner" in orange text.
 >
@@ -92,9 +89,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 4: Voice Conversation
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (3rd active), back arrow. A status pill at center-top: "● Done" with a green dot.
+> **Top:** Progress dots (3rd active), back arrow. A status pill at center-top: "● Done" with a green dot.
 >
 > **Below status:** The compass logo in a circle (80px) centered.
 >
@@ -111,9 +108,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 5: Followup Questions (Q1)
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (4th active), back arrow. "1 of 3" label centered. Progress bar below — 33% filled in cream/white, rest grey.
+> **Top:** Progress dots (4th active), back arrow. "1 of 3" label centered. Progress bar below — 33% filled in cream/white, rest grey.
 >
 > **AI avatar** (small, 32px compass logo) on the left, with a dark card containing: "How big is your community right now?" in cream.
 >
@@ -130,9 +127,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 6: Building Progress
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar only (no progress dots on this screen).
+> **Top:** No progress dots on this screen.
 >
 > **Center-top:** Large compass logo in circle (120px) with a glowing ring animation effect around it.
 >
@@ -156,9 +153,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 7: Modules Selection
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (6th active), back arrow. "Your Modules" title centered.
+> **Top:** Progress dots (6th active), back arrow. "Your Modules" title centered.
 >
 > **AI recommendation bar:** Small avatar + orange "✨ AI Recommended" label, then text: "Based on communities like yours, I've pre-selected the modules that will have the most impact. You can customize anytime." in grey.
 >
@@ -194,7 +191,7 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 8: Dashboard Preview
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A. The content is a card/preview of the operator dashboard.
+> Create a desktop web page (1280×900) with dark background #0A0A0A. The content is a card/preview of the operator dashboard.
 >
 > **Dashboard card (full-width, slightly inset, dark bg):**
 >
@@ -219,9 +216,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 9: Connect Channels
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (8th active), back arrow. Title "Connect Channels" centered.
+> **Top:** Progress dots (8th active), back arrow. Title "Connect Channels" centered.
 >
 > **AI message bar:** Orange "✨ Channel Intelligence" label. Text: "Let's connect your community channels. They'll gather intelligence from your existing channels — no need for members to switch platforms."
 >
@@ -241,9 +238,9 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 10: Live Demo (Poll)
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
-> **Top:** iOS status bar, progress dots (all dots visible), back arrow. "Live Demo" title centered. "Skip" link on top-right in muted text.
+> **Top:** Progress dots (all dots visible), back arrow. "Live Demo" title centered. "Skip" link on top-right in muted text.
 >
 > **AI message bar:** Small avatar + orange "✨ Try It Live" label. Text: "Ask your community a question! Watch us gather responses and turn them into intelligence."
 >
@@ -258,7 +255,7 @@ Paste each prompt into Figma Make one at a time. Mobile screens are 390×844 (iP
 
 ### Screen 11: Complete
 
-> Create a mobile app screen (390×844) with dark background #0A0A0A.
+> Create a desktop web page (1280×900) with dark background #0A0A0A.
 >
 > **Center of screen (vertically centered):**
 >
@@ -610,4 +607,4 @@ This screen shows the operator's view for managing a Discord integration. It red
 
 ---
 
-*Each prompt creates one screen. Paste them into Figma Make in order. The onboarding flow is 11 mobile screens (390×844), plus 5 desktop intelligence dashboard screens (1280×900), plus 1 Discord agent dashboard (1280×900) — 17 screens total.*
+*Each prompt creates one screen. Paste them into Figma Make in order. All 17 screens are desktop (1280×900): 11 onboarding + 5 intelligence dashboard tabs + 1 Discord agent dashboard.*
