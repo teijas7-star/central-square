@@ -1,0 +1,11 @@
+# Reference repos: cloned (shallow, read-only) into references/ by scripts/fetch-references.sh.
+# Third-party code: read it for technique; don't run its scripts or copy its content wholesale.
+# name                      url                                                        what it is
+pdoom-video                 https://github.com/JohnHeibel/PDoomVideo                   music video
+claude-animation-base       https://github.com/JohnHeibel/ClaudeAnimationBase          starter
+claude-animation-skill      https://github.com/buildwithhanif/claude-animation-skill   node canvas (hand-drawn)
+hyperframes                 https://github.com/heygen-com/hyperframes                  framework (html)
+remotion-skills             https://github.com/remotion-dev/skills                     framework (react) - skills from remotion.dev/docs/ai/skills
+battle-of-austerlitz-film   https://github.com/WinterArc21/Battle-of-Austerlitz-Film   long form
+awesome-ai-motion           https://github.com/guanmo-ai/awesome-ai-motion             prompt library
+awesome-opus-5-5-videos     https://github.com/athemeroy/awesome-opus-5-5-videos       dataset
