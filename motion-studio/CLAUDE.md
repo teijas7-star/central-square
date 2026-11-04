@@ -5,103 +5,124 @@ The owner is Teijas (teijas@centralsquare.ai). If a rule blocks something they e
 
 ---
 
-## 1. Who we are on screen
+## 1. Render contract
 
-**Central Square AI** is the AI-powered hub for community operators: events, engagement, analytics, sponsor matching and member management in one place. It replaces the WhatsApp + Discord + Notion + Eventbrite patchwork.
-Tagline: **"A digital agora where communities thrive."** The product has two layers: **The Square** (public discovery) and **The Arcades** (community homes).
-Buyers: community leads at enterprises and mid-size SaaS companies, universities, foundations and professional associations. We are not aiming at hobbyist groups.
-Product source of truth: `../claude.md`, `../business_plan.md`, `../app/partner/page.tsx`. Read them before writing any copy.
+- **Every film is a pure function of time: `window.seek(t)` paints frame t.**
+- No CSS transitions or animations, no `setTimeout`/`setInterval`, no `requestAnimationFrame` in render mode, no `Date.now()`, and **no state carried between frames**.
+- Seeded noise only (`mulberry32(seed)`), never `Math.random`.
+- **Render with `node scripts/render.mjs <film.html>`.** It encodes H.264, yuv420p, **CRF 16**.
+- A film declares `window.FILM = { width, height, fps, duration, bpm, seed }` and `window.seek`, plus `window.CUES` for its SFX hits. The renderer injects `window.__RENDER = true` and `window.BEATS` (the beat grid) before any film script runs.
+- `render.mjs` enforces the contract. It refuses to render when:
+  - a static lint of the film's own files finds a banned API;
+  - the runtime guard catches a banned call coming from film code;
+  - anything tries to load from the network (only `file://` loads);
+  - the **determinism check** finds frame t painting different pixels depending on seek order.
+- Lay out in **vmin** with orientation media queries, so one film reflows to 16:9, 9:16 and 1:1.
+- Keep assets local: fonts live in `assets/fonts/` (copied from `brand/fonts/`), with no CDNs.
+- HyperFrames and Remotion (skills in `.claude/skills/`) stay available when a job needs their registry blocks, captions pipeline or React components. Their output must still meet the contract and the CRF 16 spec, e.g. `npx --yes hyperframes@<hyperframesVersion> render --crf 16`. `/remotion-license` must be checked with Teijas before Remotion ships anything.
 
-**Voice:** human, warm, civic, confident. Short declarative lines. No hype words ("revolutionary", "game-changing", "unlock", "supercharge", "seamless", "leverage"). No exclamation marks. Speak to the operator ("your members", "your sponsors").
+## 2. Look
 
-**Look** (tokens in `brand/tokens.css` and `brand/brand.json`):
-- Ground: near-black `#0B0B0B` (`#000`, `#171717`, `#262626` for layers). Ink: `#FAFAFA`, muted `#A3A3A3`.
-- **Amber `#F59E0B` is the only accent. Use it for one thing per frame**: the key word, the active node, or the CTA. Never more than one.
-- Green `#22C55E` means "live/online" only.
-- Display type: **Playfair Display** (600 for headlines, 400 italic for the emphasis word). Body/UI/captions: **Inter** 400–600. No other families.
-- Visual metaphor: **networks and constellations** (warm points of light joined by thin lines) and **the public square**. Repo imagery: `../public/images/city-square.png`, `../public/images/earth-from-space.png`, `../public/design/boston-skyline.jpg`.
-- Aesthetic: lived-in, warm, spacious, never sterile-corporate. Dark theme. Generous negative space.
-- **There is no logo file in the repo yet.** Until one is added to `brand/`, the lockup is the wordmark "Central Square AI" set in Inter 500 with 0.32em tracking, uppercase, muted ink, over the amber constellation hub. Never invent a logo mark.
+**Banned defaults:**
+- a centered title on a gradient;
+- everything fading in;
+- corner labels and frame borders;
+- glow on UI chrome;
+- generic particle bursts.
 
-## 2. Truth rules (non-negotiable)
+Entrances are masked rises, wipes, line draws and scale-from-origin, chosen per element. Never one fade for everything.
 
-1. **Every factual claim on screen needs a source**, listed in the project's `BRIEF.md` "Sources" table. That covers numbers, customer names, quotes and outcomes. If there's no source, cut the claim or ask.
+- **One display face, one UI face.** Display is **Playfair Display** (600; 400 italic for the emphasis word) and UI/body is **Inter** (400–600).
+- **One accent color unless the brief says otherwise: amber `#F59E0B`.** It marks the focal point and stays a small share of the frame. Green `#22C55E` means "live/online" only.
+- Ground is near-black `#0B0B0B` (layers `#171717`, `#262626`, lines `#404040`). Ink is `#FAFAFA`, muted `#A3A3A3`. Tokens: `brand/tokens.css`, `brand/brand.json`.
+- **Every 2 to 4 seconds something new must happen on screen.**
+- Visual metaphor: **networks and constellations** (warm points joined by thin lines; communities connecting), plus the public square. Repo imagery: `../public/images/city-square.png`, `../public/images/earth-from-space.png`, `../public/design/boston-skyline.jpg`.
+- Aesthetic: human, warm, civic, spacious. Editorial asymmetric layouts (copy on one side, the world on the other), not centered stacks.
+- **There is no logo file in the repo yet.** Until one is added to `brand/`, the lockup is the "Central Square AI" wordmark in Inter 500, uppercase, tracked. Never invent a logo mark.
+
+## 3. Sound
+
+- **Score and SFX are synthesized in code unless a track is supplied.** `render.mjs` handles this:
+  - **No track supplied:** it runs `scripts/synth_audio.py score` at `FILM.bpm`. The script writes the exact grid to `audio/score.beats.json` and records the measured drift in `audio/beats.measured.json`.
+  - **Track supplied** (`--audio file`): it measures the beats with `scripts/analyze_audio.py`.
+  - **Then:** it writes `audio/beats.json`, injects it as `window.BEATS`, and synthesizes the film's `window.CUES` with `synth_audio.py sfx`. SFX kinds: pop, tick, whoosh, riser, impact, chime, thud.
+- **Place hits on the measured beat grid** (`beats.json`): beats, half-beats or downbeats. Time story events from `window.BEATS` and build `CUES` from the same times, so picture and sound can't drift apart.
+- **Loudness −14 LUFS integrated, true peak ≤ −1 dBTP.** `render.mjs` normalizes in two passes and limits. `qa.sh` fails anything off by more than 1 LU or hotter than −1 dBTP.
+- A supplied music track needs its license recorded in `BRIEF.md`.
+
+## 4. Loop before you show Teijas anything
+
+1. **Render one frame per beat as a contact sheet and LOOK at it:** `node scripts/render.mjs projects/<slug>/film.html --sheet` → `renders/film.beats.png`. Use `--every 2` for long films.
+2. **Score it 1–10** in `SCORECARD.md` on: **hook in first 2 s, readability at phone size, motion quality, variety, brand accuracy, sound sync.**
+3. **Fix the 3 worst problems.** Re-sheet and re-score. **Repeat until every score is 8+.**
+4. **Only then do the full render:** `node scripts/render.mjs projects/<slug>/film.html`.
+5. Run `bash scripts/qa.sh projects/<slug>/renders/film.mp4`. It checks specs, LUFS and true peak, and black or frozen stretches, and writes a contact sheet. Open that sheet and look at it too.
+6. Deliver `cs-<slug>-<W>x<H>-v<N>.mp4` with the final scorecard row, the QA output and any judgment calls still open.
+
+Never say a film is done from a successful exit code. "Done" means 8+ on every row, QA passes, and you looked at the frames.
+
+## 5. Truth rules (non-negotiable)
+
+1. **Every factual claim on screen needs a source** in `BRIEF.md` → "Sources". That covers numbers, customer names, quotes and outcomes. With no source, cut the claim or ask.
 2. **Adobe, Microsoft and the Aspen Institute are targets in the business plan, not customers.** Never show their names or logos, or imply a partnership, unless Teijas confirms in writing for that video.
-3. No invented testimonials, metrics, logos, user counts or UI that doesn't exist. Use real product screens (capture the running app or `npx hyperframes capture <url>`). Label mocked or future UI on screen as "Concept" or "Coming soon".
-4. No cloned voices, avatars or likenesses of real people without their recorded consent. No content imitating another brand's look.
+3. No invented testimonials, metrics, logos, user counts or UI that doesn't exist. Show real product screens. Label future UI on screen as "Concept" or "Coming soon".
+4. No cloned voices, avatars or likenesses of real people without recorded consent. No imitating another brand's look.
 5. `/reverse-any-video` and `/style-sampling` are for learning a technique or porting our own work. Never ship a recreation of someone else's video.
 
-## 3. Which tool (route)
+## 6. Who we are on screen
 
-| Job | Use | Notes |
-|---|---|---|
-| Anything by default: promos, explainers, social clips, title cards, data stories, captions | **HyperFrames** (`/hyperframes` first, then `/hyperframes-cli`, `/hyperframes-registry`, `/media-use`) | Pinned to the version in `package.json` → `hyperframesVersion`. Always `npx --yes hyperframes@<that version>`. |
-| Reusing real React components from `../components` / `../app`, or batch-rendering many data-driven variants | **Remotion** (`/remotion-best-practices` routes to the rest) | Remotion needs a paid company license once we have more than 3 people. Run `/remotion-license` and confirm with Teijas before using it on anything that ships. |
-| Hand-drawn storybook / ink-and-watercolour explainer | **claude-animation** plugin skill | Node canvas + ffmpeg, frame-exact, synthesized sound. |
-| A live-presented deck | `/slideshow` | |
-| A Figma frame, brand asset or storyboard | `/figma` (the Figma MCP connector is available) | |
+**Central Square AI** is the AI-powered hub for community operators: events, engagement, analytics, sponsor matching and member management in one place. It replaces the WhatsApp + Discord + Notion + Eventbrite patchwork.
+Tagline: **"A digital agora where communities thrive."** The two layers are **The Square** (public discovery) and **The Arcades** (community homes).
+Buyers: community leads at enterprises and mid-size SaaS companies, universities, foundations and associations. Read `../claude.md`, `../business_plan.md` and `../app/partner/page.tsx` before writing copy.
+**Voice:** human, warm, civic, confident. Short declarative lines that speak to the operator ("your members"). No hype words ("revolutionary", "game-changing", "unlock", "supercharge", "seamless", "leverage") and no exclamation marks.
 
-Start a new HyperFrames video with **`bash scripts/new-video.sh <slug> [landscape|portrait|square]`**, never a bare `hyperframes init`. The scaffold carries the brand fonts, local GSAP, the branded end card and `BRIEF.md`.
+## 7. Craft bar (the numbers)
 
-## 4. Work loop (every video)
+- **Hook:** by 2.0 s, one striking, specific image or line. No logo intro and no empty first frame.
+- **Readability at phone size:** judge the beat sheet at ~260 px per frame.
+  - Text sizes at 1080 on the short side: headline ≥ 7vmin, body ≥ 3vmin, captions ≥ 3.6vmin, nothing under 2.8vmin.
+  - Hold text ≥ 0.4 s + 0.3 s per word.
+  - Captions: max 7 words per line, 2 lines.
+- **Safe areas:** content in the 90% box, text in the 80% box. For 9:16, keep the bottom 20% and right 12% free of key text.
+- **Motion:**
+  - Entrances take 0.4–0.9 s on expo/cubic-out; moves use cubic in-out.
+  - No linear slides, except slow drifts and pushes (≤ 3% over ≥ 2 s).
+  - No bounce or elastic on text; back-out only for small node and UI pops.
+  - Stagger 50–150 ms, or half-beats. Never move everything at once.
+- **Pacing:** social cuts every 1.5–3 s; explainer beats every 3–6 s. The end card holds the CTA for the last 2.5–4 s.
+- **Captions** are burned in by default for social (Inter 600). Leave them off for silent hero loops.
 
-1. **Brief.** Fill in `projects/<slug>/BRIEF.md` with Teijas, or draft it from their notes and confirm. Settle the one thing, the audience, the channel and the CTA before building anything.
-2. **Storylines.** Offer three genuinely different storylines in words only (see the hyperframes `references/story.md`). Teijas picks one, unless they said "no stops".
-3. **SPEC.md.** Turn every adjective into a number: durations, type sizes, eases, colors and shot list by frame/second. Name the defaults we're banning.
-4. **Sound plan.** For music, run `python3 scripts/analyze_audio.py assets/audio/<track> --fps 30 --out beats.json` (or `npx hyperframes beats`). Cuts land on beats, and big reveals land on downbeats or strong onsets.
-5. **Build** scene by scene in `compositions/`. Search `/hyperframes-registry` before hand-building any named effect.
-6. **Check:** `npm run check` until it reports 0 errors and 0 warnings. Weigh every warning; never silence one blindly.
-7. **Look:** `npm run snapshot` and actually read the frames. Write `REVIEW.md` per the hyperframes `references/review.md`.
-8. **Preview → approval → render:** `npm run render`, which uses `--quality delivery`.
-9. **QA:** `bash ../../scripts/qa.sh renders/<file>.mp4`. Open the contact sheet it writes and look at every frame. Fix and re-render until it passes.
-10. **Deliver:** name the file `cs-<slug>-<W>x<H>-v<N>.mp4`. Report the path, the duration, the QA output and anything that's still a judgment call.
-
-"Done" means steps 6–9 passed **and** you looked at the frames yourself. Never say a video is done from a successful exit code alone.
-
-## 5. Craft bar (the numbers)
-
-- **One idea per shot.** If a frame needs two sentences, it's two shots.
-- **Reading time:** hold text on screen for at least 0.4 s + 0.3 s per word, and at least 1.2 s for anything readable.
-- **Type minimums** (at 1080 on the short side): headline ≥ 7vmin, body ≥ 3vmin, captions ≥ 3.6vmin, with nothing smaller than 2.4vmin. Max 7 words per caption line, 2 lines.
-- **Safe areas:** all content in the 90% action-safe box and all text in the 80% title-safe box. For 9:16 social, also keep the bottom 20% and right 12% clear of key text (platform UI).
-- **Motion:** entrances 0.4–0.9 s on `expo.out`/`power3.out`, and moves on `power3.inOut`. No linear moves except slow drifts and pushes (≤ 3% scale over ≥ 2 s). No bounce/elastic on text; `back.out` is for small UI pops only. Stagger 50–90 ms. Never animate everything at once.
-- **Pacing:** social cuts every 1.5–3 s; explainers 3–6 s per beat. Open on the hook in the first 1.0 s, with no slow logo intro. The end card is the last 2.5–4 s and uses the CTA.
-- **Color:** amber only once per frame. Check contrast (HyperFrames check runs WCAG AA, and it must pass).
-- **Sound** (any film over ~15 s): music + SFX on visible actions. Mix to **−14 LUFS integrated, true peak ≤ −1 dBTP**, with voice 6–9 dB above the music bed. Use only licensed or royalty-free music, and record its license in `BRIEF.md`.
-- **Captions** are on by default for social (burned in, Inter 600, white with a subtle dark plate). Off for website hero loops.
-
-## 6. Formats
+## 8. Formats
 
 | Channel | Size | Length | Notes |
 |---|---|---|---|
-| LinkedIn / X feed | 1080×1080 or 1080×1920 | 15–45 s | Captions on; hook in 1 s; works with sound off |
-| Website hero loop | 1920×1080 | 6–12 s | Silent, seamless loop, no captions |
+| LinkedIn / X feed | 1080×1080 or 1080×1920 | 15–45 s | Captions on, hook in 1–2 s, works with sound off |
+| Website hero loop | 1920×1080 | 6–12 s | `FILM.silent = true`, seamless loop |
 | Explainer / sales email | 1920×1080 | 60–90 s | VO + captions, chaptered beats |
-| Pitch / event screen | 1920×1080 (or 3840×2160) | as needed | Big type, slower pace |
+| Pitch / event screen | 1920×1080 or 3840×2160 | as needed | Big type, slower pace |
 
-Delivery codec: H.264, yuv420p, 30 fps, AAC 48 kHz (HyperFrames' delivery preset). Use ProRes/MOV only when someone asks for an editable master or alpha.
+Delivery is H.264, yuv420p, CRF 16, 30 fps, with AAC 256k at 48 kHz.
 
-## 7. Technical rules for this repo
+## 9. Workflow and files
 
-- **No network at render time.** Fonts come from `brand/fonts/` → `assets/fonts/`, and GSAP from `brand/vendor/gsap.min.js` → `assets/vendor/`. Never reference a CDN in a composition: headless renders here can't reach it and the render fails.
-- Each scene repeats the `@font-face` block it uses (HyperFrames lint requires it in the file). Copy it from `brand/tokens.css`.
-- Lay out in **vmin** so a scene reflows across 16:9, 9:16 and 1:1.
-- Everything visible is a function of timeline time: no `Math.random()` without a seed, no `Date.now()`, no timers.
-- Environment setup: `bash scripts/setup.sh` (idempotent). **Run it first in every new cloud session** if `python3 -c "import librosa"` fails or `node_modules/` is missing, because cloud containers start fresh.
-- In the cloud container, Playwright's bundled browser differs from the npm package. Launch with `chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })`. HyperFrames finds Chrome by itself.
-- Optional local tools not installed by default: whisper-cpp (transcription), Kokoro TTS and MusicGen (`npx hyperframes doctor` shows install lines). HeyGen features cost money, so ask before using them.
-- **Git:** commit sources (`projects/<slug>/` HTML, BRIEF, SPEC, REVIEW, small assets). Never commit renders, snapshots or large media: `renders/` and `.hyperframes/` are gitignored, and any asset over 10 MB needs Teijas's OK. Hand finished videos over as files, not commits.
-- Skills are vendored in `.claude/skills/` (lock: `skills-lock.json`). Update them with `npx skills update` or `npx hyperframes update`, then re-run a smoke render before committing.
-
-## 8. Layout
+- **New film:** `bash scripts/new-video.sh <slug> [landscape|portrait|square]`. The slug is `yyyy-mm-short-name`. You get `film.html` (the branded seek-contract starter), fonts, `BRIEF.md` and `SCORECARD.md`.
+- **Before building:**
+  - Fill in `BRIEF.md` with Teijas (audience, the one thing, CTA, channel, sources).
+  - For anything over ~15 s, offer three storylines in words and let Teijas pick, unless they said "no stops".
+- **Setup in a fresh container:** `bash scripts/setup.sh` (idempotent). Cloud containers start empty, so run it first if `python3 -c "import librosa"` fails or `node_modules/` is missing.
+- **Playwright** in the cloud container: `render.mjs` falls back to `/opt/pw-browsers/chromium` by itself.
+- **Git:**
+  - Commit sources: `film.html`, `BRIEF.md`, `SCORECARD.md`, small assets.
+  - Never commit `renders/`, `audio/` outputs or large media (they're gitignored). Assets over 10 MB need Teijas's OK.
+  - Hand over finished videos as files.
 
 ```
 motion-studio/
-  CLAUDE.md            ← these rules
-  brand/               tokens.css, brand.json, fonts/, vendor/gsap.min.js
-  templates/           cs-endcard/ (branded HyperFrames starter), BRIEF.md
-  scripts/             setup.sh, new-video.sh, analyze_audio.py, qa.sh
-  assets/              shared music/, sfx/, footage/, images/ (licensed, sourced)
-  projects/<slug>/     one folder per video (slug: yyyy-mm-short-name)
-  .claude/skills/      Remotion + HyperFrames skills (vendored)
+  CLAUDE.md          these rules
+  brand/             tokens.css, brand.json, fonts/ (OFL), vendor/gsap.min.js (HyperFrames route only)
+  templates/         cs-film/film.html (seek-contract starter), BRIEF.md, SCORECARD.md
+  scripts/           render.mjs, synth_audio.py, analyze_audio.py, qa.sh, new-video.sh, setup.sh
+  assets/            shared, licensed, sourced music/ sfx/ footage/ images/
+  projects/<slug>/   one folder per film
+  .claude/skills/    Remotion + HyperFrames skills (vendored; lock in skills-lock.json)
 ```

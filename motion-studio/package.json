@@ -1,11 +1,13 @@
 {
   "name": "cs-motion-studio",
   "private": true,
-  "description": "Central Square AI video studio: HyperFrames (default), Remotion, and hand-drawn canvas routes.",
+  "description": "Central Square AI video studio: seek(t) HTML films rendered by scripts/render.mjs, plus HyperFrames, Remotion and hand-drawn canvas routes.",
   "hyperframesVersion": "0.9.13",
   "scripts": {
     "setup": "bash scripts/setup.sh",
     "new": "bash scripts/new-video.sh",
+    "sheet": "node scripts/render.mjs --sheet",
+    "render": "node scripts/render.mjs",
     "qa": "bash scripts/qa.sh",
     "beats": "python3 scripts/analyze_audio.py"
   },

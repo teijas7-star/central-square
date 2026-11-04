@@ -19,7 +19,9 @@ if ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$v
   ffmpeg -hide_banner -nostats -i "$v" -af ebur128=peak=true -f null - 2>&1 \
     | awk '/Integrated loudness:/{f=1} f&&/I:|LRA:|Peak:/{print "  "$0}' | head -4
   I=$(ffmpeg -hide_banner -nostats -i "$v" -af ebur128 -f null - 2>&1 | awk '/Integrated loudness:/{getline; print $2}')
-  echo "  target ${target} LUFS (±1)"
+  TP=$(ffmpeg -hide_banner -nostats -i "$v" -af ebur128=peak=true -f null - 2>&1 | awk '/True peak:/{getline; print $2}')
+  echo "  target ${target} LUFS (±1), true peak ≤ -1.0 dBTP (measured ${TP})"
+  awk -v p="$TP" 'BEGIN{exit !(p>-1.0)}' && { echo "FAIL: true peak ${TP} dBTP is above -1.0"; fail=1; }
   awk -v i="$I" -v t="$target" 'BEGIN{d=i-t; if(d<0)d=-d; exit !(d>1)}' && { echo "FAIL: loudness ${I} LUFS is off target"; fail=1; }
 else
   echo "  (no audio stream — fine for a silent loop, otherwise FAIL)"

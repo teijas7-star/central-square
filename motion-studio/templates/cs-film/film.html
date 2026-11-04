@@ -1,0 +1,186 @@
+<!doctype html>
+<!--
+  Central Square AI: starter film. A pure function of time: window.seek(t) paints frame t.
+  Render:  node ../../scripts/render.mjs film.html --sheet   (review: one frame per beat)
+           node ../../scripts/render.mjs film.html           (full: H.264 yuv420p CRF 16 + synthesized score/SFX)
+  Rules: no CSS transitions/animations, no timers, no rAF, no Math.random (use rand = mulberry32(seed)).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Central Square AI — film</title>
+<style>
+  @font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
+  @font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: block; }
+
+  :root { --ground: #0b0b0b; --ink: #fafafa; --muted: #a3a3a3; --line: #404040; --amber: #f59e0b; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ground); color: var(--ink); font-family: "Inter", system-ui, sans-serif; }
+
+  /* Landscape: copy left, network right. Portrait/square reflow below. Sizes in vmin. */
+  #copy { position: absolute; left: 9vw; top: 50%; transform: translateY(-50%); width: 48vw; }
+  #net  { position: absolute; width: 78vmin; height: 78vmin; left: 69vw; top: 50%; margin: -39vmin 0 0 -39vmin; }
+  @media (orientation: portrait) {
+    #copy { left: 9vw; top: 11vh; transform: none; width: 82vw; }
+    #net  { left: 50vw; top: 66vh; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; }
+  }
+  @media (aspect-ratio: 1/1) {
+    #copy { left: 8vw; top: 8vh; transform: none; width: 84vw; }
+    #net  { left: 62vw; top: 64vh; width: 70vmin; height: 70vmin; margin: -35vmin 0 0 -35vmin; }
+  }
+
+  .mask { overflow: hidden; display: block; padding-bottom: 0.06em; }
+  .mask > span { display: inline-block; will-change: transform; }
+  #kicker { font-weight: 500; font-size: 3.1vmin; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  #headline { margin-top: 2.6vmin; font-family: "Playfair Display", Georgia, serif; font-weight: 600; font-size: 11.5vmin; line-height: 0.98; letter-spacing: -0.025em; }
+  #accent { font-style: italic; font-weight: 400; color: var(--amber); }
+  #cta-row { margin-top: 5vmin; display: inline-block; position: relative; }
+  #cta { font-weight: 500; font-size: 4.4vmin; letter-spacing: 0.02em; }
+  #underline { position: absolute; left: 0; right: 0; bottom: -1.2vmin; height: 0.45vmin; background: var(--amber); transform-origin: 0 50%; }
+
+  #net svg { width: 100%; height: 100%; overflow: visible; }
+  #net line { stroke: var(--line); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+  #net line.hot { stroke: var(--amber); }
+  #net circle.node { fill: var(--ink); }
+  #net circle.hub { fill: var(--amber); }
+  #net circle.pulse { fill: none; stroke: var(--amber); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+</style>
+</head>
+<body>
+  <div id="net"><svg viewBox="-500 -500 1000 1000"><g id="links"></g><circle id="pulse" class="pulse" r="0" /><g id="nodes"></g></svg></div>
+
+  <div id="copy">
+    <div class="mask"><span id="kicker" data-text="Central Square AI">Central Square AI</span></div>
+    <div id="headline">
+      <span class="mask"><span id="h1">Where</span></span>
+      <span class="mask"><span id="h2">communities</span></span>
+      <span class="mask"><span id="h3"><span id="accent">thrive.</span></span></span>
+    </div>
+    <div id="cta-row"><span class="mask"><span id="cta">centralsquare.ai</span></span><div id="underline"></div></div>
+  </div>
+
+<script>
+// ---------------------------------------------------------------- film spec
+window.FILM = { width: 1920, height: 1080, fps: 30, duration: 9.6, bpm: 100, seed: 7 };
+
+// ---------------------------------------------------------------- pure helpers
+function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const rand = mulberry32(FILM.seed);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const mix = (a, b, k) => a + (b - a) * k;
+const E = {
+  outExpo: (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x)),
+  outCubic: (x) => 1 - Math.pow(1 - x, 3),
+  inOutCubic: (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+  outBack: (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+};
+const prog = (t, start, dur, ease = E.outExpo) => ease(clamp((t - start) / dur));
+
+// ---------------------------------------------------------------- beat grid (injected by render.mjs from beats.json)
+const SPB = 60 / FILM.bpm;
+const GRID = (window.BEATS && window.BEATS.beats && window.BEATS.beats.length) ? window.BEATS.beats : [];
+const beat = (n) => (GRID[n] !== undefined ? GRID[n] : n * SPB);
+
+// Story on the grid: something new every 2–4 beats (1.2–2.4 s).
+const T = {
+  hub: beat(0) - 0.15,  // hook: the amber hub is already landing on frame 0
+  ring1: beat(0) - 0.3, // first communities are already connecting on frame 0
+  words: beat(1),       // "Where communities" rising by 0.6 s
+  accent: beat(4),      // downbeat, drums in: "thrive." + the amber link
+  ring2: beat(6),       // the network grows, camera eases back
+  kicker: beat(8),      // downbeat: brand line
+  cta: beat(10),        // CTA + underline
+  pulse: beat(12),      // downbeat: one pulse from the hub, then hold
+};
+
+// ---------------------------------------------------------------- the network (data, seeded)
+const ring1 = [[-230, -170], [210, -210], [250, 170], [-200, 210]];
+const ring2 = [];
+for (let i = 0; i < 10; i++) {
+  const a = (i / 10) * Math.PI * 2 + (rand() - 0.5) * 0.35;
+  const r = 360 + rand() * 70;
+  const x = Math.cos(a) * r, y = Math.sin(a) * r;
+  let parent = 0, best = Infinity;
+  ring1.forEach(([px, py], k) => { const d = (px - x) ** 2 + (py - y) ** 2; if (d < best) { best = d; parent = k; } });
+  ring2.push([x, y, parent]);
+}
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+const gl = document.getElementById("links"), gn = document.getElementById("nodes");
+const L1 = ring1.map(() => el("line", { pathLength: 1, "stroke-dasharray": 1 }, gl));
+const L2 = ring2.map(() => el("line", { pathLength: 1, "stroke-dasharray": 1 }, gl));
+const N1 = ring1.map(() => el("circle", { class: "node", r: 9 }, gn));
+const N2 = ring2.map(() => el("circle", { class: "node", r: 6 }, gn));
+const hub = el("circle", { class: "hub", r: 15 }, gn);
+const pulse = document.getElementById("pulse");
+
+const $ = (id) => document.getElementById(id);
+const drift = (i, t, amp) => [Math.sin(t * 0.7 + i * 1.7) * amp, Math.cos(t * 0.55 + i * 2.3) * amp];
+const rise = (node, k) => { node.style.transform = `translateY(${(1 - k) * 112}%)`; };
+
+// ---------------------------------------------------------------- seek(t): the whole film
+window.seek = function (t) {
+  // network camera: eases back on the ring2 downbeat to make room
+  const cam = prog(t, T.ring2, 1.2, E.inOutCubic);
+  $("net").style.transform = `scale(${mix(1.3, 0.98, cam)}) rotate(${mix(0, -6, prog(t, 0, FILM.duration, (x) => x))}deg)`;
+
+  const kh = prog(t, T.hub, 0.5, E.outBack);
+  hub.setAttribute("r", 15 * kh);
+
+  ring1.forEach(([x, y], i) => {
+    const s = T.ring1 + i * SPB * 0.5;
+    const [dx, dy] = drift(i, t, 8);
+    const kl = prog(t, s - 0.05, 0.45, E.outCubic);
+    const kn = prog(t, s + SPB * 0.5, 0.45, E.outBack);
+    L1[i].setAttribute("x1", 0); L1[i].setAttribute("y1", 0);
+    L1[i].setAttribute("x2", x + dx); L1[i].setAttribute("y2", y + dy);
+    L1[i].setAttribute("stroke-dashoffset", 1 - kl);
+    N1[i].setAttribute("cx", x + dx); N1[i].setAttribute("cy", y + dy); N1[i].setAttribute("r", 9 * kn);
+  });
+
+  ring2.forEach(([x, y, parent], i) => {
+    const s = T.ring2 + 0.15 + i * 0.07;
+    const [dx, dy] = drift(i + 10, t, 10);
+    const [px, py] = ring1[parent], [pdx, pdy] = drift(parent, t, 8);
+    const kl = prog(t, s, 0.6, E.outCubic), kn = prog(t, s + 0.3, 0.5, E.outBack);
+    L2[i].setAttribute("x1", px + pdx); L2[i].setAttribute("y1", py + pdy);
+    L2[i].setAttribute("x2", x + dx); L2[i].setAttribute("y2", y + dy);
+    L2[i].setAttribute("stroke-dashoffset", 1 - kl);
+    N2[i].setAttribute("cx", x + dx); N2[i].setAttribute("cy", y + dy); N2[i].setAttribute("r", 6 * kn);
+  });
+
+  // the one amber link: lights when "thrive." lands
+  L1.forEach((l, i) => l.classList.toggle("hot", i === 0 && t >= T.accent));
+
+  const kp = prog(t, T.pulse, 1.1, E.outCubic);
+  pulse.setAttribute("r", 20 + kp * 420);
+  pulse.setAttribute("stroke-opacity", t >= T.pulse ? (1 - kp) * 0.8 : 0);
+
+  // copy: masked rises, never fades
+  rise($("h1"), prog(t, T.words, 0.7));
+  rise($("h2"), prog(t, T.words + SPB * 0.5, 0.7));
+  rise($("h3"), prog(t, T.accent, 0.7));
+  const kk = prog(t, T.kicker, 0.8);
+  rise($("kicker"), kk);
+  $("kicker").style.letterSpacing = `${mix(0.7, 0.32, kk)}em`;
+  rise($("cta"), prog(t, T.cta, 0.6));
+  $("underline").style.transform = `scaleX(${prog(t, T.cta + 0.15, 0.9, E.inOutCubic)})`;
+};
+
+// SFX land on the same grid the visuals use.
+window.CUES = [
+  { t: Math.max(0, T.hub + 0.1), sfx: "pop" },
+  ...ring1.map((_, i) => ({ t: T.ring1 + (i + 1) * SPB * 0.5, sfx: "tick", gain: 0.7 })),
+  { t: T.words, sfx: "whoosh", gain: 0.6 },
+  { t: T.accent, sfx: "impact", gain: 0.7 },
+  { t: T.ring2, sfx: "whoosh", gain: 0.45 },
+  { t: T.kicker, sfx: "tick", gain: 0.6 },
+  { t: T.cta, sfx: "thud", gain: 0.8 },
+  { t: T.pulse, sfx: "chime", gain: 0.45 },
+];
+
+seek(0);
+</script>
+</body>
+</html>

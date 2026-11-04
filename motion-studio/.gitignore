@@ -8,3 +8,4 @@ __pycache__/
 # large raw media stays out of git unless approved
 assets/footage/*
 !assets/footage/.gitkeep
+projects/*/audio/

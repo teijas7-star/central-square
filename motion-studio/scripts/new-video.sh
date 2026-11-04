@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Scaffold a new Central Square AI video from the branded HyperFrames starter.
+# Scaffold a new Central Square AI film (seek(t) render contract).
 #   scripts/new-video.sh <slug> [landscape|portrait|square]
-# Creates projects/<slug>/ with brand fonts, the end-card scene, and a BRIEF.md to fill in first.
+# Creates projects/<slug>/ with film.html (branded starter), brand fonts, BRIEF.md and SCORECARD.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 slug="${1:?usage: scripts/new-video.sh <slug> [landscape|portrait|square]}"
@@ -16,32 +16,15 @@ esac
 dest="projects/$slug"
 [[ -e "$dest" ]] && { echo "$dest already exists" >&2; exit 1; }
 
-cp -r templates/cs-endcard "$dest"
-mkdir -p "$dest/assets/fonts" "$dest/assets/audio" "$dest/assets/images"
+mkdir -p "$dest/assets/fonts" "$dest/assets/images" "$dest/audio"
+cp templates/cs-film/film.html "$dest/film.html"
 cp brand/fonts/*.woff2 "$dest/assets/fonts/"
-mkdir -p "$dest/assets/vendor" && cp brand/vendor/gsap.min.js "$dest/assets/vendor/"
 cp templates/BRIEF.md "$dest/BRIEF.md"
-
-# Swap canvas size everywhere (scene is laid out in vmin, so it reflows).
-find "$dest" -name '*.html' -print0 | xargs -0 sed -i \
-  -e "s/data-width=\"1920\"/data-width=\"$W\"/g" -e "s/data-height=\"1080\"/data-height=\"$H\"/g" \
-  -e "s/width=1920, height=1080/width=$W, height=$H/" \
-  -e "s/width: 1920px; height: 1080px/width: ${W}px; height: ${H}px/" \
-  -e "s/data-resolution=\"landscape\"/data-resolution=\"$shape\"/"
-printf '{ "id": "%s", "name": "%s", "createdAt": "%s" }\n' "$slug" "$slug" "$(date -u +%FT%TZ)" > "$dest/meta.json"
-HFV="$(node -p "require('./package.json').hyperframesVersion")"
-cat > "$dest/package.json" <<JSON
-{
-  "name": "$slug",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "npx --yes hyperframes@$HFV preview",
-    "check": "npx --yes hyperframes@$HFV check",
-    "snapshot": "npx --yes hyperframes@$HFV snapshot --review",
-    "render": "npx --yes hyperframes@$HFV render --quality delivery",
-    "qa": "bash ../../scripts/qa.sh"
-  }
-}
-JSON
-echo "Created $dest (${W}x${H}). Next: fill in $dest/BRIEF.md, then build scenes in $dest/compositions/."
+cp templates/SCORECARD.md "$dest/SCORECARD.md"
+sed -i "s/window.FILM = { width: 1920, height: 1080,/window.FILM = { width: $W, height: $H,/" "$dest/film.html"
+grep -q "width: $W, height: $H" "$dest/film.html" || { echo "could not set film size" >&2; exit 1; }
+echo "Created $dest (${W}x${H}).
+  1. Fill in $dest/BRIEF.md
+  2. Build in $dest/film.html (window.seek(t) paints frame t)
+  3. node scripts/render.mjs $dest/film.html --sheet   -> look, score SCORECARD.md, fix, repeat until all 8+
+  4. node scripts/render.mjs $dest/film.html           -> then bash scripts/qa.sh $dest/renders/film.mp4"

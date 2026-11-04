@@ -28,11 +28,20 @@ def main() -> None:
     beats = librosa.frames_to_time(beat_frames, sr=sr, hop_length=hop)
     tempo = float(np.atleast_1d(tempo)[0])
 
-    # Downbeats: pick the 4-beat phase with the most onset energy.
+    # Downbeats: pick the 4-beat phase where harmony changes and the low end hits hardest.
+    # (Chords usually change on the 1; kick-only phase is ambiguous when the kick plays on 1 and 3.)
     downbeats = []
     if len(beat_frames) >= 4:
-        strength = onset_env[np.clip(beat_frames, 0, len(onset_env) - 1)]
-        phase = int(np.argmax([strength[p::4].sum() for p in range(4)]))
+        bf = np.clip(beat_frames, 0, len(onset_env) - 1)
+        chroma = librosa.feature.chroma_cqt(y=y, sr=sr, hop_length=hop)
+        cs = librosa.util.sync(chroma, np.concatenate([[0], bf]), aggregate=np.median)
+        change = np.r_[np.linalg.norm(np.diff(cs, axis=1), axis=0)][: len(bf)]
+        S = np.abs(librosa.stft(y, hop_length=hop))
+        low = librosa.onset.onset_strength(S=librosa.amplitude_to_db(S[: int(200 / (sr / 2048)) + 1]), sr=sr, hop_length=hop)
+        lows = low[np.clip(bf, 0, len(low) - 1)]
+        z = lambda v: (v - v.mean()) / (v.std() + 1e-9)
+        score = z(change) + 0.5 * z(lows)
+        phase = int(np.argmax([score[p::4].mean() for p in range(4)]))
         downbeats = beats[phase::4].tolist()
 
     # Strong onsets: top 20% by strength — good for hits, pops, impact frames.
