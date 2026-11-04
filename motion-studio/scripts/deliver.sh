@@ -16,13 +16,14 @@ for f in "${F[@]}"; do
   echo "== $f ($sz)"
   rm -f "$mp4"
   if ! node scripts/render.mjs "$film" --size="$sz" --out="$mp4" > "$out/render-$f.log" 2>&1; then
-    echo "FAIL: render of $f failed:"; tail -3 "$out/render-$f.log"; echo "### $f ($sz)\nFAIL: render failed (see render-$f.log)" >> "$out/qa.txt"; fail=1; continue
+    echo "FAIL: render of $f failed:"; tail -3 "$out/render-$f.log"; printf '### %s (%s)\nFAIL: render failed (see render-%s.log)\n\n' "$f" "$sz" "$f" >> "$out/qa.txt"; fail=1; continue
   fi
   grep -E "WARNING|video:" "$out/render-$f.log" || true
   { echo "### $f ($sz)"; bash scripts/qa.sh "$mp4" || fail=1; echo; } >> "$out/qa.txt" 2>&1
-  [[ -z "$first" ]] && first="$f"
+  [[ -z "$first" && -f "$mp4" ]] && first="$f"
 done
-[[ -f "$out/final-$first.mp4" ]] && cp "$out/final-$first.mp4" "$out/final.mp4"
+if [[ -z "$first" ]]; then echo "No format rendered; see $out/render-*.log"; exit 1; fi
+cp "$out/final-$first.mp4" "$out/final.mp4"
 cp "$out/final-$first.contact.jpg" "$out/contact.jpg" 2>/dev/null || true
 # contact.png: one frame per beat of the primary format (the review sheet)
 node scripts/render.mjs "$film" --sheet --size="$(size_of "$first")" --out="$out/review.mp4" >/dev/null

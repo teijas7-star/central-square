@@ -72,6 +72,7 @@ const BANNED = [
   [/(^|[;{\s])transition\s*:/, "CSS transition — compute the value from t"],
   [/(^|[;{\s])animation(-name)?\s*:|@keyframes/, "CSS animation — compute the value from t"],
   [/\.play\s*\(\s*\)/, "media .play() — the renderer owns time"],
+  [/will-change\s*:/, "will-change — Chrome reuses cached layer rasters, so pixels depend on the previous frame"],
 ];
 function lint(file) {
   const problems = [];
