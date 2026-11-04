@@ -14,3 +14,5 @@ projects/*/out/
 projects/*/assets/capture/
 auth.json
 **/auth.json
+# private captures from the logged-in dashboard (re-capture with tools/capture-shots.mjs)
+projects/*/assets/ui-app/

@@ -1,5 +1,8 @@
 # Shot list: Wakelet reel (100 BPM · beat 0.6 s · bar 2.4 s · 38.4 s)
 
+**Structure:** the Wakelet customer story. **Shots:** the real Ellie dashboard (dashboard.centralsquare.ai, teijas7's community), captured read-only with PII blurred, each labelled "LIVE PRODUCT · ELLIE". Scenes 1–5 use: People (hook → GOING QUIET 21), a project's connected sources, Possible duplicates (79), the project's scheduled tasks (Mondays 9:00, weekly pulse), Approvals → Waiting on you. Scenes 6–8 keep Wakelet's real proof (photos, ½ day, James's quote) and the CTA. The original site-panel version below is superseded.
+
+
 | # | Beats (time) | On screen | Asset | Motion | SFX | Copy (verbatim) |
 |---|---|---|---|---|---|---|
 | 1 HOOK | 0–8 (0–4.8 s) | Community photo card lands right; chip; headline; gradient line on the downbeat | photos/community.jpg | card reveal (spring), slow push; masked rises | whoosh, impact | CUSTOMER STORY · WAKELET / Two people ran Wakelet’s community. / *Ellie found the members they couldn’t see.* |
