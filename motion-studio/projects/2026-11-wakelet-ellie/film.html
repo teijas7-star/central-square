@@ -398,8 +398,9 @@ window.seek = function (t) {
     const on = t >= b(32) && t < b(36); show(person, on);
     if (on) { [...person.querySelectorAll("div:last-child > span")].slice(0, 3).forEach((sp, j) => { const kk = Math.max(0, M.spring(t, b(34 + j * 0.5), { stiffness: 520, damping: 16, velocity: 6 })); sp.style.transform = `scale(${t >= b(34 + j * 0.5) ? 0.6 + 0.4 * kk + 0.5 * pulse(t, [34 + j * 0.5], 8) : 1})`; sp.style.display = "inline-block"; });
       person.style.boxShadow = `0 30px 80px rgba(0,0,0,.45), 0 0 ${mix(0, 70, pulse(t, [33, 35], 4)) * S}px rgba(198,82,63,.55)`;
-      const w = T(860, 800, 880) * S, h = w * 0.32; person.style.width = `${w}px`; person.style.height = `${h}px`; person.style.left = `${W / 2 - w / 2}px`; person.style.top = `${H * 0.54 - h / 2}px`; person.style.fontSize = `${w / 11}px`; person.style.transform = `scale(${Math.max(0, mergeK)})`; }
+      const w = T(860, 800, 880) * S, h = w * 0.32; person.style.width = `${w}px`; person.style.height = `${h}px`; person.style.left = `${W / 2 - w / 2}px`; person.style.top = `${H * 0.54 - h / 2}px`; person.style.fontSize = `${w / 11}px`; person.style.transform = `scale(${Math.max(0, mergeK) * mix(1, 1.08, P(t, b(33), b(36) - b(33), E.io))}) translateY(${-14 * S * Math.sin((t - b(32)) * 2.6)}px) rotate(${Math.sin((t - b(32)) * 2.1) * 2}deg)`; }
     popPill(same, t, b(33), W / 2, H * 0.54 + T(205, 195, 210) * S, T(50, 46, 50));
+    if (t >= b(33)) same.style.transform += ` scale(${1 + 0.12 * pulse(t, [34, 35], 7)}) rotate(${Math.sin((t - b(33)) * 2.4) * 3}deg)`;
     show(same, t >= b(33) && t < b(36)); }
 
   // ---- 6 every Monday
