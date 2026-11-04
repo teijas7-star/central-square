@@ -23,6 +23,8 @@
 // and the moment it appears on screen (or lands, with data-sfx-at="land") becomes a cue, panned by its
 // on-screen position and weighted by its size. window.CUES adds manual cues on top.
 //   --cues                        print the derived cue table and grid check, then exit
+//   --size=1080x1920              render at another size/aspect (film must lay out in vmin/vw/vh)
+//   --poster=7.5 --out=poster.png one full-resolution still
 // Options: --out <file.mp4>  --audio <track>  --crf 16  --no-verify  --no-audio
 import { chromium } from "playwright";
 import { spawn, spawnSync } from "node:child_process";
@@ -116,6 +118,11 @@ async function openFilm(beats) {
     .catch(() => die("film never defined window.FILM and window.seek"));
   await page.evaluate(() => document.fonts.ready);
   const film = await page.evaluate(() => window.FILM);
+  if (opt("size")) { // render the same film at another aspect ratio: layouts are in vmin + orientation queries
+    const [w, h] = opt("size").split("x").map(Number);
+    if (!(w > 0 && h > 0)) die("--size wants WxH, e.g. --size=1080x1920");
+    film.width = w; film.height = h;
+  }
   for (const k of ["width", "height", "fps", "duration"]) if (!(film[k] > 0)) die(`window.FILM.${k} must be a positive number`);
   await page.setViewportSize({ width: film.width, height: film.height });
   return { page, film };
@@ -163,12 +170,24 @@ if (wantAudio) {
   const j = JSON.parse(m.slice(m.lastIndexOf("{"), m.lastIndexOf("}") + 1));
   mixPath = path.join(audioDir, "mix.wav");
   run("ffmpeg", ["-y", "-v", "error", "-i", pre, "-af",
-    `loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=${j.input_i}:measured_TP=${j.input_tp}:measured_LRA=${j.input_lra}:measured_thresh=${j.input_thresh}:offset=${j.target_offset}:linear=true,alimiter=limit=0.75:attack=1:release=50:level=false`,
+    `loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=${j.input_i}:measured_TP=${j.input_tp}:measured_LRA=${j.input_lra}:measured_thresh=${j.input_thresh}:offset=${j.target_offset}:linear=true,alimiter=limit=0.7:attack=1:release=50:level=false`,
     "-ar", "48000", mixPath]);
 }
 
 const seek = (t) => page.evaluate(async (tt) => { await window.seek(tt); }, t);
 const shot = () => page.screenshot({ type: "png", clip: { x: 0, y: 0, width: film.width, height: film.height } });
+
+// ---------- poster: one full-resolution still
+if (opt("poster")) {
+  const t = Math.min(Number(opt("poster")), film.duration - 1 / film.fps);
+  await seek(t);
+  const p = path.resolve(opt("out", path.join(filmDir, "renders", `${name}.poster.png`)));
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  await page.screenshot({ path: p, type: "png", clip: { x: 0, y: 0, width: film.width, height: film.height } });
+  await browser.close(); report();
+  console.log(`poster: ${p} (t=${t.toFixed(2)}s)`);
+  process.exit(violations.length ? 1 : 0);
+}
 
 // ---------- 4a. review: beat sheet, every-frame strip, chosen moments; optional full-res crops
 if (REVIEW) {

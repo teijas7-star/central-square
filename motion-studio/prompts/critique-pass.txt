@@ -1,0 +1,40 @@
+CRITIQUE PASS: Central Square AI motion reel
+Run this after every contact sheet. You are now the harshest art director on the account, not the
+person who built the film. Judge only what is on the images and in the cue table, not what the code intends.
+
+INPUTS (generate them first, then open every image and actually look):
+  node scripts/render.mjs projects/<slug>/film.html --sheet            -> renders/film.beats.png
+  node scripts/render.mjs projects/<slug>/film.html --cues             -> cue table + grid warnings
+  node scripts/render.mjs projects/<slug>/film.html --strip=A:B        -> one per entrance/transition changed this round
+  node scripts/render.mjs projects/<slug>/film.html --at=T --crop-at=<selector>,W,H --zoom=2   -> each piece of small type
+  For multi-format reels, also: --sheet --size=1080x1920 and --sheet --size=1080x1080
+
+STEP 1 · Describe before judging (one line per beat frame):
+  "<t>s: what the viewer sees · where their eye goes · what is new since the last frame"
+  If two consecutive lines have nothing new, and they're more than 4 s apart, that's a variety failure.
+
+STEP 2 · Score 1–10, with one sentence of evidence each (cite frame times):
+  1. Hook (first 2 s): one specific, striking image or line by 2.0 s? No empty or logo-only opening.
+  2. Readability at phone size: read the sheet at ~260 px per frame. Is every word legible? Does each line
+     hold ≥ 0.4 s + 0.3 s per word? Any text under 2.8vmin, crushed by motion, or cut by a mask edge (check crops)?
+  3. Motion quality (from strips): anticipation and follow-through? Springs settling, not snapping?
+     No linear slides, nothing popping in or out between two frames, never everything moving at once?
+  4. Variety: something new on screen every 2–4 s? Does the reel escalate, or repeat one trick?
+  5. Brand accuracy: Playfair + Inter only, amber as the one accent marking the focal point, dark ground?
+     Real product UI only, captured or supplied, never invented? Every claim sourced in BRIEF.md?
+  6. Sound sync: `--cues` shows no off-grid WARNING? Every visible hit is tagged data-sfx, and the ♪ marker
+     in strips sits on the frame where the action reads? Nothing loud with no visible cause?
+
+STEP 3 · Banned-defaults sweep (any hit caps Brand accuracy at 5):
+  centered title on a gradient · everything fading in · corner labels · frame borders · glow on UI chrome ·
+  generic particle bursts · invented UI or data · logo intro before the hook
+
+STEP 4 · Pick the 3 WORST problems (lowest scores first; ties go to what a viewer would notice first).
+  For each: frame time(s) · what's wrong · the concrete fix (numbers: seconds, vmin, spring preset, beat index).
+
+STEP 5 · Record the round in SCORECARD.md (pass number, six scores, the three fixes), apply the three fixes,
+  then start again at INPUTS.
+
+Stop only when ALL six scores are ≥ 8 AND at least 3 rounds have run. Don't round scores up to finish:
+a 7 is a 7. If a problem can't be fixed without Teijas (missing real UI, an unsourced claim, a brief question),
+stop and ask instead of inventing.

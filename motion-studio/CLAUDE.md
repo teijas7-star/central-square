@@ -145,6 +145,10 @@ When to reach for them:
 
 ## 10. Workflow and files
 
+- **Product reels, launch videos, showreels, motion ads:** use the **`motion-reel` skill** (`.claude/skills/motion-reel/`). It sets the order of work: capture real UI, style guide, beats, shotlist (wait for OK), build, critique ×3+ (`prompts/critique-pass.txt`), deliver all formats.
+- **Motion library:** `lib/motion.js` (copied into each project) has closed-form springs (`spring(t, start, "snappy"|"smooth"|"gentle"|"pop")`), eases, the beat `grid`, seeded `hash`/`noise`, and `rise`/`wipe`/`draw`/`count`/`camera` helpers. Use it instead of re-writing helpers per film.
+- **Real UI:** `node scripts/capture.mjs <url> --out projects/<slug>/assets/capture` (Playwright: full pages, sections, UI cut-outs, logos, images, colours and fonts in `manifest.json`). Captures are gitignored; re-capture in a new container.
+- **Delivery:** `bash scripts/deliver.sh projects/<slug>/film.html 16x9,9x16,1x1` → `out/final.mp4`, `final-<format>.mp4`, `contact.png`, `poster.png`, `qa.txt`. Single renders take `--size=WxH` and `--poster=t`.
 - **New film:** `bash scripts/new-video.sh <slug> [landscape|portrait|square]`. The slug is `yyyy-mm-short-name`. You get `film.html` (the branded seek-contract starter), fonts, `BRIEF.md` and `SCORECARD.md`.
 - **Before building:**
   - Fill in `BRIEF.md` with Teijas (audience, the one thing, CTA, channel, sources).
@@ -161,7 +165,11 @@ motion-studio/
   CLAUDE.md          these rules
   brand/             tokens.css, brand.json, fonts/ (OFL), vendor/gsap.min.js (HyperFrames route only)
   templates/         cs-film/film.html (seek-contract starter), BRIEF.md, SCORECARD.md
-  scripts/           render.mjs, synth_audio.py, analyze_audio.py, qa.sh, new-video.sh, setup.sh, fetch-references.sh
+  lib/motion.js      springs, eases, beat grid, seeded noise, element helpers (pure functions)
+  prompts/           critique-pass.txt (the review round)
+  scripts/           render.mjs, capture.mjs, deliver.sh, synth_audio.py, analyze_audio.py, qa.sh,
+                     new-video.sh, setup.sh, fetch-references.sh
+  .claude/skills/motion-reel/   the product-reel workflow
   references/        cloned reference repos (gitignored; list in references.txt)
   assets/            shared, licensed, sourced music/ sfx/ footage/ images/
   projects/<slug>/   one folder per film

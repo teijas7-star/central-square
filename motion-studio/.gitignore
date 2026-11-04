@@ -10,3 +10,7 @@ assets/footage/*
 !assets/footage/.gitkeep
 projects/*/audio/
 references/
+projects/*/out/
+projects/*/assets/capture/
+auth.json
+**/auth.json

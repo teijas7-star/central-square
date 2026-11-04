@@ -18,6 +18,7 @@ dest="projects/$slug"
 
 mkdir -p "$dest/assets/fonts" "$dest/assets/images" "$dest/audio"
 cp templates/cs-film/film.html "$dest/film.html"
+mkdir -p "$dest/lib" "$dest/docs" && cp lib/motion.js "$dest/lib/motion.js"
 cp brand/fonts/*.woff2 "$dest/assets/fonts/"
 cp templates/BRIEF.md "$dest/BRIEF.md"
 cp templates/SCORECARD.md "$dest/SCORECARD.md"
