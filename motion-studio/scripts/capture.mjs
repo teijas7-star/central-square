@@ -39,7 +39,11 @@ async function open(kind) {
     ? { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, storageState }
     : { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, storageState });
   const page = await ctx.newPage();
-  const res = await page.goto(url, { waitUntil: "networkidle", timeout: 45000 }).catch((e) => { throw new Error(`could not load ${url}: ${e.message.split("\n")[0]}`); });
+  // "load", then up to 8 s for the network to go quiet: apps with live connections (websockets, polling)
+  // never reach networkidle, so don't wait for it forever.
+  const res = await page.goto(url, { waitUntil: "load", timeout: 60000 }).catch((e) => { throw new Error(`could not load ${url}: ${e.message.split("\n")[0]}`); });
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+  if (page.url() !== url) console.log(`  (${kind}) redirected to ${page.url()}`);
   if (res && res.status() >= 400) console.warn(`warning: ${url} answered HTTP ${res.status()}`);
   await page.evaluate(() => document.fonts.ready);
   // settle lazy content: walk the page once
