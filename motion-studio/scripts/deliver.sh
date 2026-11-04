@@ -14,11 +14,15 @@ IFS=, read -ra F <<< "$formats"
 for f in "${F[@]}"; do
   sz=$(size_of "$f"); mp4="$out/final-$f.mp4"
   echo "== $f ($sz)"
-  node scripts/render.mjs "$film" --size="$sz" --out="$mp4" | grep -E "WARNING|video:|frame [0-9]+/[0-9]+ in" | tr '\r' '\n' | grep -vE "^frame [0-9]+/[0-9]+$" || true
+  rm -f "$mp4"
+  if ! node scripts/render.mjs "$film" --size="$sz" --out="$mp4" > "$out/render-$f.log" 2>&1; then
+    echo "FAIL: render of $f failed:"; tail -3 "$out/render-$f.log"; echo "### $f ($sz)\nFAIL: render failed (see render-$f.log)" >> "$out/qa.txt"; fail=1; continue
+  fi
+  grep -E "WARNING|video:" "$out/render-$f.log" || true
   { echo "### $f ($sz)"; bash scripts/qa.sh "$mp4" || fail=1; echo; } >> "$out/qa.txt" 2>&1
   [[ -z "$first" ]] && first="$f"
 done
-cp "$out/final-$first.mp4" "$out/final.mp4"
+[[ -f "$out/final-$first.mp4" ]] && cp "$out/final-$first.mp4" "$out/final.mp4"
 cp "$out/final-$first.contact.jpg" "$out/contact.jpg" 2>/dev/null || true
 # contact.png: one frame per beat of the primary format (the review sheet)
 node scripts/render.mjs "$film" --sheet --size="$(size_of "$first")" --out="$out/review.mp4" >/dev/null

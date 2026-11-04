@@ -83,6 +83,8 @@
   .btn { position: relative; display: inline-block; font-family: "Geist Mono", monospace; font-weight: 500; font-size: 3vmin; color: #fff; padding: 1.8vmin 3.2vmin; border-radius: 1vmin; overflow: hidden; margin-top: 4vmin; }
   .btn .fill { position: absolute; inset: 0; background: var(--violet); transform-origin: 0 50%; }
   .btn .lab { position: relative; }
+  /* square: the results and quote scenes carry more copy, so their photo sits small, bottom-right */
+  @media (aspect-ratio: 1/1) { #s5 .vis, #s6 .vis { left: 52vw; top: 61vh; width: 42vw; height: 33vh; } }
   #s7 .text { width: 60vw; }
   @media (orientation: portrait), (aspect-ratio: 1/1) { #s7 .text { width: 86vw; top: 30vh; } }
 </style>
@@ -315,7 +317,8 @@ window.seek = function (t) {
     region($("t0"), F("watch"), 0.717, 0.736, 0.951, 0.805); region($("t1"), F("watch"), 0.717, 0.885, 0.951, 0.955); }
   // 5 APPROVE: waiting on you -> the decision buttons
   { const k = clamp(spring(t, B(33.5), "gentle"));
-    cam($("approve-w"), mix(1.8, 2.4, k), mix(0.6, 0.43, k), mix(0.3, 0.25, k));
+    const kd = prog(t, B(36), beat(40) - B(36), E.linear); // slow push through the hold
+    cam($("approve-w"), mix(1.8, 2.4, k) + 0.12 * kd, mix(0.6, 0.43, k), mix(0.3, 0.25, k) + 0.02 * kd);
     region($("a0"), F("approve"), 0.237, 0.14, 0.935, 0.19); region($("r5"), F("approve"), 0.248, 0.293, 0.286, 0.323, 3); }
   // 6 RESULT: count to 20 (real figure), slow push
   $("twenty").textContent = Math.round(mix(0, 20, prog(t, B(43), 1.2, E.outExpo)));

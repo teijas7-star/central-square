@@ -117,6 +117,8 @@ async function openFilm(beats) {
   await page.waitForFunction(() => window.FILM && typeof window.seek === "function", null, { timeout: 15000 })
     .catch(() => die("film never defined window.FILM and window.seek"));
   await page.evaluate(() => document.fonts.ready);
+  // decode every image up front so no frame is captured mid-decode
+  await page.evaluate(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
   const film = await page.evaluate(() => window.FILM);
   if (opt("size")) { // render the same film at another aspect ratio: layouts are in vmin + orientation queries
     const [w, h] = opt("size").split("x").map(Number);
@@ -174,7 +176,8 @@ if (wantAudio) {
     "-ar", "48000", mixPath]);
 }
 
-const seek = (t) => page.evaluate(async (tt) => { await window.seek(tt); }, t);
+// after painting frame t, wait two paints so the compositor has rasterized it (large zoomed images included)
+const seek = (t) => page.evaluate(async (tt) => { await window.seek(tt); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); }, t);
 const shot = () => page.screenshot({ type: "png", clip: { x: 0, y: 0, width: film.width, height: film.height } });
 
 // ---------- poster: one full-resolution still
