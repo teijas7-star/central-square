@@ -6,7 +6,7 @@
 
     # SFX placed so each hit LANDS at its time (whooshes/risers pre-roll into the time)
     python3 scripts/synth_audio.py sfx --duration 12 --cues cues.json --out audio/sfx.wav
-    # cues.json: [{"t": 0.6, "sfx": "pop"}, {"t": 2.4, "sfx": "whoosh", "gain": 0.8}, ...]
+    # cues.json: [{"t": 0.6, "sfx": "pop", "pan": -0.4}, {"t": 2.4, "sfx": "whoosh", "gain": 0.8}, ...]
 
 SFX kinds: pop, tick, whoosh, riser, impact, chime, thud.
 Everything is deterministic (seeded). Output: 48 kHz stereo float WAV, peak-limited; loudness is
@@ -157,12 +157,18 @@ def make_sfx(kind, r):
 
 
 def sfx_track(duration, cues, seed):
+    """Each cue: t (where the hit lands), sfx, optional gain and pan (-1 left .. 1 right, equal-power)."""
     r = rng_for(seed)
-    n = int(duration * SR); buf = np.zeros(n)
+    n = int(duration * SR); L = np.zeros(n); R = np.zeros(n)
     for c in cues:
         sig, land = make_sfx(c["sfx"], r)
-        place(buf, sig, float(c["t"]) - land, float(c.get("gain", 1.0)))
-    return stereo(buf, width=0.1, seed=seed + 1)
+        g = float(c.get("gain", 1.0)); pan = max(-1.0, min(1.0, float(c.get("pan", 0.0))))
+        th = (pan + 1) * np.pi / 4
+        place(L, sig, float(c["t"]) - land, g * np.cos(th) * np.sqrt(2))
+        place(R, sig, float(c["t"]) - land, g * np.sin(th) * np.sqrt(2))
+    st = np.stack([L, R], axis=1)
+    peak = np.max(np.abs(st)) or 1.0
+    return (st / peak * 0.89).astype(np.float32)
 
 
 def stereo(x, width, seed):

@@ -51,13 +51,13 @@
   <div id="net"><svg viewBox="-500 -500 1000 1000"><g id="links"></g><circle id="pulse" class="pulse" r="0" /><g id="nodes"></g></svg></div>
 
   <div id="copy">
-    <div class="mask"><span id="kicker" data-text="Central Square AI">Central Square AI</span></div>
+    <div class="mask"><span id="kicker" data-sfx="tick" data-sfx-gain="0.7">Central Square AI</span></div>
     <div id="headline">
-      <span class="mask"><span id="h1">Where</span></span>
+      <span class="mask"><span id="h1" data-sfx="whoosh" data-sfx-gain="0.5">Where</span></span>
       <span class="mask"><span id="h2">communities</span></span>
-      <span class="mask"><span id="h3"><span id="accent">thrive.</span></span></span>
+      <span class="mask"><span id="h3" data-sfx="impact" data-sfx-gain="0.6"><span id="accent">thrive.</span></span></span>
     </div>
-    <div id="cta-row"><span class="mask"><span id="cta">centralsquare.ai</span></span><div id="underline"></div></div>
+    <div id="cta-row"><span class="mask"><span id="cta" data-sfx="thud">centralsquare.ai</span></span><div id="underline"></div></div>
   </div>
 
 <script>
@@ -110,9 +110,11 @@ const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag)
 const gl = document.getElementById("links"), gn = document.getElementById("nodes");
 const L1 = ring1.map(() => el("line", { pathLength: 1, "stroke-dasharray": 1 }, gl));
 const L2 = ring2.map(() => el("line", { pathLength: 1, "stroke-dasharray": 1 }, gl));
-const N1 = ring1.map(() => el("circle", { class: "node", r: 9 }, gn));
-const N2 = ring2.map(() => el("circle", { class: "node", r: 6 }, gn));
-const hub = el("circle", { class: "hub", r: 15 }, gn);
+// data-sfx: the renderer measures these on screen every frame; the moment each appears becomes a sound cue
+// (panned by where it is, weighted by its size). No hand-timed cue list to drift out of sync.
+const N1 = ring1.map((_, i) => el("circle", { id: `n1-${i}`, class: "node", r: 9, "data-sfx": "tick", "data-sfx-gain": 0.8 }, gn));
+const N2 = ring2.map((_, i) => el("circle", { id: `n2-${i}`, class: "node", r: 6, "data-sfx": "tick", "data-sfx-gain": 0.4 }, gn));
+const hub = el("circle", { id: "hub", class: "hub", r: 15, "data-sfx": "pop" }, gn);
 const pulse = document.getElementById("pulse");
 
 const $ = (id) => document.getElementById(id);
@@ -140,10 +142,10 @@ window.seek = function (t) {
   });
 
   ring2.forEach(([x, y, parent], i) => {
-    const s = T.ring2 + 0.15 + i * 0.07;
+    const s = T.ring2 + i * SPB / 4; // one node per 16th note: the stagger stays on the grid
     const [dx, dy] = drift(i + 10, t, 10);
     const [px, py] = ring1[parent], [pdx, pdy] = drift(parent, t, 8);
-    const kl = prog(t, s, 0.6, E.outCubic), kn = prog(t, s + 0.3, 0.5, E.outBack);
+    const kl = prog(t, s, 0.6, E.outCubic), kn = prog(t, s + SPB / 2, 0.5, E.outBack);
     L2[i].setAttribute("x1", px + pdx); L2[i].setAttribute("y1", py + pdy);
     L2[i].setAttribute("x2", x + dx); L2[i].setAttribute("y2", y + dy);
     L2[i].setAttribute("stroke-dashoffset", 1 - kl);
@@ -168,15 +170,8 @@ window.seek = function (t) {
   $("underline").style.transform = `scaleX(${prog(t, T.cta + 0.15, 0.9, E.inOutCubic)})`;
 };
 
-// SFX land on the same grid the visuals use.
+// Manual cues only for what the picture can't express as an element appearing (here: the hub's pulse ring).
 window.CUES = [
-  { t: Math.max(0, T.hub + 0.1), sfx: "pop" },
-  ...ring1.map((_, i) => ({ t: T.ring1 + (i + 1) * SPB * 0.5, sfx: "tick", gain: 0.7 })),
-  { t: T.words, sfx: "whoosh", gain: 0.6 },
-  { t: T.accent, sfx: "impact", gain: 0.7 },
-  { t: T.ring2, sfx: "whoosh", gain: 0.45 },
-  { t: T.kicker, sfx: "tick", gain: 0.6 },
-  { t: T.cta, sfx: "thud", gain: 0.8 },
   { t: T.pulse, sfx: "chime", gain: 0.45 },
 ];
 

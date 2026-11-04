@@ -11,7 +11,7 @@ The owner is Teijas (teijas@centralsquare.ai). If a rule blocks something they e
 - No CSS transitions or animations, no `setTimeout`/`setInterval`, no `requestAnimationFrame` in render mode, no `Date.now()`, and **no state carried between frames**.
 - Seeded noise only (`mulberry32(seed)`), never `Math.random`.
 - **Render with `node scripts/render.mjs <film.html>`.** It encodes H.264, yuv420p, **CRF 16**.
-- A film declares `window.FILM = { width, height, fps, duration, bpm, seed }` and `window.seek`, plus `window.CUES` for its SFX hits. The renderer injects `window.__RENDER = true` and `window.BEATS` (the beat grid) before any film script runs.
+- A film declares `window.FILM = { width, height, fps, duration, bpm, seed }` and `window.seek`. It tags on-screen actions with `data-sfx` (see Sound), and may add `window.CUES` for extra hits. The renderer injects `window.__RENDER = true` and `window.BEATS` (the beat grid) before any film script runs.
 - `render.mjs` enforces the contract. It refuses to render when:
   - a static lint of the film's own files finds a banned API;
   - the runtime guard catches a banned call coming from film code;
@@ -45,14 +45,31 @@ Entrances are masked rises, wipes, line draws and scale-from-origin, chosen per 
 - **Score and SFX are synthesized in code unless a track is supplied.** `render.mjs` handles this:
   - **No track supplied:** it runs `scripts/synth_audio.py score` at `FILM.bpm`. The script writes the exact grid to `audio/score.beats.json` and records the measured drift in `audio/beats.measured.json`.
   - **Track supplied** (`--audio file`): it measures the beats with `scripts/analyze_audio.py`.
-  - **Then:** it writes `audio/beats.json`, injects it as `window.BEATS`, and synthesizes the film's `window.CUES` with `synth_audio.py sfx`. SFX kinds: pop, tick, whoosh, riser, impact, chime, thud.
-- **Place hits on the measured beat grid** (`beats.json`): beats, half-beats or downbeats. Time story events from `window.BEATS` and build `CUES` from the same times, so picture and sound can't drift apart.
+  - **Then:** it writes `audio/beats.json` and injects it as `window.BEATS`.
+- **Sound cues are derived from the picture.** Don't hand-time a cue list. Instead, tag the element that does the visible action:
+  - `data-sfx="<kind>"`, with kinds pop, tick, whoosh, riser, impact, chime and thud.
+  - Optional `data-sfx-gain` (default 1).
+  - Optional `data-sfx-at="land"` to hit when the element fully arrives, instead of when it first appears.
+- **How cues are derived:**
+  - `render.mjs` seeks every frame and measures each tagged element: visible fraction after opacity, overflow masks, the viewport and stroke draw-on, plus its position and size.
+  - The frame where it appears becomes a cue, **panned by its x position and weighted by its size**.
+  - Same-kind hits within 60 ms merge into one gesture.
+  - `window.CUES` adds manual hits only for things that aren't an element appearing, e.g. a pulse ring.
+  - Preview with `node scripts/render.mjs <film> --cues`. The final list goes to `audio/cues.json`.
+- **Hits sit on the measured beat grid** (`beats.json`, subdivided to 16ths):
+  - A derived cue within 1.5 frames of a grid point snaps to it.
+  - Anything further off is reported as a WARNING naming the element. **Fix the animation timing, don't move the sound.**
+  - Time story events from `window.BEATS` (e.g. staggers of `SPB / 4`) so the picture lands on the grid by construction.
 - **Loudness −14 LUFS integrated, true peak ≤ −1 dBTP.** `render.mjs` normalizes in two passes and limits. `qa.sh` fails anything off by more than 1 LU or hotter than −1 dBTP.
 - A supplied music track needs its license recorded in `BRIEF.md`.
 
 ## 4. Loop before you show Teijas anything
 
-1. **Render one frame per beat as a contact sheet and LOOK at it:** `node scripts/render.mjs projects/<slug>/film.html --sheet` → `renders/film.beats.png`. Use `--every 2` for long films.
+1. **Render one frame per beat as a contact sheet and LOOK at it:** `node scripts/render.mjs projects/<slug>/film.html --sheet` → `renders/film.beats.png`. Use `--every 2` for long films. Labels show beat, downbeat and the sound cue on that frame.
+   - **Strip, every frame of a moment:** `--strip=2.1:2.6`. Use it for every key motion, entrance and transition. Check anticipation and follow-through, pops or snaps between frames, things moving all at once, and whether the ♪ marker sits on the frame where the action reads.
+   - **Crop, full-resolution detail:** `--crop=x,y,w,h` (frame pixels), or `--crop-at=<selector>,w,h` to follow an element through a strip. Add `--zoom=2` or `3` for more density. Use it for type edges, descenders in masks, thin lines and small UI.
+   - `--at=t1,t2,...` captures chosen moments, and works with crops too.
+   - **Budget:** one beat sheet per pass, a strip for every entrance and transition you changed, and a crop for every piece of small type.
 2. **Score it 1–10** in `SCORECARD.md` on: **hook in first 2 s, readability at phone size, motion quality, variety, brand accuracy, sound sync.**
 3. **Fix the 3 worst problems.** Re-sheet and re-score. **Repeat until every score is 8+.**
 4. **Only then do the full render:** `node scripts/render.mjs projects/<slug>/film.html`.

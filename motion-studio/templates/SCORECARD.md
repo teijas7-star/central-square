@@ -15,4 +15,5 @@ Every row must be **8+** before the full render. Each pass: fix the **3 lowest**
 - **Motion quality:** eases are intentional (expo/cubic out, in-out for moves); no linear slides; staggers, not everything moving at once; nothing pops without a cause.
 - **Variety:** list what's new at each 2–4 s window. Any window with nothing new scores ≤ 6.
 - **Brand accuracy:** Playfair + Inter only; amber as the single accent and focal point; dark ground; no banned defaults (centered title on gradient, fade-everything, corner labels, frame borders, glow on UI chrome, generic particle bursts); claims sourced in BRIEF.md.
-- **Sound sync:** every cue in `audio/cues.json` lands on a beat in `audio/beats.json` and on a visible action; mix measured at −14 LUFS by `qa.sh`.
+- **Sound sync:** `render.mjs --cues` prints **no off-grid WARNING**. Every visible action that should make a sound is tagged `data-sfx`. In strips, the ♪ marker sits on the frame where the action reads. The mix measures −14 LUFS by `qa.sh`.
+- **Motion quality** is scored from **strips** (`--strip`) of the key moments, not from the beat sheet alone. Readability of small type is scored from **crops** (`--crop` / `--crop-at`).
