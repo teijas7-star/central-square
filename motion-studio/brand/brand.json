@@ -1,0 +1,33 @@
+{
+  "name": "Central Square AI",
+  "shortName": "CS AI",
+  "tagline": "A digital agora where communities thrive",
+  "url": "centralsquare.ai",
+  "contact": "teijas@centralsquare.ai",
+  "colors": {
+    "black": "#000000",
+    "ground": "#0B0B0B",
+    "neutral900": "#171717",
+    "neutral800": "#262626",
+    "neutral700": "#404040",
+    "ink": "#FAFAFA",
+    "inkMuted": "#A3A3A3",
+    "amber": "#F59E0B",
+    "amberDeep": "#D97706",
+    "live": "#22C55E"
+  },
+  "fonts": {
+    "display": { "family": "Playfair Display", "files": "brand/fonts/playfair-display-*.woff2", "weights": [400, 600, 700], "italic": [400] },
+    "body": { "family": "Inter", "files": "brand/fonts/inter-*.woff2", "weights": [400, 500, 600] }
+  },
+  "motion": {
+    "easeIn": [0.22, 1, 0.36, 1],
+    "easeMove": [0.65, 0, 0.35, 1],
+    "gsapEaseIn": "expo.out",
+    "gsapEaseMove": "power3.inOut"
+  },
+  "imagery": {
+    "metaphor": "network / constellation: points of warm light joined by thin lines; a public square seen from above",
+    "repoImages": ["../public/images/city-square.png", "../public/images/earth-from-space.png", "../public/design/boston-skyline.jpg"]
+  }
+}

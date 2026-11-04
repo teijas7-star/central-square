@@ -1,5 +1,7 @@
 # Central Square - Claude Development Guide
 
+> **Making videos / motion content?** Work in `motion-studio/`. Its `CLAUDE.md` holds the house rules, brand kit and workflow for every Central Square AI video.
+
 ## Project Identity
 
 **Central Square** is the community marketplace — a new social layer of the internet where communities thrive, discover each other, and create economic opportunities without algorithmic manipulation or ads.
