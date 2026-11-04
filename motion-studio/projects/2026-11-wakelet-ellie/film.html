@@ -1,0 +1,508 @@
+<!doctype html>
+<!--
+  Wakelet × Ellie: 37 s at 120 BPM (beat = 0.5 s = 15 frames). A pure function of time: window.seek(t) paints frame t.
+  Components: Square, Card, Pill, Counter, KineticHeadline, Particles (200 members), Camera, Grain, Vignette, Flash.
+  Layout re-sets per format (16:9, 1:1, 9:16) from the same timeline. Plan: docs/plan.md.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Wakelet x Ellie</title>
+<style>
+  @font-face { font-family: "Fraunces"; src: url("assets/fonts/fraunces-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: block; }
+  @font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  :root { --base: #0A0511; --violet: #7C5EFF; --violet2: #9D8BFF; --coral: #C6523F; --cream: #F4F0ED; --ink: #150F1D;
+          --grad: linear-gradient(100deg, #7C5EFF 10%, #9D8BFF 45%, #C6523F 95%); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--base); color: var(--cream); font-family: "Inter", sans-serif; }
+  canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  #stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  .layer { position: absolute; inset: 0; }
+  #mid { z-index: 1; } #fg { z-index: 2; }
+  .abs { position: absolute; }
+  .hide { display: none; }
+  /* type */
+  .kh { position: absolute; transform: translate(-50%, -50%); text-align: center; font-family: "Fraunces", serif; font-weight: 500; letter-spacing: -0.02em; line-height: 1.0; white-space: nowrap; }
+  .kh .m { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.04em 0.03em 0.14em; margin: -0.04em -0.03em -0.14em; }
+  .kh .w { display: inline-block; transform-origin: 50% 80%; }
+  .kh .gap { display: inline-block; width: 0.26em; }
+  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .coral { color: var(--coral); }
+  /* cards & UI */
+  .card { position: absolute; background: var(--cream); color: var(--ink); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06); overflow: hidden; }
+  .card .lbl { font-family: "Inter"; font-weight: 600; letter-spacing: -0.01em; }
+  .ln { position: absolute; height: 9%; border-radius: 99px; background: rgba(21,15,29,.14); }
+  .pill { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 0.5em; white-space: nowrap; font-family: "Inter"; font-weight: 600; border-radius: 999px; padding: 0.55em 1.05em; }
+  .sq { position: absolute; border-radius: 22%; }
+  .btn { position: absolute; display: flex; align-items: center; justify-content: center; font-family: "Inter"; font-weight: 600; border-radius: 12px; }
+  #vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 48%, rgba(10,5,17,0) 45%, rgba(25,10,50,.55) 85%, rgba(10,5,17,.9) 110%); }
+  #grain { opacity: 0.09; mix-blend-mode: overlay; image-rendering: pixelated; }
+  #flash { position: absolute; inset: 0; background: var(--cream); display: none; }
+  .photo { position: absolute; overflow: hidden; }
+  .photo img { position: absolute; left: 50%; top: 50%; transform-origin: 50% 50%; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="mb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mbg" stdDeviation="0 0" /></filter></svg>
+<canvas id="bg"></canvas>
+<div id="stage">
+  <div class="layer" id="mid"></div>
+  <div class="layer" id="fg"></div>
+</div>
+<div id="vig"></div>
+<canvas id="grain"></canvas>
+<div id="flash"></div>
+
+<script src="lib/motion.js"></script>
+<script>
+"use strict";
+window.FILM = { width: 1920, height: 1080, fps: 30, duration: 37.0, bpm: 120, seed: 21 };
+const M = window.Motion, { clamp, mix, hash, noise } = M;
+const BEAT = 0.5, FR = 1 / 30, b = (n) => n * BEAT;
+const C = { base: "#0A0511", violet: "#7C5EFF", violet2: "#9D8BFF", coral: "#C6523F", cream: "#F4F0ED", ink: "#150F1D" };
+// shared easing (entrances expo-out; pills/buttons/counters back-out; never linear except clocks/drifts)
+const E = { out: M.ease.outExpo, back: (x) => M.ease.outBack(x, 1.9), io: M.ease.inOutCubic, inQ: (x) => x * x * x, cub: M.ease.outCubic };
+const P = (t, s, d, f = E.out) => f(clamp((t - s) / d));                  // tween progress
+const win = (t, a, z) => t >= a && t < z;                                  // time window
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (parent || $("mid")).appendChild(e); return e; };
+const show = (e, on) => { e.style.display = on ? "" : "none"; };
+const hex = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const lerpC = (h1, h2, k, a = 1) => { const p = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; const A = p(h1), B = p(h2); return `rgba(${A.map((v, i) => Math.round(mix(v, B[i], k))).join(",")},${a})`; };
+
+// ---------------------------------------------------------------- layout per format
+let W = 1920, H = 1080, S = 1, MODE = "land";
+function layout() {
+  W = innerWidth; H = innerHeight; S = Math.min(W, H) / 1080;
+  MODE = W / H > 1.2 ? "land" : W / H < 0.8 ? "port" : "square";
+}
+const T = (land, square, port) => (MODE === "land" ? land : MODE === "square" ? square : port); // pick per format
+
+// ---------------------------------------------------------------- KineticHeadline
+// words arrive 1–2 per hit: masked slide up (expo-out) + scale punch (back-out). Exits are hard cuts or a masked slide out.
+const HEADS = [];
+function Head(words, opts) {
+  const e = el("div", "kh", $("fg"));
+  const parts = words.map((w, i) => {
+    if (i) el("span", "gap", e);
+    if (w.br) { el("br", null, e); return null; }
+    const m = el("span", "m", e), s = el("span", "w " + (w.cls || ""), m, w.t);
+    if (w.sfx) { s.dataset.sfx = w.sfx; s.dataset.sfxGain = w.gain || 0.5; }
+    return { s, at: w.at };
+  }).filter(Boolean);
+  const h = { e, parts, ...opts }; HEADS.push(h); return h;
+}
+function drawHead(h, t) {
+  const on = t >= h.in - 0.001 && t < h.out;
+  show(h.e, on); if (!on) return;
+  const [x, y, size] = h.pos();
+  h.e.style.left = `${x * W}px`; h.e.style.top = `${y * H}px`; h.e.style.fontSize = `${size * S}px`;
+  const kout = h.exit ? P(t, h.out - h.exit, h.exit, E.io) : 0;
+  for (const p of h.parts) {
+    const k = P(t, p.at, 0.32, E.out), kp = P(t, p.at, 0.3, E.back);
+    p.s.style.transform = `translateY(${(1 - k) * 105 - kout * 105}%) scale(${mix(1.18, 1, kp)})`;
+  }
+}
+
+// ---------------------------------------------------------------- Counter
+function count(e, t, at, to, dur = 0.9) { e.textContent = Math.round(mix(0, to, P(t, at, dur, E.cub))); }
+
+// ---------------------------------------------------------------- Pill
+function Pill(html, bg, fg, parent) { const p = el("div", "pill", parent || $("mid"), html); p.style.background = bg; p.style.color = fg; return p; }
+function popPill(p, t, at, x, y, size) {
+  const k = Math.max(0, M.spring(t, at, { stiffness: 520, damping: 20, velocity: 6 }));
+  show(p, t >= at);
+  p.style.left = `${x}px`; p.style.top = `${y}px`; p.style.fontSize = `${size * S}px`;
+  p.style.transform = `translate(-50%,-50%) scale(${k})`;
+}
+
+// ---------------------------------------------------------------- Camera (push / shake / whip), with directional motion blur
+function camera(t) {
+  let x = 0, y = 0, s = 1, r = 0;
+  // slow push-ins per scene
+  const scenes = [[0, b(6)], [b(6), b(14)], [b(14), b(18)], [b(18), b(28)], [b(28), b(36)], [b(36), b(44)], [b(44), b(50)], [b(50), b(60)], [b(60), b(68)], [b(68), 37]];
+  for (const [a, z] of scenes) if (t >= a && t < z) s *= 1 + 0.045 * clamp((t - a) / (z - a));
+  // shakes on hits (decaying, seeded)
+  for (const [at, amp] of [[b(1), 14], [b(2), 10], [b(6), 8], [b(7), 8], [b(8), 8], [b(9), 8], [b(10), 6], [b(11), 6], [b(16), 12], [b(32), 8], [b(47), 7], [b(50), 18], [b(69), 10]]) {
+    const d = t - at; if (d < 0 || d > 0.5) continue; const k = Math.exp(-d * 11) * amp * S;
+    x += noise(d * 38, at * 13) * k; y += noise(d * 41, at * 17 + 3) * k;
+  }
+  // whip-pans: content leaves fast to the left, next scene arrives from the right
+  for (const at of [b(36), b(60)]) {
+    const kout = P(t, at - 0.2, 0.2, E.inQ), kin = 1 - P(t, at, 0.28, E.out);
+    if (t >= at - 0.2 && t < at) x -= kout * W * 0.9;
+    if (t >= at && t < at + 0.28) x += kin * W * 0.9;
+  }
+  return { x, y, s, r };
+}
+
+// ---------------------------------------------------------------- Particles: 200 members, every position a pure function of t
+const N = 200;
+const MEM = Array.from({ length: N }, (_, i) => {
+  const r = (k) => hash(i, 100 + k);
+  const loud = i < 9, quiet = !loud && r(5) < 0.42;
+  return { hx: 0.04 + r(0) * 0.92, hy: 0.06 + r(1) * 0.88, small: 5 + r(2) * 7, own: loud ? 34 + r(3) * 26 : quiet ? 6 + r(3) * 5 : 8 + r(3) * 8,
+           loud, quiet, ang: r(4) * Math.PI * 2, sp: 0.25 + r(6) * 0.75, ph: r(7) * 100, gx: i % 20, gy: Math.floor(i / 20) };
+});
+const GLYPHS = ["chat", "hash", "cam", "x", "mail", "mic", "chat", "hash", "mail", "cam", "mic", "x"].map((g, i) => ({ g, x: 0.08 + hash(i, 900) * 0.84, y: 0.1 + hash(i, 901) * 0.8, s: 0.6 + hash(i, 902) * 0.6, rot: (hash(i, 903) - 0.5) * 0.5 }));
+
+function memberPos(m, t) {
+  // home (with drift)
+  let x = m.hx + noise(t * 0.25 * m.sp + m.ph, 1) * 0.02, y = m.hy + noise(t * 0.22 * m.sp + m.ph, 2) * 0.02;
+  // shatter out from the landed square (b2)
+  const ks = clamp(M.springValue(t - b(2), { stiffness: 60, damping: 13, velocity: 2.5 }));
+  const cx = 0.5 + Math.cos(m.ang) * 0.004, cy = 0.5 + Math.sin(m.ang) * 0.004;
+  x = mix(cx, x, ks); y = mix(cy, y, ks);
+  // buried under the mess (b6-b16): sink a little
+  const kb = P(t, b(6), 1.2, E.io) * (1 - P(t, b(16), 0.2));
+  y += kb * 0.04;
+  // order from chaos: aligned grid at b16, released into the member field at b18
+  const kg = clamp(M.spring(t, b(16), "snappy")) * (1 - clamp(M.spring(t, b(18), "gentle")));
+  const gx = 0.5 + (m.gx - 9.5) * T(0.042, 0.044, 0.044), gy = 0.5 + (m.gy - 4.5) * T(0.07, 0.044, 0.025);
+  x = mix(x, gx, kg); y = mix(y, gy, kg);
+  // lockup: everyone rushes to the center (b68 -> b69)
+  const kc = P(t, b(68), 0.5, E.inQ);
+  x = mix(x, 0.5, kc); y = mix(y, T(0.4, 0.4, 0.42), kc);
+  return [x, y];
+}
+function drawMembers(ctx, t, cam) {
+  if (t < b(2) || t >= b(69)) return;
+  // visibility per scene (the field lives behind everything; solid scenes cover it)
+  const vis = t < b(6) ? 1 : t < b(16) ? 0.5 : t < b(28) ? 1 : t < b(50) ? 0.35 : t < b(68) ? 0 : 1;
+  if (!vis) return;
+  const scanX = mix(-0.15, 1.15, P(t, b(18), 2.0, E.io));
+  const field = clamp(M.spring(t, b(18), "gentle")) * (1 - P(t, b(28), 0.3));
+  for (const m of MEM) {
+    const [ux, uy] = memberPos(m, t);
+    // parallax: background layer moves at 50% of the camera
+    const px = W / 2 + (ux * W - W / 2) * (1 + (cam.s - 1) * 0.5) + cam.x * 0.5, py = H / 2 + (uy * H - H / 2) * (1 + (cam.s - 1) * 0.5) + cam.y * 0.5;
+    let size = mix(m.small, m.own, field) * S;
+    let col = m.loud && field > 0.1 ? C.violet2 : C.violet, a = (m.quiet ? mix(0.55, 0.28, field) : 0.85) * vis;
+    // the scan lights quiet members coral, each with a small pop
+    let lit = 0;
+    if (m.quiet && t >= b(18) && t < b(28)) {
+      const tl = b(18) + 2.0 * clamp((m.hx + 0.15) / 1.3); // time the line passes (approx, eased below)
+      if (scanX > m.hx) { lit = 1; const kp = Math.max(0, M.spring(t, tl, "pop")); size *= mix(1, 1.9, kp); }
+    }
+    if (lit) { col = C.coral; a = 0.95; ctx.shadowColor = hex(C.coral, 0.9); ctx.shadowBlur = 18 * S; }
+    else if (m.loud && field > 0.1) { ctx.shadowColor = hex(C.violet2, 0.6); ctx.shadowBlur = 24 * S; }
+    else ctx.shadowBlur = 0;
+    ctx.fillStyle = hex(col.length === 7 ? col : C.violet, a);
+    if (lit) ctx.fillStyle = hex(C.coral, a);
+    const s = size, r = s * 0.22;
+    ctx.beginPath(); ctx.roundRect(px - s / 2, py - s / 2, s, s, r); ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  // the coral scan line
+  if (t >= b(18) && t < b(22.5)) {
+    const x = W / 2 + (scanX * W - W / 2) + cam.x * 0.5;
+    const g = ctx.createLinearGradient(x - 90 * S, 0, x + 6 * S, 0); g.addColorStop(0, hex(C.coral, 0)); g.addColorStop(1, hex(C.coral, 0.55));
+    ctx.fillStyle = g; ctx.fillRect(x - 90 * S, 0, 96 * S, H);
+    ctx.fillStyle = hex(C.coral, 0.95); ctx.fillRect(x, 0, 2.5 * S, H);
+  }
+}
+function drawGlyphs(ctx, t, cam, alpha) {
+  if (alpha <= 0) return;
+  ctx.save(); ctx.strokeStyle = hex(C.cream, alpha); ctx.lineWidth = 2.2 * S; ctx.lineJoin = ctx.lineCap = "round";
+  for (const [i, g] of GLYPHS.entries()) {
+    const x = g.x * W + cam.x * 0.3 + noise(t * 0.2 + i, 7) * 12 * S, y = g.y * H + cam.y * 0.3 + noise(t * 0.2 + i, 8) * 12 * S, s = 44 * S * g.s;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(g.rot); ctx.beginPath();
+    if (g.g === "chat") { ctx.roundRect(-s, -s * 0.7, s * 2, s * 1.3, s * 0.35); ctx.moveTo(-s * 0.4, s * 0.6); ctx.lineTo(-s * 0.7, s * 1.05); ctx.lineTo(-s * 0.05, s * 0.6); }
+    if (g.g === "hash") { for (const o of [-0.35, 0.35]) { ctx.moveTo(o * s - 0.15 * s, -s); ctx.lineTo(o * s + 0.15 * s, s); ctx.moveTo(-s, o * s); ctx.lineTo(s, o * s); } }
+    if (g.g === "cam") { ctx.roundRect(-s, -s, s * 2, s * 2, s * 0.55); ctx.moveTo(s * 0.45, 0); ctx.arc(0, 0, s * 0.45, 0, Math.PI * 2); }
+    if (g.g === "x") { ctx.moveTo(-s * 0.8, -s * 0.8); ctx.lineTo(s * 0.8, s * 0.8); ctx.moveTo(s * 0.8, -s * 0.8); ctx.lineTo(-s * 0.8, s * 0.8); }
+    if (g.g === "mail") { ctx.roundRect(-s, -s * 0.7, s * 2, s * 1.4, s * 0.15); ctx.moveTo(-s, -s * 0.6); ctx.lineTo(0, s * 0.1); ctx.lineTo(s, -s * 0.6); }
+    if (g.g === "mic") { ctx.roundRect(-s * 0.35, -s, s * 0.7, s * 1.3, s * 0.35); ctx.moveTo(-s * 0.7, 0); ctx.quadraticCurveTo(-s * 0.7, s * 0.75, 0, s * 0.75); ctx.quadraticCurveTo(s * 0.7, s * 0.75, s * 0.7, 0); ctx.moveTo(0, s * 0.75); ctx.lineTo(0, s * 1.1); }
+    ctx.stroke(); ctx.restore();
+  }
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- Grain (seeded tiles, picked by frame number)
+const GR = $("grain"), gctx = GR.getContext("2d"); GR.width = 480; GR.height = 270;
+const tiles = Array.from({ length: 4 }, (_, k) => { const id = gctx.createImageData(480, 270), rnd = M.mulberry32(77 + k); for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } return id; });
+
+// ================================================================= scene elements (built once)
+const mid = $("mid"), fg = $("fg");
+// 1 · hero square
+const hero = el("div", "sq", mid); hero.style.background = C.violet; hero.dataset.sfx = "thud"; hero.dataset.sfxGain = 0.9;
+const H1a = Head([{ t: "Thousands", at: b(2), sfx: "impact", gain: 0.7 }, { t: "of", at: b(2.5) }, { t: "members.", at: b(3) }], { in: b(2), out: b(4), pos: () => [0.5, 0.5, T(150, 128, 112)] });
+const H1b = Head([{ t: "Two", at: b(4), sfx: "tick", gain: 0.9 }, { t: "people.", at: b(4.5) }], { in: b(4), out: b(6), pos: () => [0.5, 0.5, T(260, 210, 190)] });
+
+// 2 · the mess: six cards from the four edges
+function sheet(c) { c.innerHTML = '<div class="lbl" style="position:absolute;left:7%;top:7%;font-size:.9em">Members.xlsx</div>'; for (let r = 0; r < 7; r++) for (let k = 0; k < 4; k++) { const d = el("div", "", c); d.style.cssText = `position:absolute;left:${6 + k * 22}%;top:${22 + r * 10.5}%;width:20%;height:8%;border-radius:4px;background:${(r + k) % 5 === 0 ? "rgba(124,94,255,.35)" : "rgba(21,15,29,.10)"}`; } }
+function doc(c) { c.innerHTML = '<div class="lbl" style="position:absolute;left:9%;top:8%;font-size:1.05em">Community notes</div>'; [[22, 80], [32, 70], [42, 84], [52, 60], [62, 76], [72, 50]].forEach(([y, w]) => { const d = el("div", "ln", c); d.style.cssText += `left:9%;top:${y}%;width:${w}%;height:5%`; }); }
+function contact(c) { c.innerHTML = '<div style="position:absolute;left:8%;top:12%;width:20%;aspect-ratio:1;border-radius:50%;background:#9D8BFF"></div><div class="lbl" style="position:absolute;left:33%;top:14%;font-size:1em">Contact</div><div style="position:absolute;left:33%;top:30%;font-size:.7em;color:rgba(21,15,29,.55)">Lifecycle · Customer</div>'; [[52, 84], [64, 66], [76, 74]].forEach(([y, w]) => { const d = el("div", "ln", c); d.style.cssText += `left:8%;top:${y}%;width:${w}%;height:6%`; }); }
+function chat(c, k) { c.style.background = "transparent"; c.style.boxShadow = "none"; c.style.overflow = "visible"; [[0, 0, 70, k ? C.violet : C.cream], [22, 34, 64, k ? C.cream : C.violet], [52, 8, 56, k ? C.violet : C.cream]].forEach(([x, y, w, bg]) => { const d = el("div", "", c); d.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:${w}%;height:26%;border-radius:22px;background:${bg};box-shadow:0 20px 50px rgba(0,0,0,.4)`; }); }
+const MESS = [
+  { make: sheet, w: 560, h: 380, from: [-1.3, 0.1], to: [0.13, 0.19], rot: -7, at: 6 },
+  { make: doc, w: 380, h: 480, from: [1.3, -0.2], to: [0.885, 0.26], rot: 6, at: 7 },
+  { make: contact, w: 480, h: 280, from: [0.2, 1.4], to: [0.2, 0.8], rot: 4, at: 8 },
+  { make: (c) => chat(c, 0), w: 440, h: 320, from: [0.8, -1.3], to: [0.52, 0.12], rot: -4, at: 9 },
+  { make: sheet, w: 500, h: 340, from: [1.12, 0.95], to: [0.85, 0.83], rot: 8, at: 10 },
+  { make: (c) => chat(c, 1), w: 400, h: 300, from: [0.45, 1.2], to: [0.5, 0.9], rot: -9, at: 11 },
+].map((m, i) => { const c = el("div", "card", mid); c.style.fontSize = "28px"; m.make(c); c.dataset.sfx = "whoosh"; c.dataset.sfxGain = 0.35; return { ...m, c, i }; });
+const H2 = Head([{ t: "Spread", at: b(8), sfx: "tick", gain: 0.6 }, { t: "across", at: b(8.5) }, { br: 1 }, { t: "four", at: b(10) }, { t: "places.", at: b(10.5) }], { in: b(8), out: b(14), exit: 0.2, pos: () => [0.5, T(0.5, 0.5, 0.5), T(160, 132, 124)] });
+
+// 3 · Ellie: coral square slices through, cream flash, order
+const ellieSq = el("div", "sq", mid); ellieSq.style.background = C.coral; ellieSq.style.boxShadow = "0 0 80px rgba(198,82,63,.7)";
+const H3 = Head([{ t: "Meet", at: b(16), sfx: "impact", gain: 0.8 }, { t: "Ellie.", at: b(16.5), cls: "coral" }], { in: b(16), out: b(18), pos: () => [0.5, T(0.77, 0.78, 0.64), T(160, 140, 140)] });
+
+// 4 · finds the quiet ones: metric cards
+function metric(title, dot) { const c = el("div", "card", mid); c.innerHTML = `<div class="lbl" style="position:absolute;left:9%;top:13%;font-size:.62em;display:flex;align-items:center;gap:.5em"><span style="width:.7em;height:.7em;border-radius:22%;background:${dot}"></span>${title}</div><div class="num" style="position:absolute;left:9%;top:36%;font-family:Fraunces;font-weight:500;font-size:2.1em;letter-spacing:-.02em">0</div><div style="position:absolute;left:9%;bottom:12%;font-size:.42em;color:rgba(21,15,29,.5)">Illustrative</div>`; return c; }
+const mQuiet = metric("Going quiet", C.coral), mBack = metric("Returning", C.violet); mQuiet.dataset.sfx = "pop"; mBack.dataset.sfx = "pop";
+const H4 = Head([{ t: "Finds", at: b(18), sfx: "whoosh", gain: 0.4 }, { t: "who", at: b(18.5) }, { br: 1 }, { t: "you", at: b(20) }, { t: "can't", at: b(20.5) }, { t: "see.", at: b(21), cls: "coral" }], { in: b(18), out: b(28), exit: 0.2, pos: () => [0.5, T(0.2, 0.18, 0.16), T(120, 108, 104)] });
+
+// 5 · one person: three identity chips merge
+const CHIPS = [["WhatsApp", "Sam R."], ["Email", "sam@example.com"], ["Slack", "@samrivera"]].map(([src, who], i) => {
+  const p = Pill(`<span style="width:1.1em;height:1.1em;border-radius:22%;background:${[C.violet, C.violet2, C.ink][i]}"></span><span style="opacity:.6;font-weight:500">${src}</span><span>${who}</span>`, C.cream, C.ink); p.dataset.sfx = "whoosh"; p.dataset.sfxGain = 0.4; return p;
+});
+const person = el("div", "card", mid);
+person.innerHTML = `<div style="position:absolute;left:7%;top:50%;transform:translateY(-50%);width:22%;aspect-ratio:1;border-radius:50%;background:${C.violet};color:${C.cream};display:flex;align-items:center;justify-content:center;font-family:Inter;font-weight:600;font-size:.9em">SR</div><div style="position:absolute;left:35%;top:24%;font-family:Fraunces;font-weight:500;font-size:1.25em;letter-spacing:-.02em">Sam Rivera</div><div style="position:absolute;left:35%;top:60%;display:flex;gap:.35em">${[C.violet, C.violet2, C.ink].map((c) => `<span style="width:.7em;height:.7em;border-radius:22%;background:${c}"></span>`).join("")}<span style="font-size:.5em;color:rgba(21,15,29,.55);margin-left:.4em">3 accounts</span></div>`;
+person.dataset.sfx = "impact"; person.dataset.sfxGain = 0.5;
+const same = Pill(`<span style="width:.8em;height:.8em;border-radius:22%;background:${C.cream}"></span>Same person`, C.coral, C.cream); same.dataset.sfx = "pop";
+const H5a = Head([{ t: "Many", at: b(28), sfx: "tick", gain: 0.5 }, { t: "records.", at: b(28.5) }], { in: b(28), out: b(32), pos: () => [0.5, T(0.18, 0.16, 0.16), T(130, 116, 112)] });
+const H5b = Head([{ t: "One", at: b(32) }, { t: "person.", at: b(32.5), cls: "coral" }], { in: b(32), out: b(36), pos: () => [0.5, T(0.18, 0.16, 0.16), T(130, 116, 112)] });
+
+// 6 · every Monday: MON tile + task rows with coral checks
+const mon = el("div", "card", mid); mon.innerHTML = `<div style="position:absolute;left:0;right:0;top:0;height:26%;background:${C.violet}"></div><div style="position:absolute;left:0;right:0;top:30%;text-align:center;font-family:Fraunces;font-weight:500;font-size:2.2em;letter-spacing:-.02em">MON</div><div style="position:absolute;left:0;right:0;bottom:10%;text-align:center;font-size:.5em;color:rgba(21,15,29,.55)">08:00 · weekly</div>`; mon.dataset.sfx = "thud"; mon.dataset.sfxGain = 0.6;
+const ROWS = ["Weekly community pulse", "Re-engagement brief", "Member follow-ups"].map((txt) => {
+  const r = el("div", "card", mid); r.innerHTML = `<div class="chk" style="position:absolute;left:5%;top:50%;transform:translateY(-50%);width:1.1em;height:1.1em;border-radius:22%;border:3px solid rgba(21,15,29,.25)"></div><div class="fill" style="position:absolute;left:5%;top:50%;width:1.1em;height:1.1em;border-radius:22%;background:${C.coral};box-shadow:0 0 22px rgba(198,82,63,.8);transform:translateY(-50%) scale(0)"></div><div style="position:absolute;left:16%;top:50%;transform:translateY(-50%);font-family:Inter;font-weight:500;font-size:.8em">${txt}</div>`;
+  r.dataset.sfx = "tick"; r.dataset.sfxGain = 0.5; return r;
+});
+const checks = ROWS.map((r) => { const f = r.querySelector(".fill"); f.dataset.sfx = "chime"; f.dataset.sfxGain = 0.3; return f; });
+const H6a = Head([{ t: "Every", at: b(36) }, { t: "Monday.", at: b(36.5) }], { in: b(36), out: b(40), pos: () => [0.5, T(0.17, 0.15, 0.15), T(130, 116, 112)] });
+const H6b = Head([{ t: "Nobody", at: b(40) }, { t: "asked.", at: b(40.5), cls: "coral" }], { in: b(40), out: b(44), pos: () => [0.5, T(0.17, 0.15, 0.15), T(130, 116, 112)] });
+
+// 7 · you approve: draft card, cursor, click on the beat, coral burst
+const draft = el("div", "card", mid);
+draft.innerHTML = `<div style="position:absolute;left:6%;top:9%;font-size:.55em;font-weight:600;color:${C.coral};display:flex;align-items:center;gap:.5em"><span style="width:.8em;height:.8em;border-radius:22%;background:${C.coral}"></span>Ellie drafted · to Sam</div>
+  <div style="position:absolute;left:6%;top:26%;right:6%;font-size:.78em;line-height:1.35;color:${C.ink}">Hi Sam, we missed you this term. Want first look at the new guide?</div>
+  <div class="btn" style="right:28%;bottom:9%;width:18%;height:17%;border:2px solid rgba(21,15,29,.18);font-size:.6em">Edit</div>
+  <div class="btn" id="doit" style="right:6%;bottom:9%;width:20%;height:17%;background:${C.violet};color:${C.cream};font-size:.6em">Do it</div>`;
+draft.dataset.sfx = "whoosh"; draft.dataset.sfxGain = 0.4;
+const cursor = el("div", "abs", fg, `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M3 2 L3 19 L8 14.5 L11.5 22 L14.5 20.6 L11 13.3 L17.5 13.3 Z" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4" stroke-linejoin="round"/></svg>`);
+const burst = Array.from({ length: 14 }, () => { const s = el("div", "sq", fg); s.style.background = C.coral; s.style.boxShadow = "0 0 20px rgba(198,82,63,.8)"; return s; });
+burst[0].dataset.sfx = "pop"; burst[0].dataset.sfxGain = 1.0;
+const H7a = Head([{ t: "Nothing", at: b(44) }, { t: "sends", at: b(44.5) }], { in: b(44), out: b(46), pos: () => [0.5, T(0.16, 0.14, 0.15), T(120, 108, 104)] });
+const H7b = Head([{ t: "without", at: b(46) }, { t: "your", at: b(46.5) }, { t: "yes.", at: b(47), cls: "coral" }], { in: b(46), out: b(50), pos: () => [0.5, T(0.16, 0.14, 0.15), T(120, 108, 104)] });
+const wipeSq = el("div", "sq", fg);
+
+// 8 · payoff: the drop
+const clock = el("div", "abs", mid, `<svg viewBox="-100 -100 200 200" width="100%" height="100%"><circle r="92" fill="none" stroke="${hex(C.violet2, 0.35)}" stroke-width="2"/>${Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="-84" x2="0" y2="${i % 3 ? -78 : -72}" stroke="${hex(C.cream, 0.35)}" stroke-width="${i % 3 ? 1.5 : 3}" transform="rotate(${i * 30})"/>`).join("")}<g id="hh"><line x1="0" y1="8" x2="0" y2="-46" stroke="${hex(C.cream, 0.5)}" stroke-width="5" stroke-linecap="round"/></g><g id="mh"><line x1="0" y1="10" x2="0" y2="-70" stroke="${hex(C.coral, 0.75)}" stroke-width="3" stroke-linecap="round"/></g></svg>`);
+const half = el("div", "kh grad", fg, "½ day"); half.dataset.sfx = "impact"; half.dataset.sfxGain = 0.2;
+const H8 = Head([{ t: "back.", at: b(52) }, { t: "every", at: b(52.5) }, { t: "week.", at: b(53) }], { in: b(52), out: b(54), exit: 0.2, pos: () => [0.5, T(0.74, 0.72, 0.66), T(96, 88, 84)] });
+const team = el("div", "photo", mid, `<img src="assets/photos/community.jpg">`); team.dataset.sfx = "whoosh"; team.dataset.sfxGain = 0.5;
+
+// 9 · James
+const james = el("div", "photo", mid, `<img src="assets/photos/james.jpg">`); james.style.borderRadius = "22px";
+const QPOS = () => T([0.655, 0.46, 112], [0.5, 0.68, 86], [0.5, 0.66, 92]);
+const Q = [
+  Head([{ t: "“It", at: b(60) }, { t: "helps", at: b(60.25) }, { t: "you", at: b(60.5) }, { t: "identify", at: b(60.75) }], { in: b(60), out: b(62), pos: QPOS }),
+  Head([{ t: "underserved", at: b(62) }, { t: "members…", at: b(62.5) }], { in: b(62), out: b(64), pos: QPOS }),
+  Head([{ t: "…who", at: b(64) }, { t: "might", at: b(64.25) }, { t: "not", at: b(64.5) }, { t: "be", at: b(64.75) }], { in: b(64), out: b(66), pos: QPOS }),
+  Head([{ t: "the", at: b(66) }, { t: "loudest", at: b(66.5), cls: "coral", sfx: "chime", gain: 0.35 }, { t: "voices.”", at: b(66.75), cls: "coral" }], { in: b(66), out: b(68), pos: QPOS }),
+];
+const attr = el("div", "abs", fg, `<div style="font-family:Inter;font-weight:600">James Davis</div><div style="font-family:Inter;font-weight:400;opacity:.7">Head of Community &amp; Growth, Wakelet</div>`);
+
+// 10 · lockup
+const mono = el("div", "abs", fg, `<svg viewBox="200 178 242 284" width="100%" height="100%"><g transform="translate(192.7,445.7)"><path d="M239.58 -64.98Q239.58 -52.56 232.74 -39.96Q225.9 -27.36 213.03 -16.83Q200.16 -6.3 181.8 0.18Q163.44 6.66 140.22 6.66Q101.52 6.66 73.53 -10.17Q45.54 -27.0 30.33 -56.52Q15.12 -86.04 15.12 -124.38Q15.12 -153.36 24.12 -177.75Q33.12 -202.14 49.41 -220.14Q65.7 -238.14 87.66 -248.13Q109.62 -258.12 135.54 -258.12Q153.9 -258.12 165.33 -254.43Q176.76 -250.74 183.33 -246.96Q189.9 -243.18 193.5 -243.18Q198.0 -243.18 200.07 -246.42Q202.14 -249.66 204.39 -252.81Q206.64 -255.96 210.96 -255.96Q213.84 -255.96 215.82 -254.16Q217.8 -252.36 219.06 -247.86L238.14 -186.3Q239.4 -182.34 237.51 -179.37Q235.62 -176.4 231.66 -175.68Q227.88 -175.14 224.82 -176.67Q221.76 -178.2 220.14 -181.98Q210.24 -203.58 198.27 -216.45Q186.3 -229.32 172.17 -234.99Q158.04 -240.66 141.3 -240.66Q124.56 -240.66 110.43 -233.19Q96.3 -225.72 86.04 -211.86Q75.78 -198.0 70.02 -178.56Q64.26 -159.12 64.26 -135.0Q64.26 -98.28 76.05 -72.72Q87.84 -47.16 108.09 -33.84Q128.34 -20.52 154.26 -20.52Q179.46 -20.52 197.73 -32.31Q216.0 -44.1 225.72 -65.34Q227.7 -69.12 229.86 -70.47Q232.02 -71.82 234.72 -71.28Q237.24 -70.92 238.41 -69.3Q239.58 -67.68 239.58 -64.98Z" fill="${C.cream}"/><rect id="monosq" x="155.3" y="-171.9" width="81.7" height="81.7" rx="20.4" fill="${C.violet}"/></g></svg>`);
+mono.dataset.sfx = "impact"; mono.dataset.sfxGain = 0.6;
+const wordmark = el("div", "kh", fg, `<span style="font-family:Inter;font-weight:600;letter-spacing:-.02em">centralsquare</span> <span style="font-family:Inter;color:${C.coral};font-size:.75em">▪</span> <span style="font-family:Inter;font-weight:500">ai</span>`);
+wordmark.dataset.sfx = "chime"; wordmark.dataset.sfxGain = 0.35;
+const subline = el("div", "kh", fg, `<span style="font-family:Inter;font-weight:400;letter-spacing:-.01em">Ellie, the agent for community teams.</span>`);
+const url = el("div", "kh", fg, `<span style="font-family:'Geist Mono';font-weight:500;letter-spacing:-.02em">centralsquare.ai/customers/wakelet</span>`);
+
+// ================================================================= seek(t)
+const bg = $("bg"), ctx = bg.getContext("2d");
+window.seek = function (t) {
+  layout();
+  if (bg.width !== W || bg.height !== H) { bg.width = W; bg.height = H; }
+  const cam = camera(t), camPrev = camera(Math.max(0, t - FR));
+  // ---- background layer (canvas): base, glows, glyphs, members
+  ctx.fillStyle = C.base; ctx.fillRect(0, 0, W, H);
+  const glow = (x, y, r, col, a) => { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, hex(col, a)); g.addColorStop(1, hex(col, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); };
+  glow(W * (0.3 + 0.05 * Math.sin(t * 0.3)) + cam.x * 0.2, H * 0.35, Math.max(W, H) * 0.7, C.violet, 0.16);
+  if (t >= b(14)) glow(W * 0.72 + cam.x * 0.2, H * 0.7, Math.max(W, H) * 0.55, C.coral, t < b(50) ? 0.08 : 0.12);
+  drawGlyphs(ctx, t, cam, t < b(6) ? 0.06 * P(t, b(2), 0.6) : 0);
+  drawMembers(ctx, t, cam);
+
+  // ---- stage: camera + motion blur from camera velocity
+  const st = $("stage");
+  st.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.s})`;
+  const vx = Math.abs(cam.x - camPrev.x) / (W * 0.01);
+  $("mbg").setAttribute("stdDeviation", `${Math.min(40, vx * 1.6)} 0`);
+  st.style.filter = vx > 0.6 ? "url(#mb)" : "none";
+
+  // ---- 1 cold open: drop (lands b1), squash, shatter (b2)
+  { const on = t < b(2) + FR; show(hero, on);
+    if (on) { const s = T(170, 160, 160) * S, kf = P(t, 0, b(1), E.inQ), y = mix(-0.25 * H, H / 2, kf);
+      const sq = t >= b(1) ? 1 - 0.28 * Math.exp(-(t - b(1)) * 14) * Math.cos((t - b(1)) * 40) : 1;
+      hero.style.width = hero.style.height = `${s}px`; hero.style.left = `${W / 2 - s / 2}px`; hero.style.top = `${y - s / 2}px`;
+      hero.style.transform = `scale(${2 - sq}, ${sq})`; hero.style.transformOrigin = "50% 100%";
+      hero.style.boxShadow = `0 0 ${60 * S}px rgba(124,94,255,${t >= b(1) ? 0.7 : 0.3})`; } }
+
+  // ---- 2 the mess (b6-b16), snap to grid (b16), collapse (b18)
+  for (const m of MESS) {
+    const on = t >= b(m.at) && t < b(18); show(m.c, on); if (!on) continue;
+    const k = P(t, b(m.at), 0.38, E.out), sz = T(1, 0.85, 0.8) * S;
+    const tw = m.w * sz, th = m.h * sz;
+    let x = mix(m.from[0], m.to[0], k) * W, y = mix(m.from[1], m.to[1], k) * H, r = m.rot * k + noise(t * 3 + m.i, 11) * 2.5 * P(t, b(m.at) + 0.3, 0.3);
+    // jitter while piled up
+    x += noise(t * 9 + m.i * 7, 12) * 6 * S * (1 - P(t, b(16), 0.1)); y += noise(t * 9 + m.i * 5, 13) * 6 * S * (1 - P(t, b(16), 0.1));
+    // order from chaos (b16): snap into an aligned 3x2 grid
+    const kg = clamp(M.spring(t, b(16), "snappy")), col = m.i % 3, row = Math.floor(m.i / 3);
+    const gw = T(0.2, 0.26, 0.27) * W, gh = gw * 0.62, gx = W / 2 + (col - 1) * gw * 1.12, gy = H * T(0.28, 0.3, 0.3) + (row - 0.5) * gh * 1.15;
+    x = mix(x, gx, kg); y = mix(y, gy, kg); r = mix(r, 0, kg);
+    const ww = mix(tw, gw, kg), hh = mix(th, gh, kg);
+    const kc = P(t, b(18) - 0.25, 0.25, E.inQ); // collapse into squares as the field takes over
+    m.c.style.width = `${ww}px`; m.c.style.height = `${hh}px`; m.c.style.left = `${x - ww / 2}px`; m.c.style.top = `${y - hh / 2}px`;
+    m.c.style.fontSize = `${28 * sz * mix(1, gw / tw, kg)}px`;
+    m.c.style.transform = `rotate(${r}deg) scale(${1 - kc})`;
+  }
+  // coral square slices through the pile (b14 -> b15.5), then sits small above "Meet Ellie."
+  { const on = t >= b(14) && t < b(18); show(ellieSq, on);
+    if (on) { const k = P(t, b(14), 1.0, E.io), s = mix(T(220, 200, 200), 90, P(t, b(16), 0.3, E.out)) * S;
+      let x = mix(-0.2, 1.2, k) * W, y = mix(1.2, -0.2, k) * H;
+      const kl = clamp(M.spring(t, b(15.5), "snappy")); x = mix(x, W / 2, kl); y = mix(y, H * T(0.6, 0.62, 0.52), kl);
+      ellieSq.style.width = ellieSq.style.height = `${s}px`; ellieSq.style.left = `${x - s / 2}px`; ellieSq.style.top = `${y - s / 2}px`;
+      ellieSq.style.transform = `rotate(${(1 - kl) * 45}deg)`; ellieSq.style.filter = t < b(15.5) ? "url(#mb)" : "none"; } }
+
+  // ---- 4 quiet ones: metric cards (illustrative numbers)
+  for (const [c, at, to, i] of [[mQuiet, b(22), 21, 0], [mBack, b(24), 44, 1]]) {
+    const on = t >= at && t < b(28); show(c, on); if (!on) continue;
+    const k = Math.max(0, M.spring(t, at, { stiffness: 420, damping: 20, velocity: 5 })), w = T(330, 300, 340) * S, h = w * 0.62;
+    const x = T(W / 2 + (i - 0.5) * w * 1.15, W / 2 + (i - 0.5) * w * 1.15, W / 2 + (i - 0.5) * w * 1.12), y = H * T(0.78, 0.8, 0.74);
+    c.style.width = `${w}px`; c.style.height = `${h}px`; c.style.left = `${x - w / 2}px`; c.style.top = `${y - h / 2}px`; c.style.fontSize = `${w / 6.2}px`;
+    c.style.transform = `scale(${k}) translateY(${(1 - Math.min(1, k)) * 40}px)`;
+    count(c.querySelector(".num"), t, at + 0.1, to);
+  }
+
+  // ---- 5 one person
+  { const col = P(t, b(32), 0.25, E.inQ), mergeK = clamp(M.spring(t, b(32), "pop"));
+    CHIPS.forEach((p, i) => {
+      const at = b(28 + i), on = t >= at && t < b(32) + 0.12; show(p, on); if (!on) return;
+      const k = P(t, at, 0.4, E.out), from = [[-0.4, 0.38], [1.4, 0.52], [0.5, 1.3]][i], to = T([[0.5, 0.4], [0.5, 0.54], [0.5, 0.68]], [[0.5, 0.42], [0.5, 0.55], [0.5, 0.68]], [[0.5, 0.42], [0.5, 0.52], [0.5, 0.62]])[i];
+      let x = mix(from[0], to[0], k), y = mix(from[1], to[1], k);
+      x = mix(x, 0.5, col); y = mix(y, 0.54, col);
+      p.style.left = `${x * W}px`; p.style.top = `${y * H}px`; p.style.fontSize = `${T(54, 48, 50) * S}px`; p.style.transform = `translate(-50%,-50%) scale(${1 - col * 0.3})`;
+    });
+    const on = t >= b(32) && t < b(36); show(person, on);
+    if (on) { const w = T(860, 800, 880) * S, h = w * 0.32; person.style.width = `${w}px`; person.style.height = `${h}px`; person.style.left = `${W / 2 - w / 2}px`; person.style.top = `${H * 0.54 - h / 2}px`; person.style.fontSize = `${w / 11}px`; person.style.transform = `scale(${Math.max(0, mergeK)})`; }
+    popPill(same, t, b(33), W / 2, H * 0.54 + T(205, 195, 210) * S, T(50, 46, 50));
+    show(same, t >= b(33) && t < b(36)); }
+
+  // ---- 6 every Monday
+  { const on = t >= b(36) && t < b(44); show(mon, on); ROWS.forEach((r) => show(r, false));
+    if (on) {
+      const ts = T(360, 300, 340) * S, mx = T(W * 0.3, W * 0.5, W * 0.5), my = T(H * 0.56, H * 0.44, H * 0.38);
+      const kf = P(t, b(36), 0.45, E.back);
+      mon.style.width = mon.style.height = `${ts}px`; mon.style.left = `${mx - ts / 2}px`; mon.style.top = `${my - ts / 2}px`; mon.style.fontSize = `${ts / 5}px`;
+      mon.style.transform = `perspective(900px) rotateX(${(1 - kf) * 90}deg)`; mon.style.transformOrigin = "50% 0%";
+      ROWS.forEach((r, i) => {
+        const at = b(37 + i); show(r, t >= at); if (t < at) return;
+        const k = P(t, at, 0.35, E.out), rw = T(780, 760, 880) * S, rh = T(118, 104, 116) * S;
+        const rx = T(W * 0.64, W / 2, W / 2), ry = T(H * 0.4, H * 0.66, H * 0.6) + (i - (MODE === "land" ? 0 : 0)) * rh * 1.25;
+        r.style.width = `${rw}px`; r.style.height = `${rh}px`; r.style.left = `${rx - rw / 2}px`; r.style.top = `${ry - rh / 2}px`; r.style.fontSize = `${rh * 0.42}px`;
+        r.style.transform = `translateX(${(1 - k) * 0.6 * W}px)`;
+        const kc = Math.max(0, M.spring(t, b(40 + i), { stiffness: 520, damping: 18, velocity: 6 }));
+        checks[i].style.transform = `translateY(-50%) scale(${kc})`;
+      });
+    } }
+
+  // ---- 7 you approve
+  { const on = t >= b(44) && t < b(49); show(draft, on); show(cursor, t >= b(44.5) && t < b(48));
+    const dw = T(1040, 900, 940) * S, dh = dw * 0.42, dx = W / 2, dy = H * T(0.56, 0.56, 0.5);
+    if (on) {
+      const k = Math.max(0, M.spring(t, b(44), { stiffness: 380, damping: 22, velocity: 4 })), ko = P(t, b(48), 0.4, E.inQ);
+      draft.style.width = `${dw}px`; draft.style.height = `${dh}px`; draft.style.fontSize = `${dw / 16}px`;
+      draft.style.left = `${dx - dw / 2 + ko * W * 0.8}px`; draft.style.top = `${dy - dh / 2 - ko * H * 0.5}px`;
+      draft.style.transform = `scale(${k * (1 - ko * 0.3)}) rotate(${ko * 18}deg)`; draft.style.filter = ko > 0.05 ? "url(#mb)" : "none";
+      const press = t >= b(47) && t < b(47) + 0.15 ? 0.9 : 1;
+      $("doit").style.transform = `scale(${press})`; $("doit").style.background = t >= b(47) ? C.coral : C.violet;
+    }
+    // cursor glides to "Do it" and clicks on b47
+    const tx = dx + dw * 0.34, ty = dy + dh * 0.33, kc = P(t, b(45), b(47) - b(45), E.io);
+    const cx = mix(W * 0.86, tx, kc), cy = mix(H * 0.95, ty, kc), cs = 46 * S * (t >= b(47) && t < b(47) + 0.12 ? 0.85 : 1);
+    cursor.style.width = cursor.style.height = `${cs}px`; cursor.style.left = `${cx - cs * 0.15}px`; cursor.style.top = `${cy - cs * 0.1}px`;
+    burst.forEach((s, i) => {
+      const on2 = t >= b(47) && t < b(47) + 0.6; show(s, on2); if (!on2) return;
+      const k2 = P(t, b(47), 0.6, E.out), a = (i / burst.length) * Math.PI * 2 + 0.2, d = mix(10, 220, k2) * S * (0.7 + hash(i, 5) * 0.6), sz = mix(18, 0, P(t, b(47) + 0.15, 0.45)) * S;
+      s.style.width = s.style.height = `${sz}px`; s.style.left = `${tx + Math.cos(a) * d - sz / 2}px`; s.style.top = `${ty + Math.sin(a) * d - sz / 2}px`; s.style.transform = `rotate(${k2 * 90}deg)`;
+    });
+  }
+  // square wipes: violet at b28 (4->5), coral at b44 (6->7) and b49.5 (7->8 setup)
+  { let on = false;
+    for (const [at, col] of [[b(28), C.violet], [b(44), C.coral]]) {
+      if (t >= at - 0.25 && t < at + 0.25) { on = true; const k = t < at ? P(t, at - 0.25, 0.25, E.inQ) : 1 - P(t, at, 0.25, E.out);
+        const s = k * Math.hypot(W, H) * 1.05; wipeSq.style.background = col; wipeSq.style.width = wipeSq.style.height = `${s}px`;
+        wipeSq.style.left = `${W / 2 - s / 2}px`; wipeSq.style.top = `${H / 2 - s / 2}px`; wipeSq.style.transform = `rotate(${(1 - k) * 45}deg)`; }
+    }
+    show(wipeSq, on); }
+
+  // ---- 8 payoff: drop (b50) -> ½ day (gradient), clock spins backwards -> team photo in an expanding square
+  { const on = t >= b(50) && t < b(54) + 0.2; show(half, on); show(clock, t >= b(50) && t < b(55));
+    if (on) { const k = Math.max(0, M.spring(t, b(50), { stiffness: 300, damping: 16, velocity: 3 })), ko = P(t, b(54) - 0.2, 0.35, E.inQ);
+      half.style.left = `${W / 2}px`; half.style.top = `${H * T(0.46, 0.44, 0.42)}px`; half.style.fontSize = `${T(360, 300, 260) * S}px`;
+      half.style.transform = `translate(-50%,-50%) scale(${mix(0.8, 1, k) * (1 + ko * 0.6)})`; half.style.opacity = 1 - ko; }
+    if (t >= b(50) && t < b(55)) { const cs = T(820, 760, 820) * S; clock.style.width = clock.style.height = `${cs}px`; clock.style.left = `${W / 2 - cs / 2}px`; clock.style.top = `${H * T(0.46, 0.44, 0.42) - cs / 2}px`;
+      const spin = -(1 - Math.exp(-(t - b(50)) * 1.4)) * 1440; // backwards, decelerating
+      $("mh").setAttribute("transform", `rotate(${spin})`); $("hh").setAttribute("transform", `rotate(${spin / 12})`);
+      clock.style.transform = `scale(${mix(0.85, 1.05, P(t, b(50), 2.5, E.out))})`; clock.style.opacity = 1 - P(t, b(54), 0.4); }
+    const onT = t >= b(54) - 0.05 && t < b(60); show(team, onT);
+    if (onT) { // a small square at center opens to fill the frame; the photo stays fixed in screen space
+      const k = clamp(M.spring(t, b(54), { stiffness: 140, damping: 22 })), s = mix(120 * S, Math.hypot(W, H) * 1.02, k);
+      const tw = Math.min(s, W), th = Math.min(s, H), tl = W / 2 - tw / 2, tt = H / 2 - th / 2;
+      team.style.width = `${tw}px`; team.style.height = `${th}px`; team.style.left = `${tl}px`; team.style.top = `${tt}px`; team.style.borderRadius = `${mix(26, 0, k) * S}px`;
+      const img = team.querySelector("img"), push = mix(1.0, 1.1, P(t, b(54), b(60) - b(54), (x) => x));
+      const iw = Math.max(W, H * 4 / 3) * push, ih = iw * 3 / 4;
+      img.style.width = `${iw}px`; img.style.left = `${W / 2 - tl}px`; img.style.top = `${H / 2 - tt}px`; img.style.transform = `translate(-50%,-50%)`;
+    } }
+
+  // ---- 9 James (the only text-beside-image moment)
+  { const on = t >= b(60) && t < b(68) + 0.1; show(james, on); show(attr, on);
+    if (on) { const kj = clamp(M.spring(t, b(60), "snappy")), ko = P(t, b(68) - 0.15, 0.25, E.inQ);
+      const js = T(H * 0.62, W * 0.42, W * 0.56), jx = T(W * 0.22, W * 0.5, W * 0.5), jy = T(H * 0.5, H * 0.3, H * 0.3);
+      const s = js * kj * (1 - ko);
+      james.style.width = james.style.height = `${s}px`; james.style.left = `${jx - s / 2}px`; james.style.top = `${jy - s / 2}px`;
+      const img = james.querySelector("img"); img.style.width = `${js * 1.05}px`; img.style.transform = `translate(-50%,-42%) scale(${mix(1.02, 1.1, P(t, b(60), 4, (x) => x))})`;
+      const [ax, ay, as] = T([0.655, 0.66, 30], [0.5, 0.88, 26], [0.5, 0.82, 30]);
+      attr.style.left = `${ax * W}px`; attr.style.top = `${ay * H}px`; attr.style.fontSize = `${as * S}px`; attr.style.textAlign = "center";
+      attr.style.transform = `translate(-50%,-50%) translateY(${(1 - P(t, b(61), 0.4)) * 30}px)`; attr.style.clipPath = `inset(0 0 ${(1 - P(t, b(61), 0.4)) * 100}% 0)`; } }
+
+  // ---- 10 lockup: converge (b68->b69), monogram (b69), wordmark (b70), subline (b71), URL (b72), hold to 37.0
+  { const on = t >= b(69); show(mono, on); show(wordmark, t >= b(70)); show(subline, t >= b(71)); show(url, t >= b(72));
+    if (on) { const k = Math.max(0, M.spring(t, b(69), { stiffness: 420, damping: 18, velocity: 4 })), ms = T(220, 220, 240) * S;
+      mono.style.width = `${ms}px`; mono.style.height = `${ms * 284 / 242}px`; mono.style.left = `${W / 2 - ms / 2}px`; mono.style.top = `${H * T(0.36, 0.36, 0.38) - ms * 0.58}px`;
+      mono.style.transform = `scale(${k})`; mono.style.filter = `drop-shadow(0 0 ${30 * S}px rgba(124,94,255,.6))`; }
+    for (const [e, at, y, sz] of [[wordmark, b(70), T(0.6, 0.58, 0.55), T(64, 60, 64)], [subline, b(71), T(0.68, 0.66, 0.61), T(36, 34, 38)], [url, b(72), T(0.88, 0.88, 0.86), T(24, 24, 28)]]) {
+      if (t < at) continue; const k = P(t, at, 0.4, E.out);
+      e.style.left = `${W / 2}px`; e.style.top = `${H * y}px`; e.style.fontSize = `${sz * S}px`;
+      e.style.clipPath = `inset(${(1 - k) * 100}% 0 0 0)`; e.style.transform = `translate(-50%,-50%) translateY(${(1 - k) * 0.5}em)`; e.style.color = e === url ? hex(C.cream, 0.6) : C.cream;
+    } }
+
+  // ---- kinetic headlines
+  for (const h of HEADS) drawHead(h, t);
+
+  // ---- flashes: single cream frames on the three big hits
+  const f = Math.round(t * 30); $("flash").style.display = [Math.round(b(16) * 30), Math.round(b(50) * 30), Math.round(b(69) * 30)].includes(f) ? "block" : "none";
+  // ---- grain: seeded tile per frame
+  gctx.putImageData(tiles[f % 4], 0, 0);
+};
+// Manual cues only for canvas events (the picture-derived ones come from data-sfx)
+window.CUES = [
+  { t: b(2), sfx: "whoosh", gain: 0.5 },                                  // shatter
+  ...[19, 20, 21, 22].map((n) => ({ t: b(n), sfx: "tick", gain: 0.45 })), // quiet members lighting up
+  { t: b(14) + 0.5, sfx: "whoosh", gain: 0.6 },                            // coral slice
+  { t: b(36), sfx: "whoosh", gain: 0.55 }, { t: b(60), sfx: "whoosh", gain: 0.55 }, // whip-pans
+  { t: b(28), sfx: "whoosh", gain: 0.45 }, { t: b(44), sfx: "whoosh", gain: 0.45 }, // square wipes
+  { t: b(50), sfx: "riser", gain: 0.7 }, { t: b(50), sfx: "drop", gain: 1.0 },      // the drop on ½ day
+  { t: b(68), sfx: "riser", gain: 0.35 },                                            // converge
+];
+seek(0);
+</script>
+</body>
+</html>

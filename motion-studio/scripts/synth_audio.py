@@ -8,7 +8,7 @@
     python3 scripts/synth_audio.py sfx --duration 12 --cues cues.json --out audio/sfx.wav
     # cues.json: [{"t": 0.6, "sfx": "pop", "pan": -0.4}, {"t": 2.4, "sfx": "whoosh", "gain": 0.8}, ...]
 
-SFX kinds: pop, tick, whoosh, riser, impact, chime, thud.
+SFX kinds: pop, tick, whoosh, riser, impact, chime, thud, drop.
 Everything is deterministic (seeded). Output: 48 kHz stereo float WAV, peak-limited; loudness is
 normalized to -14 LUFS at mux time by render.mjs.
 """
@@ -150,6 +150,11 @@ def make_sfx(kind, r):
         L = int(1.6 * SR); t = np.arange(L) / SR
         s = sum(a * np.sin(2 * np.pi * f * t) * np.exp(-t * d) for f, a, d in [(1318.5, 0.5, 3), (1975.5, 0.3, 4.5), (2637, 0.15, 6)])
         return s * np.minimum(1, t * 400), 0.0
+    if kind == "drop":  # the bass drop: a long sub sweep with a noise transient
+        L = int(2.2 * SR); t = np.arange(L) / SR
+        sub = np.sin(2 * np.pi * np.cumsum(32 + 70 * np.exp(-t * 6)) / SR) * np.exp(-t * 1.6)
+        hit = lp(r.standard_normal(L), 3000) * np.exp(-t * 18) * 0.5
+        return (sub * 1.1 + hit), 0.0
     if kind == "thud":
         L = int(0.3 * SR); t = np.arange(L) / SR
         return np.sin(2 * np.pi * np.cumsum(70 + 60 * np.exp(-t * 40)) / SR) * np.exp(-t * 14), 0.0
