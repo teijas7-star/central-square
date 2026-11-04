@@ -97,7 +97,7 @@ Never say a film is done from a successful exit code. "Done" means 8+ on every r
 ## 5. Truth rules (non-negotiable)
 
 1. **Every factual claim on screen needs a source** in `BRIEF.md` → "Sources". That covers numbers, customer names, quotes and outcomes. With no source, cut the claim or ask.
-2. **Adobe, Microsoft and the Aspen Institute are targets in the business plan, not customers.** Never show their names or logos, or imply a partnership, unless Teijas confirms in writing for that video.
+2. **Company names beyond Wakelet only as the site shows them.** The live home page lists Wakelet, Adobe, Microsoft, SMART Technologies, Aspen Institute, Spiky AI and Capsule CRM under "Working with community teams at". A film may show that list only with that same wording. Never upgrade it to "customers", "partners" or an endorsement, and never show their logos without Teijas's OK. Only Wakelet has a published story.
 3. No invented testimonials, metrics, logos, user counts or UI that doesn't exist. Show real product screens. Label future UI on screen as "Concept" or "Coming soon".
 4. **Example data stays labelled.** The Wakelet page shows example figures ("The numbers and names below are examples. Wakelet's real figures stay private."). Examples include the 186/64/122/71 dashboard and "Hannah O." Whenever those appear in a film, they carry an on-screen **EXAMPLE DATA** chip, exactly as the site does. Never present them as Wakelet's real numbers.
 5. **Real, citable Wakelet facts** (source: centralsquare.ai/customers/wakelet):

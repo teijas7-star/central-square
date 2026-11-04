@@ -1,0 +1,937 @@
+{
+  "site": "https://centralsquare.ai",
+  "crawled": "2026-11-04",
+  "pages": [
+    "https://centralsquare.ai/",
+    "https://centralsquare.ai/customers/wakelet"
+  ],
+  "nodes": [
+    {
+      "id": "page:home",
+      "type": "Page",
+      "label": "Home",
+      "source": "https://centralsquare.ai/",
+      "title": "Central Square AI · Your community is your moat"
+    },
+    {
+      "id": "page:wakelet",
+      "type": "Page",
+      "label": "Customer story: Wakelet",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "title": "Wakelet · Customer story · Central Square AI"
+    },
+    {
+      "id": "org:csai",
+      "type": "Organization",
+      "label": "Central Square AI",
+      "source": "https://centralsquare.ai/",
+      "legal": "CentralSquareAI, Inc."
+    },
+    {
+      "id": "product:ellie",
+      "type": "Product",
+      "label": "Ellie",
+      "source": "https://centralsquare.ai/",
+      "pronoun": "she",
+      "what": "AI teammate for community teams: the extra pair of hands"
+    },
+    {
+      "id": "msg:0",
+      "type": "Positioning",
+      "label": "Your community is your moat. Not enough people are running it.",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "msg:1",
+      "type": "Positioning",
+      "label": "The community layer of the agentic era",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "msg:2",
+      "type": "Mission",
+      "label": "Agents will do more and more of the work. People trusting each other is the part they can't do, and that trust lives in communities.",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "msg:3",
+      "type": "Problem",
+      "label": "Most community teams are one or two people doing the work of seven.",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "step:goal",
+      "type": "Step",
+      "label": "1 · Give Ellie a goal",
+      "source": "https://centralsquare.ai/",
+      "detail": "She works backwards from it, every day."
+    },
+    {
+      "id": "step:view",
+      "type": "Step",
+      "label": "2 · She builds the view",
+      "source": "https://centralsquare.ai/",
+      "detail": "Charts what leadership keeps asking, updates it weekly, links every point to the posts behind it."
+    },
+    {
+      "id": "step:approve",
+      "type": "Step",
+      "label": "3 · You approve every send",
+      "source": "https://centralsquare.ai/",
+      "detail": "Drafts in your voice. Nothing reaches a member until someone on your team says yes."
+    },
+    {
+      "id": "cap:channels",
+      "type": "Capability",
+      "label": "Reads every channel the community is on (sits on top; nothing moves, members install nothing)",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "cap:identity",
+      "type": "Capability",
+      "label": "Joins each person up across sources (one person, many records)",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "cap:memory",
+      "type": "Capability",
+      "label": "Remembers last week and flags what changed",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "cap:weekly",
+      "type": "Capability",
+      "label": "Checks every Monday 08:00 without being asked",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "cap:charts",
+      "type": "Capability",
+      "label": "Charts leadership questions, linked to the posts behind them",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "cap:drafts",
+      "type": "Capability",
+      "label": "Drafts personal nudges in your voice",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "cap:approval",
+      "type": "Capability",
+      "label": "Approval gate: nothing goes out until a person approves",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "cap:quiet",
+      "type": "Capability",
+      "label": "Finds quiet and underserved members, not just the loudest voices",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:slack",
+      "type": "Integration",
+      "label": "Slack",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:discord",
+      "type": "Integration",
+      "label": "Discord",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:whatsapp",
+      "type": "Integration",
+      "label": "WhatsApp",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:reddit",
+      "type": "Integration",
+      "label": "Reddit",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:circle",
+      "type": "Integration",
+      "label": "Circle",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:youtube",
+      "type": "Integration",
+      "label": "YouTube",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:email",
+      "type": "Integration",
+      "label": "Email",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:hubspot",
+      "type": "Integration",
+      "label": "HubSpot",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:salesforce",
+      "type": "Integration",
+      "label": "Salesforce",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "int:linkedin",
+      "type": "Integration",
+      "label": "LinkedIn",
+      "source": "https://centralsquare.ai/",
+      "status": "soon"
+    },
+    {
+      "id": "int:x",
+      "type": "Integration",
+      "label": "X",
+      "source": "https://centralsquare.ai/",
+      "status": "soon"
+    },
+    {
+      "id": "goal:0",
+      "type": "ExampleGoal",
+      "label": "Grow the ambassador programme",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "goal:1",
+      "type": "ExampleGoal",
+      "label": "Win back quiet members",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "goal:2",
+      "type": "ExampleGoal",
+      "label": "Recruit 20 founding members before the summit",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "goal:3",
+      "type": "ExampleGoal",
+      "label": "How often are we mentioned next to our main alternative?",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "goal:4",
+      "type": "ExampleGoal",
+      "label": "Who's gone quiet this month, and who matters most?",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "goal:5",
+      "type": "ExampleGoal",
+      "label": "Is our ambassador programme growing?",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "offer:0",
+      "type": "Offer",
+      "label": "Live in 7 days",
+      "source": "https://centralsquare.ai/",
+      "detail": "from first call to live, nothing migrated"
+    },
+    {
+      "id": "offer:1",
+      "type": "Offer",
+      "label": "No migration",
+      "source": "https://centralsquare.ai/",
+      "detail": ""
+    },
+    {
+      "id": "offer:2",
+      "type": "Offer",
+      "label": "60-day refund",
+      "source": "https://centralsquare.ai/",
+      "detail": "full refund within 60 days if it isn't working"
+    },
+    {
+      "id": "offer:3",
+      "type": "Offer",
+      "label": "Unlimited seats",
+      "source": "https://centralsquare.ai/",
+      "detail": "one plan"
+    },
+    {
+      "id": "offer:4",
+      "type": "Offer",
+      "label": "20-minute demo",
+      "source": "https://centralsquare.ai/",
+      "detail": "Book a demo / Talk to us / Try Ellie"
+    },
+    {
+      "id": "policy:data",
+      "type": "Policy",
+      "label": "You own every byte. Export or delete any time. Never used to train AI models. Isolated.",
+      "source": "https://centralsquare.ai/"
+    },
+    {
+      "id": "metric:home0",
+      "type": "Claim",
+      "label": "7M+ community members across customers' communities",
+      "source": "https://centralsquare.ai/",
+      "value": "7M+"
+    },
+    {
+      "id": "metric:home1",
+      "type": "Claim",
+      "label": "4+ hrs saved a week by one customer, within the first two weeks",
+      "source": "https://centralsquare.ai/",
+      "value": "4+ hrs"
+    },
+    {
+      "id": "metric:home2",
+      "type": "Claim",
+      "label": "Minutes for a monthly leadership report that used to take the best part of a day",
+      "source": "https://centralsquare.ai/",
+      "value": "Minutes"
+    },
+    {
+      "id": "metric:home3",
+      "type": "Claim",
+      "label": "7 days from first call to live",
+      "source": "https://centralsquare.ai/",
+      "value": "7 days"
+    },
+    {
+      "id": "org:adobe",
+      "type": "Organization",
+      "label": "Adobe",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "org:microsoft",
+      "type": "Organization",
+      "label": "Microsoft",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "org:smart-technologies",
+      "type": "Organization",
+      "label": "SMART Technologies",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "org:aspen-institute",
+      "type": "Organization",
+      "label": "Aspen Institute",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "org:spiky-ai",
+      "type": "Organization",
+      "label": "Spiky AI",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "org:capsule-crm",
+      "type": "Organization",
+      "label": "Capsule CRM",
+      "source": "https://centralsquare.ai/",
+      "context": "'Working with community teams at' logo strip"
+    },
+    {
+      "id": "customer:wakelet",
+      "type": "Customer",
+      "label": "Wakelet",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "industry": "EdTech",
+      "about": "Helps educators save, organise and share content from across the web."
+    },
+    {
+      "id": "person:james",
+      "type": "Person",
+      "label": "James Davis",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "role": "Head of Community and Growth, Wakelet",
+      "handle": "@JBDbiz"
+    },
+    {
+      "id": "fact:team",
+      "type": "Team",
+      "label": "2 people on the community team",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:trigger",
+      "type": "Context",
+      "label": "Changed its subscription model; needed to know who was still engaged, including quieter members",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:before",
+      "type": "Before",
+      "label": "Hours of copying every week: NPS and CRM report built by hand from four places",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:after",
+      "type": "With Ellie",
+      "label": "Ellie checks every Monday, joins each person across the four sources, remembers last week, flags what changed",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:time",
+      "type": "Outcome",
+      "label": "At least ½ day a week saved, more than 20 working days a year",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:ambassadors",
+      "type": "Outcome",
+      "label": "Ambassador programme rebuilt into tiers, each tied to a different revenue goal",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "fact:hard",
+      "type": "Hard part",
+      "label": "One ambassador. Four records. One person.",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "src:documents",
+      "type": "DataSource",
+      "label": "Documents",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "src:spreadsheets",
+      "type": "DataSource",
+      "label": "Spreadsheets",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "src:wakelets-own-data",
+      "type": "DataSource",
+      "label": "Wakelet's own data",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "src:hubspot",
+      "type": "DataSource",
+      "label": "HubSpot",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "quote:james",
+      "type": "Quote",
+      "label": "“It helps you identify underserved members who might not be the loudest voices in your community.”",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "verbatim": true
+    },
+    {
+      "id": "watch:0",
+      "type": "WatchQuestion",
+      "label": "Which of our paying customers have an ambassador, and which don't yet?",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "watch:1",
+      "type": "WatchQuestion",
+      "label": "Which ambassadors are making an impact, and who hasn't got going yet?",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "watch:2",
+      "type": "WatchQuestion",
+      "label": "Who is in our community, and how far along is each person?",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "watch:3",
+      "type": "WatchQuestion",
+      "label": "How is one market growing, month by month?",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    },
+    {
+      "id": "example:dashboard",
+      "type": "ExampleData",
+      "label": "186 paying customers · 64 with an ambassador (34%) · 122 without (66%) · 71 ambassadors at customers",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "label_required": "EXAMPLE DATA",
+      "note": "Site: numbers and names are examples; Wakelet's real figures stay private"
+    },
+    {
+      "id": "example:hannah",
+      "type": "ExampleData",
+      "label": "Hannah O.: HubSpot 'Hannah Okafor', survey 'H. Okafor' (scored 9), usage 'hannah.o' (12 collections last term, none this term), spreadsheet 'Hannah O'",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "label_required": "EXAMPLE DATA"
+    },
+    {
+      "id": "example:nudge",
+      "type": "ExampleData",
+      "label": "“Same person. Keen last term and offered to help, quiet since moving to the new tier. Worth a personal nudge. I’ve drafted one for you to look at.”",
+      "source": "https://centralsquare.ai/customers/wakelet",
+      "label_required": "EXAMPLE DATA"
+    },
+    {
+      "id": "cta:wakelet",
+      "type": "CTA",
+      "label": "See who’s quietly engaged in your community. → Find your quiet members (20-minute demo)",
+      "source": "https://centralsquare.ai/customers/wakelet"
+    }
+  ],
+  "edges": [
+    {
+      "source": "org:csai",
+      "relation": "builds",
+      "target": "product:ellie"
+    },
+    {
+      "source": "page:home",
+      "relation": "describes",
+      "target": "product:ellie"
+    },
+    {
+      "source": "page:wakelet",
+      "relation": "describes",
+      "target": "customer:wakelet"
+    },
+    {
+      "source": "org:csai",
+      "relation": "states",
+      "target": "msg:0"
+    },
+    {
+      "source": "org:csai",
+      "relation": "states",
+      "target": "msg:1"
+    },
+    {
+      "source": "org:csai",
+      "relation": "states",
+      "target": "msg:2"
+    },
+    {
+      "source": "org:csai",
+      "relation": "states",
+      "target": "msg:3"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "works_in",
+      "target": "step:goal"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "works_in",
+      "target": "step:view"
+    },
+    {
+      "source": "step:goal",
+      "relation": "then",
+      "target": "step:view"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "works_in",
+      "target": "step:approve"
+    },
+    {
+      "source": "step:view",
+      "relation": "then",
+      "target": "step:approve"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:channels"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:identity"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:memory"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:weekly"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:charts"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:drafts"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:approval"
+    },
+    {
+      "source": "product:ellie",
+      "relation": "can",
+      "target": "cap:quiet"
+    },
+    {
+      "source": "step:view",
+      "relation": "uses",
+      "target": "cap:charts"
+    },
+    {
+      "source": "step:view",
+      "relation": "uses",
+      "target": "cap:identity"
+    },
+    {
+      "source": "step:approve",
+      "relation": "uses",
+      "target": "cap:approval"
+    },
+    {
+      "source": "step:approve",
+      "relation": "uses",
+      "target": "cap:drafts"
+    },
+    {
+      "source": "step:goal",
+      "relation": "uses",
+      "target": "cap:channels"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:slack"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:discord"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:whatsapp"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:reddit"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:circle"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:youtube"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:email"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:hubspot"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads",
+      "target": "int:salesforce"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads_soon",
+      "target": "int:linkedin"
+    },
+    {
+      "source": "cap:channels",
+      "relation": "reads_soon",
+      "target": "int:x"
+    },
+    {
+      "source": "goal:0",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "goal:1",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "goal:2",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "goal:3",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "goal:4",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "goal:5",
+      "relation": "given_to",
+      "target": "product:ellie"
+    },
+    {
+      "source": "org:csai",
+      "relation": "offers",
+      "target": "offer:0"
+    },
+    {
+      "source": "org:csai",
+      "relation": "offers",
+      "target": "offer:1"
+    },
+    {
+      "source": "org:csai",
+      "relation": "offers",
+      "target": "offer:2"
+    },
+    {
+      "source": "org:csai",
+      "relation": "offers",
+      "target": "offer:3"
+    },
+    {
+      "source": "org:csai",
+      "relation": "offers",
+      "target": "offer:4"
+    },
+    {
+      "source": "org:csai",
+      "relation": "commits_to",
+      "target": "policy:data"
+    },
+    {
+      "source": "org:csai",
+      "relation": "claims",
+      "target": "metric:home0"
+    },
+    {
+      "source": "org:csai",
+      "relation": "claims",
+      "target": "metric:home1"
+    },
+    {
+      "source": "org:csai",
+      "relation": "claims",
+      "target": "metric:home2"
+    },
+    {
+      "source": "org:csai",
+      "relation": "claims",
+      "target": "metric:home3"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "customer:wakelet",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:adobe",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:microsoft",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:smart-technologies",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:aspen-institute",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:spiky-ai",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "org:csai",
+      "relation": "works_with_teams_at",
+      "target": "org:capsule-crm",
+      "evidence": "logo strip on home"
+    },
+    {
+      "source": "person:james",
+      "relation": "works_at",
+      "target": "customer:wakelet"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "uses",
+      "target": "product:ellie"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:team"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:trigger"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:before"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:after"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:time"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:ambassadors"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "has",
+      "target": "fact:hard"
+    },
+    {
+      "source": "fact:before",
+      "relation": "replaced_by",
+      "target": "fact:after"
+    },
+    {
+      "source": "fact:after",
+      "relation": "led_to",
+      "target": "fact:time"
+    },
+    {
+      "source": "fact:after",
+      "relation": "led_to",
+      "target": "fact:ambassadors"
+    },
+    {
+      "source": "fact:hard",
+      "relation": "solved_by",
+      "target": "cap:identity"
+    },
+    {
+      "source": "fact:after",
+      "relation": "reads",
+      "target": "src:documents"
+    },
+    {
+      "source": "fact:after",
+      "relation": "reads",
+      "target": "src:spreadsheets"
+    },
+    {
+      "source": "fact:after",
+      "relation": "reads",
+      "target": "src:wakelets-own-data"
+    },
+    {
+      "source": "fact:after",
+      "relation": "reads",
+      "target": "src:hubspot"
+    },
+    {
+      "source": "src:hubspot",
+      "relation": "same_as",
+      "target": "int:hubspot"
+    },
+    {
+      "source": "person:james",
+      "relation": "said",
+      "target": "quote:james"
+    },
+    {
+      "source": "quote:james",
+      "relation": "supports",
+      "target": "cap:quiet"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "watches",
+      "target": "watch:0"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "watches",
+      "target": "watch:1"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "watches",
+      "target": "watch:2"
+    },
+    {
+      "source": "customer:wakelet",
+      "relation": "watches",
+      "target": "watch:3"
+    },
+    {
+      "source": "watch:0",
+      "relation": "shown_as",
+      "target": "example:dashboard"
+    },
+    {
+      "source": "fact:hard",
+      "relation": "illustrated_by",
+      "target": "example:hannah"
+    },
+    {
+      "source": "example:hannah",
+      "relation": "prompts",
+      "target": "example:nudge"
+    },
+    {
+      "source": "example:nudge",
+      "relation": "uses",
+      "target": "cap:drafts"
+    },
+    {
+      "source": "page:wakelet",
+      "relation": "ends_with",
+      "target": "cta:wakelet"
+    }
+  ]
+}

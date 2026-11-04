@@ -71,5 +71,5 @@ Make the project first: `bash scripts/new-video.sh <yyyy-mm-slug> landscape`. Pa
 - **Real product UI only. Never invent screens,** data, metrics, customers or logos. No capture means ask.
 - No `Math.random`, no timers, no `requestAnimationFrame`, no CSS transitions or animations in render mode. `render.mjs` refuses to render and names the line.
 - Banned: corner labels, a centered title on a gradient, everything fading in, frame borders, glow on UI chrome, generic particle bursts.
-- Don't show Adobe, Microsoft or Aspen Institute (business-plan targets, not customers) without written confirmation.
+- Other company names only as the site frames them ("Working with community teams at"), never as customers or endorsements; only Wakelet has a published story.
 - Don't say a reel is done until the critique has run 3+ rounds with every score at 8 or higher, and `qa.sh` passes for every format.
