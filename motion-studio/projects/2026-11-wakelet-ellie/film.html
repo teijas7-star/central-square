@@ -302,7 +302,7 @@ const team = el("div", "photo", mid, `<img src="assets/photos/community.jpg">`);
 
 // 9 · James
 const james = el("div", "photo", mid, `<img src="assets/photos/james.jpg">`); james.style.borderRadius = "22px";
-const QPOS = () => T([0.68, 0.46, 100], [0.5, 0.68, 86], [0.5, 0.66, 92]);
+let tNow = 0; const QPOS = () => { const d = -0.025 * P(tNow, b(66), 1, E.io); const [x, y, sz] = T([0.68, 0.46, 100], [0.5, 0.68, 86], [0.5, 0.66, 92]); return [x, y + d, sz * (1 + 0.04 * P(tNow, b(66), 1, E.io))]; };
 const Q = [
   Head([{ t: "“It", at: b(60) }, { t: "helps", at: b(60.25) }, { t: "you", at: b(60.5) }, { t: "identify", at: b(60.75) }], { in: b(60), out: b(62), pos: QPOS }),
   Head([{ t: "underserved", at: b(62) }, { t: "members…", at: b(62.5) }], { in: b(62), out: b(64), pos: QPOS }),
@@ -323,7 +323,7 @@ const url = el("div", "kh", fg, `<span style="font-family:'Geist Mono';font-weig
 // ================================================================= seek(t)
 const bg = $("bg"), ctx = bg.getContext("2d");
 window.seek = function (t) {
-  layout();
+  layout(); tNow = t;
   if (bg.width !== W || bg.height !== H) { bg.width = W; bg.height = H; }
   const cam = camera(t), camPrev = camera(Math.max(0, t - FR));
   // ---- background layer (canvas): base, glows, glyphs, members
@@ -455,9 +455,10 @@ window.seek = function (t) {
   { const on = t >= b(50) && t < b(54) + 0.2; show(half, on); show(clock, t >= b(50) && t < b(55));
     if (on) { const k = Math.max(0, M.spring(t, b(50), { stiffness: 300, damping: 16, velocity: 3 })), ko = P(t, b(54) - 0.2, 0.35, E.inQ);
       half.style.left = `${W / 2}px`; half.style.top = `${H * T(0.46, 0.44, 0.42)}px`; half.style.fontSize = `${T(360, 300, 260) * S}px`;
-      half.style.transform = `translate(-50%,-50%) scale(${mix(0.8, 1, k) * (1 + ko * 0.6)})`; half.style.opacity = 1 - ko; }
+      half.style.transform = `translate(-50%,-50%) scale(${mix(0.8, 1, k) * (1 + ko * 0.6) * mix(1, 1.07, P(t, b(50), 2, E.io)) * (1 + 0.035 * pulse(t, [51, 52, 53], 9))})`; half.style.opacity = 1 - ko;
+      half.style.backgroundSize = "220% 100%"; half.style.backgroundPosition = `${mix(0, 100, P(t, b(50), 2, (x) => x))}% 50%`; }
     if (t >= b(50) && t < b(55)) { const cs = T(820, 760, 820) * S; clock.style.width = clock.style.height = `${cs}px`; clock.style.left = `${W / 2 - cs / 2}px`; clock.style.top = `${H * T(0.46, 0.44, 0.42) - cs / 2}px`;
-      const spin = -(1 - Math.exp(-(t - b(50)) * 1.4)) * 1440; // backwards, decelerating
+      const spin = -(1 - Math.exp(-(t - b(50)) * 1.4)) * 1440 - (t - b(50)) * 140; // backwards: fast, then a steady unwind
       $("mh").setAttribute("transform", `rotate(${spin})`); $("hh").setAttribute("transform", `rotate(${spin / 12})`);
       clock.style.transform = `scale(${mix(0.85, 1.05, P(t, b(50), 2.5, E.out))})`; clock.style.opacity = 1 - P(t, b(54), 0.4); }
     const onT = t >= b(54) - 0.05 && t < b(60); show(team, onT);
@@ -476,7 +477,7 @@ window.seek = function (t) {
       const js = T(H * 0.56, W * 0.42, W * 0.56), jx = T(W * 0.17, W * 0.5, W * 0.5), jy = T(H * 0.5, H * 0.3, H * 0.3);
       const s = js * kj * (1 - ko);
       james.style.width = james.style.height = `${s}px`; james.style.left = `${jx - s / 2}px`; james.style.top = `${jy - s / 2}px`;
-      const img = james.querySelector("img"); img.style.width = `${js * 1.05}px`; img.style.transform = `translate(-50%,-42%) scale(${mix(1.02, 1.1, P(t, b(60), 4, (x) => x))})`;
+      const img = james.querySelector("img"); img.style.width = `${js * 1.05}px`; img.style.transform = `translate(-50%,-42%) scale(${mix(1.02, 1.18, P(t, b(60), 4, E.io))})`;
       const [ax, ay, as] = T([0.68, 0.64, 30], [0.5, 0.88, 26], [0.5, 0.82, 30]);
       attr.style.left = `${ax * W}px`; attr.style.top = `${ay * H}px`; attr.style.fontSize = `${as * S}px`; attr.style.textAlign = "center";
       attr.style.transform = `translate(-50%,-50%) translateY(${(1 - P(t, b(61), 0.4)) * 30}px)`; attr.style.clipPath = `inset(0 0 ${(1 - P(t, b(61), 0.4)) * 100}% 0)`; } }
