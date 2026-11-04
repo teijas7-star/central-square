@@ -15,7 +15,7 @@ for f in "${F[@]}"; do
   sz=$(size_of "$f"); mp4="$out/final-$f.mp4"
   echo "== $f ($sz)"
   rm -f "$mp4"
-  if ! node scripts/render.mjs "$film" --size="$sz" --out="$mp4" > "$out/render-$f.log" 2>&1; then
+  if ! node scripts/render.mjs "$film" --size="$sz" --out="$mp4" --crf="${CRF:-16}" > "$out/render-$f.log" 2>&1; then
     echo "FAIL: render of $f failed:"; tail -3 "$out/render-$f.log"; printf '### %s (%s)\nFAIL: render failed (see render-%s.log)\n\n' "$f" "$sz" "$f" >> "$out/qa.txt"; fail=1; continue
   fi
   grep -E "WARNING|video:" "$out/render-$f.log" || true

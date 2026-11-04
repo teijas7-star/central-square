@@ -67,6 +67,7 @@ const C = { base: "#0A0511", violet: "#7C5EFF", violet2: "#9D8BFF", coral: "#C65
 const E = { out: M.ease.outExpo, back: (x) => M.ease.outBack(x, 1.9), io: M.ease.inOutCubic, inQ: (x) => x * x * x, cub: M.ease.outCubic };
 const P = (t, s, d, f = E.out) => f(clamp((t - s) / d));                  // tween progress
 const win = (t, a, z) => t >= a && t < z;                                  // time window
+const pulse = (t, beats, k = 9) => beats.reduce((a, n) => a + (t >= b(n) ? Math.exp(-(t - b(n)) * k) : 0), 0); // decaying hit on each beat
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (parent || $("mid")).appendChild(e); return e; };
 const show = (e, on) => { e.style.display = on ? "" : "none"; };
@@ -100,6 +101,8 @@ function drawHead(h, t) {
   show(h.e, on); if (!on) return;
   const [x, y, size] = h.pos();
   h.e.style.left = `${x * W}px`; h.e.style.top = `${y * H}px`; h.e.style.fontSize = `${size * S}px`;
+  // re-set per format: one line in 16:9, wrapped to the frame in 1:1 and 9:16
+  h.e.style.whiteSpace = MODE === "land" ? "nowrap" : "normal"; h.e.style.width = MODE === "land" ? "auto" : (h.wrapW || 0.88) * W + "px";
   const kout = h.exit ? P(t, h.out - h.exit, h.exit, E.io) : 0;
   for (const p of h.parts) {
     const k = P(t, p.at, 0.32, E.out), kp = P(t, p.at, 0.3, E.back);
@@ -185,7 +188,7 @@ function drawMembers(ctx, t, cam) {
     let lit = 0;
     if (m.quiet && t >= b(18) && t < b(28)) {
       const tl = b(18) + 2.0 * clamp((m.hx + 0.15) / 1.3); // time the line passes (approx, eased below)
-      if (scanX > m.hx) { lit = 1; const kp = Math.max(0, M.spring(t, tl, "pop")); size *= mix(1, 1.9, kp); }
+      if (scanX > m.hx) { lit = 1; const kp = Math.max(0, M.spring(t, tl, "pop")); size *= mix(1, 1.9, kp) * (1 + 0.45 * pulse(t, [23, 24, 25, 26, 27], 7)); }
     }
     if (lit) { col = C.coral; a = 0.95; ctx.shadowColor = hex(C.coral, 0.9); ctx.shadowBlur = 18 * S; }
     else if (m.loud && field > 0.1) { ctx.shadowColor = hex(C.violet2, 0.6); ctx.shadowBlur = 24 * S; }
@@ -229,8 +232,8 @@ const tiles = Array.from({ length: 4 }, (_, k) => { const id = gctx.createImageD
 const mid = $("mid"), fg = $("fg");
 // 1 · hero square
 const hero = el("div", "sq", mid); hero.style.background = C.violet; hero.dataset.sfx = "thud"; hero.dataset.sfxGain = 0.9;
-const H1a = Head([{ t: "Thousands", at: b(2), sfx: "impact", gain: 0.7 }, { t: "of", at: b(2.5) }, { t: "members.", at: b(3) }], { in: b(2), out: b(4), pos: () => [0.5, 0.5, T(150, 128, 112)] });
-const H1b = Head([{ t: "Two", at: b(4), sfx: "tick", gain: 0.9 }, { t: "people.", at: b(4.5) }], { in: b(4), out: b(6), pos: () => [0.5, 0.5, T(260, 210, 190)] });
+const H1a = Head([{ t: "Thousands", at: b(2), sfx: "impact", gain: 0.7 }, { t: "of", at: b(2.5) }, { t: "members.", at: b(3) }], { in: b(2), out: b(4), pos: () => [0.5, 0.5, T(150, 132, 124)] });
+const H1b = Head([{ t: "Two", at: b(4), sfx: "tick", gain: 0.9 }, { t: "people.", at: b(4.5) }], { in: b(4), out: b(6), pos: () => [0.5, 0.5, T(260, 230, 220)] });
 
 // 2 · the mess: six cards from the four edges
 function sheet(c) { c.innerHTML = '<div class="lbl" style="position:absolute;left:7%;top:7%;font-size:.9em">Members.xlsx</div>'; for (let r = 0; r < 7; r++) for (let k = 0; k < 4; k++) { const d = el("div", "", c); d.style.cssText = `position:absolute;left:${6 + k * 22}%;top:${22 + r * 10.5}%;width:20%;height:8%;border-radius:4px;background:${(r + k) % 5 === 0 ? "rgba(124,94,255,.35)" : "rgba(21,15,29,.10)"}`; } }
@@ -239,7 +242,7 @@ function contact(c) { c.innerHTML = '<div style="position:absolute;left:8%;top:1
 function chat(c, k) { c.style.background = "transparent"; c.style.boxShadow = "none"; c.style.overflow = "visible"; [[0, 0, 70, k ? C.violet : C.cream], [22, 34, 64, k ? C.cream : C.violet], [52, 8, 56, k ? C.violet : C.cream]].forEach(([x, y, w, bg]) => { const d = el("div", "", c); d.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:${w}%;height:26%;border-radius:22px;background:${bg};box-shadow:0 20px 50px rgba(0,0,0,.4)`; }); }
 const MESS = [
   { make: sheet, w: 560, h: 380, from: [-1.3, 0.1], to: [0.13, 0.19], rot: -7, at: 6 },
-  { make: doc, w: 380, h: 480, from: [1.3, -0.2], to: [0.885, 0.26], rot: 6, at: 7 },
+  { make: doc, w: 380, h: 480, from: [1.12, -0.05], to: [0.885, 0.26], rot: 6, at: 7 },
   { make: contact, w: 480, h: 280, from: [0.2, 1.4], to: [0.2, 0.8], rot: 4, at: 8 },
   { make: (c) => chat(c, 0), w: 440, h: 320, from: [0.8, -1.3], to: [0.52, 0.12], rot: -4, at: 9 },
   { make: sheet, w: 500, h: 340, from: [1.12, 0.95], to: [0.85, 0.83], rot: 8, at: 10 },
@@ -261,7 +264,7 @@ const CHIPS = [["WhatsApp", "Sam R."], ["Email", "sam@example.com"], ["Slack", "
   const p = Pill(`<span style="width:1.1em;height:1.1em;border-radius:22%;background:${[C.violet, C.violet2, C.ink][i]}"></span><span style="opacity:.6;font-weight:500">${src}</span><span>${who}</span>`, C.cream, C.ink); p.dataset.sfx = "whoosh"; p.dataset.sfxGain = 0.4; return p;
 });
 const person = el("div", "card", mid);
-person.innerHTML = `<div style="position:absolute;left:7%;top:50%;transform:translateY(-50%);width:22%;aspect-ratio:1;border-radius:50%;background:${C.violet};color:${C.cream};display:flex;align-items:center;justify-content:center;font-family:Inter;font-weight:600;font-size:.9em">SR</div><div style="position:absolute;left:35%;top:24%;font-family:Fraunces;font-weight:500;font-size:1.25em;letter-spacing:-.02em">Sam Rivera</div><div style="position:absolute;left:35%;top:60%;display:flex;gap:.35em">${[C.violet, C.violet2, C.ink].map((c) => `<span style="width:.7em;height:.7em;border-radius:22%;background:${c}"></span>`).join("")}<span style="font-size:.5em;color:rgba(21,15,29,.55);margin-left:.4em">3 accounts</span></div>`;
+person.innerHTML = `<div style="position:absolute;left:7%;top:50%;transform:translateY(-50%);width:22%;aspect-ratio:1;border-radius:50%;background:${C.violet};color:${C.cream};display:flex;align-items:center;justify-content:center;font-family:Inter;font-weight:600;font-size:.9em">SR</div><div style="position:absolute;left:35%;top:13%;font-family:Fraunces;font-weight:500;font-size:1.25em;letter-spacing:-.02em">Sam Rivera</div><div style="position:absolute;left:35%;top:64%;display:flex;align-items:center;gap:.35em">${[C.violet, C.violet2, C.ink].map((c) => `<span style="width:.7em;height:.7em;border-radius:22%;background:${c}"></span>`).join("")}<span style="font-size:.5em;color:rgba(21,15,29,.55);margin-left:.4em">3 accounts</span></div>`;
 person.dataset.sfx = "impact"; person.dataset.sfxGain = 0.5;
 const same = Pill(`<span style="width:.8em;height:.8em;border-radius:22%;background:${C.cream}"></span>Same person`, C.coral, C.cream); same.dataset.sfx = "pop";
 const H5a = Head([{ t: "Many", at: b(28), sfx: "tick", gain: 0.5 }, { t: "records.", at: b(28.5) }], { in: b(28), out: b(32), pos: () => [0.5, T(0.18, 0.16, 0.16), T(130, 116, 112)] });
@@ -299,13 +302,14 @@ const team = el("div", "photo", mid, `<img src="assets/photos/community.jpg">`);
 
 // 9 · James
 const james = el("div", "photo", mid, `<img src="assets/photos/james.jpg">`); james.style.borderRadius = "22px";
-const QPOS = () => T([0.655, 0.46, 112], [0.5, 0.68, 86], [0.5, 0.66, 92]);
+const QPOS = () => T([0.68, 0.46, 100], [0.5, 0.68, 86], [0.5, 0.66, 92]);
 const Q = [
   Head([{ t: "“It", at: b(60) }, { t: "helps", at: b(60.25) }, { t: "you", at: b(60.5) }, { t: "identify", at: b(60.75) }], { in: b(60), out: b(62), pos: QPOS }),
   Head([{ t: "underserved", at: b(62) }, { t: "members…", at: b(62.5) }], { in: b(62), out: b(64), pos: QPOS }),
   Head([{ t: "…who", at: b(64) }, { t: "might", at: b(64.25) }, { t: "not", at: b(64.5) }, { t: "be", at: b(64.75) }], { in: b(64), out: b(66), pos: QPOS }),
   Head([{ t: "the", at: b(66) }, { t: "loudest", at: b(66.5), cls: "coral", sfx: "chime", gain: 0.35 }, { t: "voices.”", at: b(66.75), cls: "coral" }], { in: b(66), out: b(68), pos: QPOS }),
 ];
+const uline = el("div", "abs", fg); uline.style.background = C.coral; uline.style.height = "6px"; uline.style.borderRadius = "3px"; uline.style.transformOrigin = "0 50%"; uline.style.boxShadow = "0 0 20px rgba(198,82,63,.7)";
 const attr = el("div", "abs", fg, `<div style="font-family:Inter;font-weight:600">James Davis</div><div style="font-family:Inter;font-weight:400;opacity:.7">Head of Community &amp; Growth, Wakelet</div>`);
 
 // 10 · lockup
@@ -348,7 +352,7 @@ window.seek = function (t) {
   // ---- 2 the mess (b6-b16), snap to grid (b16), collapse (b18)
   for (const m of MESS) {
     const on = t >= b(m.at) && t < b(18); show(m.c, on); if (!on) continue;
-    const k = P(t, b(m.at), 0.38, E.out), sz = T(1, 0.85, 0.8) * S;
+    const k = P(t, b(m.at), 0.38, E.out), sz = T(1, 0.66, 0.8) * S;
     const tw = m.w * sz, th = m.h * sz;
     let x = mix(m.from[0], m.to[0], k) * W, y = mix(m.from[1], m.to[1], k) * H, r = m.rot * k + noise(t * 3 + m.i, 11) * 2.5 * P(t, b(m.at) + 0.3, 0.3);
     // jitter while piled up
@@ -377,7 +381,7 @@ window.seek = function (t) {
     const k = Math.max(0, M.spring(t, at, { stiffness: 420, damping: 20, velocity: 5 })), w = T(330, 300, 340) * S, h = w * 0.62;
     const x = T(W / 2 + (i - 0.5) * w * 1.15, W / 2 + (i - 0.5) * w * 1.15, W / 2 + (i - 0.5) * w * 1.12), y = H * T(0.78, 0.8, 0.74);
     c.style.width = `${w}px`; c.style.height = `${h}px`; c.style.left = `${x - w / 2}px`; c.style.top = `${y - h / 2}px`; c.style.fontSize = `${w / 6.2}px`;
-    c.style.transform = `scale(${k}) translateY(${(1 - Math.min(1, k)) * 40}px)`;
+    c.style.transform = `scale(${k * (1 + 0.04 * pulse(t, [25, 26, 27], 10))}) translateY(${(1 - Math.min(1, k)) * 40 - 10 * S * Math.sin((t - at) * 2.2 + i)}px)`;
     count(c.querySelector(".num"), t, at + 0.1, to);
   }
 
@@ -387,11 +391,14 @@ window.seek = function (t) {
       const at = b(28 + i), on = t >= at && t < b(32) + 0.12; show(p, on); if (!on) return;
       const k = P(t, at, 0.4, E.out), from = [[-0.4, 0.38], [1.4, 0.52], [0.5, 1.3]][i], to = T([[0.5, 0.4], [0.5, 0.54], [0.5, 0.68]], [[0.5, 0.42], [0.5, 0.55], [0.5, 0.68]], [[0.5, 0.42], [0.5, 0.52], [0.5, 0.62]])[i];
       let x = mix(from[0], to[0], k), y = mix(from[1], to[1], k);
+      const ant = P(t, b(30.5), b(32) - b(30.5), E.io) * 0.12; x = mix(x, 0.5, ant); y = mix(y, 0.54, ant) + Math.sin(t * 3 + i * 2) * 0.006;
       x = mix(x, 0.5, col); y = mix(y, 0.54, col);
       p.style.left = `${x * W}px`; p.style.top = `${y * H}px`; p.style.fontSize = `${T(54, 48, 50) * S}px`; p.style.transform = `translate(-50%,-50%) scale(${1 - col * 0.3})`;
     });
     const on = t >= b(32) && t < b(36); show(person, on);
-    if (on) { const w = T(860, 800, 880) * S, h = w * 0.32; person.style.width = `${w}px`; person.style.height = `${h}px`; person.style.left = `${W / 2 - w / 2}px`; person.style.top = `${H * 0.54 - h / 2}px`; person.style.fontSize = `${w / 11}px`; person.style.transform = `scale(${Math.max(0, mergeK)})`; }
+    if (on) { [...person.querySelectorAll("div:last-child > span")].slice(0, 3).forEach((sp, j) => { const kk = Math.max(0, M.spring(t, b(34 + j * 0.5), { stiffness: 520, damping: 16, velocity: 6 })); sp.style.transform = `scale(${t >= b(34 + j * 0.5) ? 0.6 + 0.4 * kk + 0.5 * pulse(t, [34 + j * 0.5], 8) : 1})`; sp.style.display = "inline-block"; });
+      person.style.boxShadow = `0 30px 80px rgba(0,0,0,.45), 0 0 ${mix(0, 70, pulse(t, [33, 35], 4)) * S}px rgba(198,82,63,.55)`;
+      const w = T(860, 800, 880) * S, h = w * 0.32; person.style.width = `${w}px`; person.style.height = `${h}px`; person.style.left = `${W / 2 - w / 2}px`; person.style.top = `${H * 0.54 - h / 2}px`; person.style.fontSize = `${w / 11}px`; person.style.transform = `scale(${Math.max(0, mergeK)})`; }
     popPill(same, t, b(33), W / 2, H * 0.54 + T(205, 195, 210) * S, T(50, 46, 50));
     show(same, t >= b(33) && t < b(36)); }
 
@@ -401,7 +408,7 @@ window.seek = function (t) {
       const ts = T(360, 300, 340) * S, mx = T(W * 0.3, W * 0.5, W * 0.5), my = T(H * 0.56, H * 0.44, H * 0.38);
       const kf = P(t, b(36), 0.45, E.back);
       mon.style.width = mon.style.height = `${ts}px`; mon.style.left = `${mx - ts / 2}px`; mon.style.top = `${my - ts / 2}px`; mon.style.fontSize = `${ts / 5}px`;
-      mon.style.transform = `perspective(900px) rotateX(${(1 - kf) * 90}deg)`; mon.style.transformOrigin = "50% 0%";
+      mon.style.transform = `perspective(900px) rotateX(${(1 - kf) * 90}deg) scale(${1 + 0.05 * pulse(t, [41, 43], 8)}) rotate(${Math.sin(t * 1.6) * 1.2}deg)`; mon.style.transformOrigin = "50% 0%";
       ROWS.forEach((r, i) => {
         const at = b(37 + i); show(r, t >= at); if (t < at) return;
         const k = P(t, at, 0.35, E.out), rw = T(780, 760, 880) * S, rh = T(118, 104, 116) * S;
@@ -409,7 +416,8 @@ window.seek = function (t) {
         r.style.width = `${rw}px`; r.style.height = `${rh}px`; r.style.left = `${rx - rw / 2}px`; r.style.top = `${ry - rh / 2}px`; r.style.fontSize = `${rh * 0.42}px`;
         r.style.transform = `translateX(${(1 - k) * 0.6 * W}px)`;
         const kc = Math.max(0, M.spring(t, b(40 + i), { stiffness: 520, damping: 18, velocity: 6 }));
-        checks[i].style.transform = `translateY(-50%) scale(${kc})`;
+        checks[i].style.transform = `translateY(-50%) scale(${kc * (1 + 0.5 * pulse(t, [42.5 + i * 0.25, 43.5 + i * 0.25], 8))})`;
+        r.style.transform = `translateX(${(1 - k) * 0.6 * W + 16 * S * pulse(t, [42.5 + i * 0.25], 6)}px) translateY(${-6 * S * Math.sin((t - at) * 2.4 + i)}px)`;
       });
     } }
 
@@ -465,11 +473,11 @@ window.seek = function (t) {
   // ---- 9 James (the only text-beside-image moment)
   { const on = t >= b(60) && t < b(68) + 0.1; show(james, on); show(attr, on);
     if (on) { const kj = clamp(M.spring(t, b(60), "snappy")), ko = P(t, b(68) - 0.15, 0.25, E.inQ);
-      const js = T(H * 0.62, W * 0.42, W * 0.56), jx = T(W * 0.22, W * 0.5, W * 0.5), jy = T(H * 0.5, H * 0.3, H * 0.3);
+      const js = T(H * 0.56, W * 0.42, W * 0.56), jx = T(W * 0.17, W * 0.5, W * 0.5), jy = T(H * 0.5, H * 0.3, H * 0.3);
       const s = js * kj * (1 - ko);
       james.style.width = james.style.height = `${s}px`; james.style.left = `${jx - s / 2}px`; james.style.top = `${jy - s / 2}px`;
       const img = james.querySelector("img"); img.style.width = `${js * 1.05}px`; img.style.transform = `translate(-50%,-42%) scale(${mix(1.02, 1.1, P(t, b(60), 4, (x) => x))})`;
-      const [ax, ay, as] = T([0.655, 0.66, 30], [0.5, 0.88, 26], [0.5, 0.82, 30]);
+      const [ax, ay, as] = T([0.68, 0.64, 30], [0.5, 0.88, 26], [0.5, 0.82, 30]);
       attr.style.left = `${ax * W}px`; attr.style.top = `${ay * H}px`; attr.style.fontSize = `${as * S}px`; attr.style.textAlign = "center";
       attr.style.transform = `translate(-50%,-50%) translateY(${(1 - P(t, b(61), 0.4)) * 30}px)`; attr.style.clipPath = `inset(0 0 ${(1 - P(t, b(61), 0.4)) * 100}% 0)`; } }
 
@@ -486,6 +494,11 @@ window.seek = function (t) {
 
   // ---- kinetic headlines
   for (const h of HEADS) drawHead(h, t);
+  // coral underline draws under "loudest voices" (b67 -> b68), riding the word's measured box
+  { const on = t >= b(67) && t < b(68); show(uline, on);
+    if (on) { const w = Q[3].parts[1].s, v = Q[3].parts[2].s, r1 = w.getBoundingClientRect(), r2 = v.getBoundingClientRect(), k = P(t, b(67), 0.45, E.out);
+      uline.style.left = `${(r1.left - cam.x - W / 2) / cam.s + W / 2}px`; uline.style.top = `${(r1.bottom - cam.y - H / 2) / cam.s + H / 2 + 4 * S}px`; uline.style.width = `${((r2.right - r1.left) / cam.s) * k}px`; uline.style.height = `${7 * S}px`; } }
+
 
   // ---- flashes: single cream frames on the three big hits
   const f = Math.round(t * 30); $("flash").style.display = [Math.round(b(16) * 30), Math.round(b(50) * 30), Math.round(b(69) * 30)].includes(f) ? "block" : "none";

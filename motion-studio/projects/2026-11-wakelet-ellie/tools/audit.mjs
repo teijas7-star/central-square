@@ -9,11 +9,13 @@ const film = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../f
 
 if (argv[0] === "--video") {
   // per-frame mean absolute difference via ffmpeg; a frame is "static" if it barely changes from the previous one
-  const r = spawnSync("ffmpeg", ["-v", "error", "-i", argv[1], "-vf", "scale=480:-2,format=gray,tblend=all_mode=difference,signalstats,metadata=print:key=lavfi.signalstats.YAVG", "-f", "null", "-"], { encoding: "utf8", maxBuffer: 1 << 26 });
+  const r = spawnSync("ffmpeg", ["-v", "error", "-i", argv[1], "-vf", "scale=96:54:flags=area,format=gray,tblend=all_mode=difference,signalstats,metadata=mode=print:key=lavfi.signalstats.YAVG:file=-", "-f", "null", "-"], { encoding: "utf8", maxBuffer: 1 << 26 });
   const vals = [...(r.stderr + r.stdout).matchAll(/YAVG=([\d.]+)/g)].map((m) => +m[1]);
   const fps = 30, total = vals.length, endHold = total - 2 * fps;
   let run = 0, worst = { len: 0, at: 0 };
-  vals.forEach((v, i) => { if (v < 0.35 && i < endHold) { run++; if (run > worst.len) worst = { len: run, at: (i - run + 1) / fps }; } else run = 0; });
+  // downscaled so grain averages out; "static" = changing less than the slow push of the final hold does (calibrated: 1.5x its max)
+  const thr = Math.max(...vals.slice(-45)) * 1.5;
+  vals.forEach((v, i) => { if (v <= thr && i < endHold) { run++; if (run > worst.len) worst = { len: run, at: (i - run + 1) / fps }; } else run = 0; });
   console.log(`frames ${total}; longest static run before the end hold: ${worst.len} frames at ${worst.at.toFixed(2)}s -> ${worst.len <= 20 ? "PASS" : "FAIL"}`);
   process.exit(worst.len <= 20 ? 0 : 1);
 }
