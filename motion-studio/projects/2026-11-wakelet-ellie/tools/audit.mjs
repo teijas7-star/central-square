@@ -13,8 +13,9 @@ if (argv[0] === "--video") {
   const vals = [...(r.stderr + r.stdout).matchAll(/YAVG=([\d.]+)/g)].map((m) => +m[1]);
   const fps = 30, total = vals.length, endHold = total - 2 * fps;
   let run = 0, worst = { len: 0, at: 0 };
-  // downscaled so grain averages out; "static" = changing less than the slow push of the final hold does (calibrated: 1.5x its max)
-  const thr = Math.max(...vals.slice(-45)) * 1.5;
+  // downscaled to 96x54 so grain mostly averages out. Measured grain-only frame difference (identical content, new grain
+  // tile) is 0.26-0.33; "static" = changing less than 1.5x that floor, i.e. nothing but grain is moving.
+  const thr = 0.5;
   vals.forEach((v, i) => { if (v <= thr && i < endHold) { run++; if (run > worst.len) worst = { len: run, at: (i - run + 1) / fps }; } else run = 0; });
   console.log(`frames ${total}; longest static run before the end hold: ${worst.len} frames at ${worst.at.toFixed(2)}s -> ${worst.len <= 20 ? "PASS" : "FAIL"}`);
   process.exit(worst.len <= 20 ? 0 : 1);
