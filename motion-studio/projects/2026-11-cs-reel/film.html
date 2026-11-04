@@ -1,0 +1,332 @@
+<!doctype html>
+<!--
+  Wakelet customer reel: a pure function of time. window.seek(t) paints frame t.
+  Copy is verbatim from centralsquare.ai/customers/wakelet and the home page (see BRIEF.md sources).
+  Example figures and names carry an EXAMPLE DATA chip, as on the site.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Wakelet reel</title>
+<style>
+  @font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: block; }
+  @font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+
+  :root {
+    --ground: #F6F4FB; --ink: #1B1726; --ink2: #55506A; --ink3: #8C879C; --line: rgba(27,23,38,.14);
+    --violet: #6B4EFF; --violet-ink: #4F35D9; --violet-soft: rgba(107,78,255,.10); --coral: #C9573F;
+    --grad: linear-gradient(95deg, #6B4EFF 15%, #B24FC0 60%, #D9623F);
+    --shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 6px rgba(27,23,38,.04), 0 30px 80px rgba(76,56,170,.16);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ground); color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
+
+  .field { position: absolute; border-radius: 50%; width: 90vmax; height: 90vmax; margin: -45vmax 0 0 -45vmax; }
+  #f1 { background: radial-gradient(closest-side, rgba(211,199,255,.85), rgba(211,199,255,0)); }
+  #f2 { background: radial-gradient(closest-side, rgba(255,227,214,.8), rgba(255,227,214,0)); }
+  #f3 { background: radial-gradient(closest-side, rgba(207,228,255,.6), rgba(207,228,255,0)); }
+
+  .scene { position: absolute; inset: 0; visibility: hidden; }
+
+  /* Landscape: copy left, picture right. Portrait and square: copy top, picture below. */
+  .text { position: absolute; left: 6vw; top: 50%; transform: translateY(-50%); width: 43vw; }
+  .vis  { position: absolute; left: 51vw; top: 9vh; width: 45vw; height: 82vh; }
+  @media (orientation: portrait) {
+    .text { left: 7vw; top: 8vh; transform: none; width: 86vw; }
+    .vis  { left: 7vw; top: 47vh; width: 86vw; height: 43vh; }
+  }
+  @media (aspect-ratio: 1/1) {
+    .text { left: 6vw; top: 6vh; transform: none; width: 88vw; }
+    .vis  { left: 6vw; top: 50vh; width: 88vw; height: 44vh; }
+  }
+
+  /* A frame is sized (in seek) to the image's aspect inside .vis; the image inside moves with the camera */
+  .frame { position: absolute; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); background: #fff; }
+  .frame img, .frame .world { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; }
+  .world img { transform: none; }
+  .frame.photo img { object-fit: cover; }
+  .hl { position: absolute; border-radius: 8px; background: rgba(107,78,255,.13); box-shadow: inset 0.5vmin 0 0 var(--violet); transform-origin: 0 50%; }
+  .ring { position: absolute; border-radius: 12px; border: 0.45vmin solid var(--violet); }
+
+  .mask { overflow: hidden; display: block; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+  .mask > span { display: inline-block; will-change: transform; }
+  .chip { display: inline-block; font-family: "Geist Mono", monospace; font-weight: 500; font-size: 3vmin; text-transform: uppercase; letter-spacing: -0.02em;
+          color: var(--violet-ink); background: var(--violet-soft); border-radius: 999px; padding: 0.8vmin 1.7vmin; white-space: nowrap; }
+  .chip.ex { position: absolute; right: 2vmin; top: 2vmin; z-index: 3; background: rgba(255,255,255,.94); box-shadow: 0 0 0 1px var(--line); font-size: 2.6vmin; }
+  .chip.ex::before { content: ""; display: inline-block; width: 1vmin; height: 1vmin; border-radius: 50%; background: var(--violet); margin-right: 1vmin; vertical-align: 0.15vmin; }
+  .h { font-weight: 400; font-size: 7.6vmin; line-height: 1.02; letter-spacing: -0.045em; margin-top: 2.6vmin; }
+  .h.big { font-size: 8.6vmin; }
+  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 0.08em; }
+  .sub { font-size: 3.8vmin; line-height: 1.3; color: var(--ink2); letter-spacing: -0.015em; margin-top: 2.4vmin; }
+  .mono { font-family: "Geist Mono", monospace; font-size: 2.9vmin; color: var(--ink3); text-transform: uppercase; letter-spacing: -0.02em; margin-top: 2.6vmin; }
+
+  /* scene 2 diagram */
+  #srcs { position: absolute; inset: 0; }
+  .src { position: absolute; font-family: "Geist Mono", monospace; font-weight: 500; font-size: 3vmin; text-transform: uppercase; color: var(--ink);
+         background: #fff; border-radius: 1.4vmin; padding: 1.4vmin 2vmin; box-shadow: var(--shadow); white-space: nowrap; transform: translate(-50%, -50%); }
+  #report { position: absolute; transform: translate(-50%, -50%); background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 2.4vmin 3vmin; text-align: left; min-width: 30vmin; }
+  #report .t { font-family: "Geist Mono", monospace; font-size: 2.6vmin; color: var(--coral); text-transform: uppercase; }
+  #report .n { font-size: 4.8vmin; letter-spacing: -0.04em; margin-top: 0.8vmin; }
+  #wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  #wires path { fill: none; stroke: var(--violet); stroke-width: 2; stroke-dasharray: 6 7; vector-effect: non-scaling-stroke; opacity: .55; }
+
+  /* result */
+  .num { font-weight: 400; font-size: 16vmin; line-height: 0.95; letter-spacing: -0.06em; }
+  /* quote */
+  .q { font-weight: 400; font-size: 5.7vmin; line-height: 1.12; letter-spacing: -0.035em; }
+  /* CTA */
+  #lockup { display: flex; align-items: center; gap: 1.6vmin; }
+  #lockup img { height: 7vmin; width: auto; }
+  #wm { font-size: 4.2vmin; font-weight: 500; letter-spacing: -0.02em; }
+  #wm b { font-weight: 600; } #wm i { font-style: normal; color: var(--coral); font-size: 0.8em; padding: 0 0.15em; }
+  .btn { position: relative; display: inline-block; font-family: "Geist Mono", monospace; font-weight: 500; font-size: 3vmin; color: #fff; padding: 1.8vmin 3.2vmin; border-radius: 1vmin; overflow: hidden; margin-top: 4vmin; }
+  .btn .fill { position: absolute; inset: 0; background: var(--violet); transform-origin: 0 50%; }
+  .btn .lab { position: relative; }
+  #s7 .text { width: 60vw; }
+  @media (orientation: portrait), (aspect-ratio: 1/1) { #s7 .text { width: 86vw; top: 30vh; } }
+</style>
+</head>
+<body>
+  <div id="f1" class="field"></div><div id="f2" class="field"></div><div id="f3" class="field"></div>
+
+  <!-- 1 HOOK -->
+  <section class="scene" id="s0">
+    <div class="vis"><div class="frame photo" data-in="reveal" data-at="-0.4" data-ar="1600/1200" data-sfx="whoosh" data-sfx-gain="0.4"><img id="hook-img" src="assets/photos/community.jpg"></div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="0" data-sfx="tick">Customer story · Wakelet</span></div>
+      <div class="h">
+        <span class="mask"><span data-in="rise" data-at="1">Two people ran</span></span>
+        <span class="mask"><span data-in="rise" data-at="1.5">Wakelet’s community.</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="4" data-sfx="impact" data-sfx-gain="0.6">Ellie found the</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="4.5">members they</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="5">couldn’t see.</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 BEFORE -->
+  <section class="scene" id="s1">
+    <div class="vis"><div id="srcs">
+      <svg id="wires"><path id="w0"/><path id="w1"/><path id="w2"/><path id="w3"/></svg>
+      <div class="src" id="c0" data-in="pop" data-at="9" data-sfx="tick">Documents</div>
+      <div class="src" id="c1" data-in="pop" data-at="10" data-sfx="tick">Spreadsheets</div>
+      <div class="src" id="c2" data-in="pop" data-at="11" data-sfx="tick">Wakelet’s own data</div>
+      <div class="src" id="c3" data-in="pop" data-at="12" data-sfx="tick">HubSpot</div>
+      <div id="report" data-in="pop" data-at="13" data-sfx="thud"><div class="t">NPS + CRM report</div><div class="n">Built by hand</div></div>
+    </div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="8" data-sfx="tick" data-sfx-gain="0.5">Before</span></div>
+      <div class="h">
+        <span class="mask"><span data-in="rise" data-at="8.5" data-sfx="whoosh" data-sfx-gain="0.4">The answer was</span></span>
+        <span class="mask"><span data-in="rise" data-at="9">spread across</span></span>
+        <span class="mask"><span data-in="rise" data-at="9.5">four places.</span></span>
+      </div>
+      <div class="sub mask"><span data-in="rise" data-at="13">Hours of copying, every week.</span></div>
+    </div>
+  </section>
+
+  <!-- 3 THE HARD PART -->
+  <section class="scene" id="s2">
+    <div class="vis"><div class="frame" id="hannah" data-in="reveal" data-at="16" data-ar="1132/652" data-sfx="whoosh" data-sfx-gain="0.4">
+      <div class="world" id="hannah-w"><img src="assets/ui/hannah-card.png">
+      <div class="hl" id="r0" data-in="wipe" data-at="18" data-sfx="tick"></div><div class="hl" id="r1" data-in="wipe" data-at="19" data-sfx="tick"></div>
+      <div class="hl" id="r2" data-in="wipe" data-at="20" data-sfx="tick"></div><div class="hl" id="r3" data-in="wipe" data-at="21" data-sfx="tick"></div>
+      <div class="ring" id="r4" data-in="pop" data-at="22" data-sfx="chime" data-sfx-gain="0.5"></div></div>
+      <span class="chip ex">Example data</span>
+    </div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="16" data-sfx="tick" data-sfx-gain="0.5">The hard part</span></div>
+      <div class="h big">
+        <span class="mask"><span data-in="rise" data-at="16.5">One ambassador.</span></span>
+        <span class="mask"><span data-in="rise" data-at="18">Four records.</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="22" data-sfx="impact" data-sfx-gain="0.5">One person.</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 WITH ELLIE -->
+  <section class="scene" id="s3">
+    <div class="vis"><div class="frame" id="watch" data-in="reveal" data-at="24" data-ar="2236/984" data-sfx="whoosh" data-sfx-gain="0.4">
+      <img id="watch-img" src="assets/ui/watching-panel.png">
+      <span class="chip ex">Example data</span>
+    </div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="24" data-sfx="tick" data-sfx-gain="0.5">With Ellie</span></div>
+      <div class="h">
+        <span class="mask"><span data-in="rise" data-at="24.5">Ellie checks</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="25" data-sfx="impact" data-sfx-gain="0.4">every Monday,</span></span>
+        <span class="mask"><span data-in="rise" data-at="25.5">without anyone</span></span>
+        <span class="mask"><span data-in="rise" data-at="26">asking.</span></span>
+      </div>
+      <div class="mono mask"><span data-in="rise" data-at="28" data-sfx="tick" data-sfx-gain="0.5">Remembers last week · flags what changed</span></div>
+    </div>
+  </section>
+
+  <!-- 5 APPROVE -->
+  <section class="scene" id="s4">
+    <div class="vis"><div class="frame" id="approve" data-in="reveal" data-at="32" data-ar="726/906" data-sfx="whoosh" data-sfx-gain="0.4">
+      <div class="world" id="approve-w"><img src="assets/ui/approve-card.png">
+      <div class="ring" id="r5" data-in="pop" data-at="36" data-sfx="pop"></div></div>
+    </div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="32" data-sfx="tick" data-sfx-gain="0.5">You approve every send</span></div>
+      <div class="h">
+        <span class="mask"><span data-in="rise" data-at="32.5">Nothing reaches</span></span>
+        <span class="mask"><span data-in="rise" data-at="33">a member until</span></span>
+        <span class="mask"><span data-in="rise" data-at="33.5">someone on your</span></span>
+        <span class="mask"><span data-in="rise" data-at="34" data-sfx="chime" data-sfx-gain="0.4">team <span class="grad">says yes.</span></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 RESULT -->
+  <section class="scene" id="s5">
+    <div class="vis"><div class="frame photo" id="res-photo" data-in="reveal" data-at="40" data-ar="1600/1200" data-sfx="whoosh" data-sfx-gain="0.4"><img id="res-img" src="assets/photos/community.jpg"></div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="40" data-sfx="tick" data-sfx-gain="0.5">Time back</span></div>
+      <div class="num mask" style="margin-top:2.4vmin"><span class="grad" data-in="rise" data-at="40.5" data-sfx="impact" data-sfx-gain="0.6">½ day</span></div>
+      <div class="h mask" style="margin-top:0.6vmin"><span data-in="rise" data-at="41">back, every week.</span></div>
+      <div class="h mask" style="margin-top:0"><span data-in="rise" data-at="41.5">At least.</span></div>
+      <div class="sub mask"><span data-in="rise" data-at="43">More than <b style="font-weight:500;color:var(--ink)" id="twenty">20</b> working days a year.</span></div>
+      <div class="mask" style="display:inline-block;margin-top:3vmin"><span class="chip" data-in="rise" data-at="45" data-sfx="tick">Ambassador programme → rebuilt into tiers</span></div>
+    </div>
+  </section>
+
+  <!-- 7 QUOTE -->
+  <section class="scene" id="s6">
+    <div class="vis"><div class="frame photo" id="james" data-in="reveal" data-at="48" data-ar="800/1000" data-sfx="whoosh" data-sfx-gain="0.4"><img id="james-img" src="assets/photos/james.jpg"></div></div>
+    <div class="text">
+      <div class="mask" style="display:inline-block"><span class="chip" data-in="rise" data-at="48">In James’s words</span></div>
+      <div class="q" style="margin-top:2.6vmin">
+        <span class="mask"><span data-in="rise" data-at="48.5">“It helps you identify</span></span>
+        <span class="mask"><span data-in="rise" data-at="49">underserved members</span></span>
+        <span class="mask"><span data-in="rise" data-at="49.5">who might not be the</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="50" data-sfx="chime" data-sfx-gain="0.35">loudest voices</span></span>
+        <span class="mask"><span data-in="rise" data-at="50.5">in your community.”</span></span>
+      </div>
+      <div class="mono mask"><span data-in="rise" data-at="52">James Davis · Head of Community and Growth, Wakelet</span></div>
+    </div>
+  </section>
+
+  <!-- 8 CTA -->
+  <section class="scene" id="s7">
+    <div class="text">
+      <div id="lockup" data-in="pop" data-at="58" data-sfx="pop"><img src="assets/logo-mark.svg"><span id="wm"><b>centralsquare</b><i>▪</i>ai</span></div>
+      <div class="h big">
+        <span class="mask"><span data-in="rise" data-at="58.5">See who’s</span></span>
+        <span class="mask"><span class="grad" data-in="rise" data-at="59" data-sfx="impact" data-sfx-gain="0.4">quietly engaged</span></span>
+        <span class="mask"><span data-in="rise" data-at="59.5">in your community.</span></span>
+      </div>
+      <div class="mask" style="display:inline-block"><span class="btn" data-in="rise" data-at="60" data-sfx="thud"><span class="fill" id="btn-fill"></span><span class="lab">Find your quiet members →</span></span></div>
+      <div class="mono mask"><span data-in="rise" data-at="61">centralsquare.ai · 20-minute demo</span></div>
+    </div>
+  </section>
+
+<script src="lib/motion.js"></script>
+<script>
+window.FILM = { width: 1920, height: 1080, fps: 30, duration: 38.4, bpm: 100, seed: 11 };
+const { clamp, mix, prog, ease: E, spring, rise } = window.Motion;
+const { SPB, beat } = window.Motion.grid(FILM, window.BEATS);
+const B = (x) => { const i = Math.floor(x), f = x - i; return mix(beat(i), beat(i + 1), f); }; // fractional beats on the grid
+const $ = (id) => document.getElementById(id);
+
+// scenes on bars (beats); last scene runs to the end
+const SC = [["s0", 0, 8], ["s1", 8, 16], ["s2", 16, 24], ["s3", 24, 32], ["s4", 32, 40], ["s5", 40, 48], ["s6", 48, 58], ["s7", 58, 99]];
+const EXIT = 0.42;
+
+// size each .frame to its image aspect inside its .vis box (layout only: no time involved)
+function layoutFrames() {
+  document.querySelectorAll(".frame[data-ar]").forEach((f) => {
+    const [w, h] = f.dataset.ar.split("/").map(Number), box = f.parentElement.getBoundingClientRect();
+    let fw = box.width, fh = (fw * h) / w;
+    if (fh > box.height) { fh = box.height; fw = (fh * w) / h; }
+    f.style.width = `${fw}px`; f.style.height = `${fh}px`;
+    f.style.left = `${(box.width - fw) / (window.innerHeight > window.innerWidth ? 2 : 1)}px`; // landscape: hug the right edge
+    f.style.top = `${(box.height - fh) / 2}px`;
+  });
+}
+// place an overlay over a region of a frame's image, in image fractions
+function region(el, frame, x0, y0, x1, y1, pad = 0) {
+  const W = frame.clientWidth, H = frame.clientHeight;
+  el.style.left = `${x0 * W - pad}px`; el.style.top = `${y0 * H - pad}px`; el.style.width = `${(x1 - x0) * W + 2 * pad}px`; el.style.height = `${(y1 - y0) * H + 2 * pad}px`;
+}
+// camera on an image inside a frame: zoom s around image point (fx, fy) in fractions
+function cam(img, s, fx, fy) {
+  const W = img.parentElement.clientWidth, H = img.parentElement.clientHeight;
+  const tx = clamp(W / 2 - fx * W * s, W - W * s, 0), ty = clamp(H / 2 - fy * H * s, H - H * s, 0);
+  img.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+}
+
+const animated = [...document.querySelectorAll("[data-in]")];
+function animate(t) {
+  for (const el of animated) {
+    const at = B(parseFloat(el.dataset.at)), kind = el.dataset.in;
+    if (kind === "rise") rise(el, Math.min(1.02, Math.max(0, spring(t, at, "snappy"))));
+    else if (kind === "pop") { const k = Math.max(0, spring(t, at, "pop")); el.style.transform = `${el.classList.contains("src") || el.id === "report" ? "translate(-50%,-50%) " : ""}scale(${k})`; }
+    else if (kind === "wipe") { const k = prog(t, at, 0.5, E.outExpo); el.style.transform = `scaleX(${k})`; }
+    else if (kind === "reveal") {
+      const k = clamp(spring(t, at, "smooth"));
+      el.style.clipPath = `inset(${(1 - k) * 100}% 0 0 0 round 22px)`;
+      el.style.transform = `translateY(${(1 - k) * 7}vh) scale(${0.96 + 0.04 * k})`;
+    }
+  }
+}
+
+window.seek = function (t) {
+  layoutFrames();
+  // drifting colour fields
+  [[0.15, 0.1, 0], [0.95, 0.95, 1], [0.95, 0.08, 2]].forEach(([x, y, k], i) => {
+    const f = $(`f${i + 1}`); f.style.left = `${(x + 0.05 * Math.sin(t * 0.18 + k * 2)) * 100}vw`; f.style.top = `${(y + 0.05 * Math.cos(t * 0.15 + k)) * 100}vh`;
+  });
+  // scene windows + exit wipe (up and out)
+  for (const [id, a, b] of SC) {
+    const s = $(id), ta = beat(a), tb = b >= 99 ? 1e9 : beat(b);
+    const on = t >= ta - 0.5 && t < tb + 0.2; // overlap: the next scene lands on the beat while this one wipes out
+    s.style.visibility = on ? "visible" : "hidden";
+    const kx = prog(t, tb - 0.25, EXIT, E.inOutCubic);
+    s.style.clipPath = kx > 0 ? `inset(0 0 ${kx * 100}% 0)` : "none";
+    s.style.transform = kx > 0 ? `translateY(${-kx * 5}vh)` : "none";
+  }
+  animate(t);
+
+  // 1 HOOK: slow push on the community
+  cam($("hook-img"), mix(1.0, 1.12, prog(t, 0, beat(8), E.linear)), 0.5, 0.45);
+  // 2 BEFORE: chips around the report, wires draw into it
+  const vb = $("srcs").getBoundingClientRect(), port = innerHeight > innerWidth;
+  const P = port ? [[0.22, 0.14], [0.78, 0.14], [0.22, 0.86], [0.78, 0.86]] : [[0.2, 0.18], [0.78, 0.2], [0.18, 0.82], [0.8, 0.8]];
+  const R = [0.5, 0.5];
+  P.forEach(([x, y], i) => {
+    const c = $(`c${i}`); c.style.left = `${x * 100}%`; c.style.top = `${y * 100}%`;
+    const k = clamp(prog(t, B(13), 0.8, E.outCubic));
+    const x1 = x * vb.width, y1 = y * vb.height, x2 = mix(x1, R[0] * vb.width, k), y2 = mix(y1, R[1] * vb.height, k);
+    $(`w${i}`).setAttribute("d", `M${x1},${y1} L${x2},${y2}`);
+  });
+  $("report").style.left = `${R[0] * 100}%`; $("report").style.top = `${R[1] * 100}%`;
+  // 3 HARD PART: four record rows, then Ellie's note
+  const hf = $("hannah");
+  [0.297, 0.386, 0.476, 0.565].forEach((y, i) => region($(`r${i}`), hf, 0.035, y - 0.034, 0.965, y + 0.036));
+  region($("r4"), hf, 0.035, 0.645, 0.965, 0.93, 4);
+  // 4 WITH ELLIE: push to the numbers, then to SINCE LAST MONDAY
+  const k1 = clamp(spring(t, B(26), "gentle")), k2 = clamp(spring(t, B(29), "gentle"));
+  cam($("watch-img"), mix(mix(1, 1.75, k1), 2.0, k2), mix(mix(0.5, 0.4, k1), 0.33, k2), mix(mix(0.5, 0.3, k1), 0.8, k2));
+  const kh = clamp(spring(t, B(17), "gentle")), kh2 = clamp(spring(t, B(22), "gentle"));
+  cam($("hannah-w"), mix(mix(1, 1.3, kh), 1.25, kh2), 0.5, mix(mix(0.5, 0.43, kh), 0.75, kh2));
+  // 5 APPROVE: ring on Approve & send, gentle push toward the draft
+  region($("r5"), $("approve"), 0.596, 0.862, 0.937, 0.95, 6);
+  cam($("approve-w"), mix(1, 1.45, clamp(spring(t, B(35), "gentle"))), 0.6, 0.82);
+  // 6 RESULT: count to 20 (real figure), slow push
+  $("twenty").textContent = Math.round(mix(0, 20, prog(t, B(43), 1.2, E.outExpo)));
+  cam($("res-img"), mix(1.15, 1.0, prog(t, B(40), beat(48) - B(40), E.linear)), 0.5, 0.5);
+  // 7 QUOTE: slow push on James
+  cam($("james-img"), mix(1.0, 1.08, prog(t, B(48), beat(58) - B(48), E.linear)), 0.5, 0.35);
+  // 8 CTA: button fills
+  $("btn-fill").style.transform = `scaleX(${prog(t, B(60), 0.7, E.outExpo)})`;
+};
+window.CUES = [];
+seek(0);
+</script>
+</body>
+</html>

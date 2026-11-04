@@ -343,6 +343,13 @@ async function deriveCues(page, film, beats) {
         const full = r.width * r.height;
         let v = full < 1 ? 0 : (op * Math.max(0, x1 - x0) * Math.max(0, y1 - y0)) / full;
         const cs = getComputedStyle(el), da = parseFloat(cs.strokeDasharray);
+        // clip-path: inset(top right bottom left) on the element itself (reveals and wipes)
+        const ci = /^inset\(([^)]*)\)/.exec(cs.clipPath || "");
+        if (ci) {
+          const parts = ci[1].split(/\s+round\s+/)[0].trim().split(/\s+/).map((v) => (v.endsWith("%") ? parseFloat(v) / 100 : null));
+          const [it, ir = it, ib = it, il = ir] = parts.map((v) => v ?? 0);
+          v *= Math.max(0, 1 - it - ib) * Math.max(0, 1 - il - ir);
+        }
         if (da > 0) v *= Math.min(1, Math.max(0, 1 - (parseFloat(cs.strokeDashoffset) || 0) / da));
         out.push({ id: el.id || `${el.tagName.toLowerCase()}[${idx}]`, kind: el.dataset.sfx, at: el.dataset.sfxAt || "start",
           gain: parseFloat(el.dataset.sfxGain || "1"), v, cx: (r.left + r.right) / 2 / W, area: full / (W * H) });
