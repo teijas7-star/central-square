@@ -1,0 +1,153 @@
+← BACK TO HOME
+CUSTOMER STORY · WAKELET · SUMMER 2026
+Two people ran Wakelet’s community.
+Ellie found the members they couldn’t see.
+
+After Wakelet changed its subscription model, James Davis and his team needed to know who was still engaged. The answer was spread across documents, spreadsheets, Wakelet’s own data and HubSpot, and putting it together by hand took hours every week. Now Ellie checks it every Monday on her own, remembers what she saw the week before, and tells the team what changed.
+
+James Davis
+Head of Community and Growth, Wakelet
+@JBDbiz
+LinkedIn
+WHAT CHANGED
+Rebuilt
+
+their ambassador programme, with tiers tied to different revenue goals
+
+THE TEAM
+2 people
+
+on Wakelet’s community team at the time
+
+TIME BACK
+½ day
+
+every week, at least. Over a year, that comes to more than 20 working days.
+
+BEFORE
+Hours of copying, every week
+
+The NPS and CRM report was built by hand from four places: documents, spreadsheets, Wakelet’s own data and HubSpot. It took hours every time.
+
+→
+WITH ELLIE
+Ellie checks every Monday, without anyone asking
+
+She reads the same four sources, joins each person up across them, and remembers last week, so the team sees what changed, including the members who engage quietly and rarely post. Working from that, the team rebuilt its ambassador programme into tiers, each tied to a different revenue goal.
+
+See what Ellie watches ↓
+THE HARD PART
+One ambassador. Four records. One person.
+
+The same person shows up in HubSpot, a feedback survey, Wakelet’s own usage data and a training spreadsheet, under slightly different names. Ellie works out it’s one person, keeps that picture up to date week after week, and notices when it changes.
+
+EXAMPLE DATA
+HO
+Hannah O.
+Ambassador · joined the new tier 7 weeks ago
+HUBSPOT
+“Hannah Okafor” · ambassador since September
+SURVEY
+“H. Okafor” · scored 9, offered to run a session
+USAGE
+“hannah.o” · shared 12 collections last term, none this term
+SPREADSHEET
+“Hannah O” · on the spring training list
+E
+
+Same person. Keen last term and offered to help, quiet since moving to the new tier. Worth a personal nudge. I’ve drafted one for you to look at.
+
+INSIDE ELLIE
+What Ellie watches for Wakelet, every week.
+
+The team told Ellie what they wanted to keep an eye on. She checks each one every Monday morning, joins every person up across HubSpot and Wakelet’s own data, and flags what changed since last week. The numbers and names below are examples. Wakelet’s real figures stay private.
+
+E
+Ellie
+/ Wakelet · Watching
+EXAMPLE DATA
+Ambassadors and customers
+Ambassador impact
+Community stages
+One market
+WATCHING FOR
+
+Which of our paying customers have an ambassador, and which don't yet?
+
+CHECKED EVERY MONDAY, 08:00
+Paying customers
+186
+from HubSpot deals
+With an ambassador
+64
+one or more
+Without one yet
+122
+where to recruit next
+Ambassadors at customers
+71
+across those 64
+With an ambassador · 34%
+Without one yet · 66%
+Customers with an ambassador (64)
+Customers without one yet (122)
+SINCE LAST MONDAY
+2 more customers have an ambassador. 3 of the 122 without one have members who already post a lot.
+FROM HUBSPOT DEALS + AMBASSADOR RECORDS
+↗ 186 LINKED CUSTOMERS
+
+Everything Ellie learns about Wakelet’s community stays Wakelet’s. It’s never used to train AI models, and the team can export or delete it at any time.
+
+IN JAMES'S WORDS
+
+We asked James three questions. These are his answers, word for word.
+
+JAMES AT WAKELET
+01
+What were you trying to understand about the Wakelet community before we started?
+
+We wanted to understand who was actively engaging with our community, including those who were participating more quietly, rather than making assumptions based on the most visible voices. After changing our subscription model, we needed a clearer picture of usage patterns, sharing and collaboration so we could focus our time and resources on the people who were most engaged with Wakelet.
+
+02
+What did Ellie help you do that you couldn't do before, and roughly how much time did it save you?
+
+We had a wealth of information spread across documents, spreadsheets, our own data and HubSpot, making it difficult for the team to build a clear picture of what was happening. Pulling everything together manually, including NPS and CRM reports, could take hours. Ellie helped us automate this process, saving our team at least half a day each week and giving us faster, clearer insights into our community.
+
+“It helps you identify underserved members who might not be the loudest voices in your community.”
+JAMES DAVIS · WAKELET
+03
+What would you say to another community lead thinking about using Ellie?
+
+If your focus is on community and building something that goes beyond one-to-one engagement, Ellie is invaluable. It helps you identify underserved members who might not be the loudest voices in your community, understand their engagement and focus your efforts on the right people. It allows you to move beyond guesswork and make more informed decisions about how to nurture and grow your community.
+
+WAKELET’S COMMUNITY
+James and the Wakelet community
+
+Some of the educators James and the Wakelet team worked with, in person.
+
+About Wakelet
+COMPANY
+Wakelet helps educators save, organise and share content from across the web.
+EDTECH
+THE TEAM
+Two people on the community team.
+SMALL TEAM
+THE GOAL
+Understand who was engaging after a change to their subscription model, including quieter members.
+ENGAGEMENT
+WHAT ELLIE READS
+Documents, spreadsheets, Wakelet's own data and HubSpot, every Monday, with each person joined up across them.
+4 SOURCES
+TIME SAVED
+At least half a day a week.
+IN JAMES'S WORDS
+THE RESULT
+Rebuilt the community and ambassador programme around new goals, with new ways to join and new tiers, each tied to its own revenue goal.
+AMBASSADORS
+YOUR COMMUNITY
+See who’s quietly engaged in your community.
+
+In 20 minutes, we’ll show you what Ellie finds in your own channels. Give her a goal and she keeps watch every week, so you hear what changed without having to ask. Nothing goes out until you approve it.
+
+Find your quiet members
+→

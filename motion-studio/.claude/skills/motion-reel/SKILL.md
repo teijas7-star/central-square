@@ -12,7 +12,7 @@ Ask only for what's missing. Defaults are in brackets.
 - **Product:** Central Square AI, https://centralsquare.ai/ (marketing site) and https://dashboard.centralsquare.ai/ (the product).
 - **Duration** [15 s social, 30 s launch, 60–90 s explainer].
 - **Formats** [16:9, 9:16 and 1:1]. Also available: 4:5.
-- **Brand colors and fonts** [`brand/tokens.css`: near-black ground, amber `#F59E0B`, Playfair Display + Inter]. If the captured site disagrees with the tokens, show both and ask which wins.
+- **Brand colors and fonts** [`brand/tokens.css`: the live site — lavender ground `#F6F4FB`, violet `#6B4EFF`, violet→coral headline gradient, Geist + Geist Mono]. If the captured site disagrees with the tokens, show both and ask which wins.
 - **A reference:** a frame, video or image folder [none].
 - **Music:** a file, or "synthesize" [synthesize at 100 BPM].
 - **The one thing** viewers should remember, and the **CTA** (these go in `BRIEF.md`).

@@ -20,7 +20,8 @@ STEP 2 · Score 1–10, with one sentence of evidence each (cite frame times):
   3. Motion quality (from strips): anticipation and follow-through? Springs settling, not snapping?
      No linear slides, nothing popping in or out between two frames, never everything moving at once?
   4. Variety: something new on screen every 2–4 s? Does the reel escalate, or repeat one trick?
-  5. Brand accuracy: Playfair + Inter only, amber as the one accent marking the focal point, dark ground?
+  5. Brand accuracy: Geist + Geist Mono only, lavender ground, violet the one accent, the headline gradient on at
+     most one text line per frame (never on backgrounds or chrome), real logo mark, "EXAMPLE DATA" chips on example figures?
      Real product UI only, captured or supplied, never invented? Every claim sourced in BRIEF.md?
   6. Sound sync: `--cues` shows no off-grid WARNING? Every visible hit is tagged data-sfx, and the ♪ marker
      in strips sits on the frame where the action reads? Nothing loud with no visible cause?

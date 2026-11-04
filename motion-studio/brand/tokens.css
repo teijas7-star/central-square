@@ -1,38 +1,55 @@
-/* Central Square AI — motion brand tokens.
-   Source of truth: ../../claude.md "Design System" + app/layout.tsx fonts.
-   HyperFrames lint requires @font-face in the file that uses the font, so paste this whole block
-   into each scene's <style>. scripts/new-video.sh copies the font files to <project>/assets/fonts/,
-   so renders never fetch fonts from the network and every machine draws identical type. */
+/* Central Square AI: motion brand tokens, taken from the live site (centralsquare.ai :root, Nov 2026).
+   HyperFrames/our lint want @font-face in the file that uses the font, so paste the faces into each film.
+   scripts/new-video.sh copies brand/fonts/ to <project>/assets/fonts/ and brand/logo-mark.svg to assets/. */
 
-@font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
-@font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
-@font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
-@font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
-@font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
-@font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: block; }
-@font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
+@font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
 
 :root {
-  /* Ground */
-  --cs-black: #000000;
-  --cs-ground: #0b0b0b;      /* default film background: a hair off pure black so grain/glow reads */
-  --cs-900: #171717;
-  --cs-800: #262626;
-  --cs-700: #404040;
-  /* Ink */
-  --cs-ink: #fafafa;
-  --cs-ink-muted: #a3a3a3;
-  /* Accent — amber is the only accent. Use it for one thing per frame. */
-  --cs-amber: #f59e0b;
-  --cs-amber-deep: #d97706;
-  --cs-amber-glow: rgba(245, 158, 11, 0.35);
-  /* Status — only for "live / online" semantics, never decoration */
-  --cs-live: #22c55e;
+  /* Ground: lavender paper, washed with soft colour fields */
+  --cs-ground: #F6F4FB;
+  --cs-wash-lavender: #D3C7FF;
+  --cs-wash-peach: #FFE3D6;
+  --cs-wash-blue: #CFE4FF;
+  --cs-surface: #FFFFFF;                                    /* cards and UI panels */
+  --cs-glass: linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.5));
+  --cs-glass-border: rgba(255,255,255,.85);
+  --cs-line: rgba(27,23,38,.09);
+  --cs-line-2: rgba(27,23,38,.14);
 
-  --cs-font-display: "Playfair Display", Georgia, serif;
-  --cs-font-body: "Inter", system-ui, sans-serif;
+  /* Ink */
+  --cs-ink: #1B1726;      /* headlines, primary text */
+  --cs-ink-2: #55506A;    /* body */
+  --cs-ink-3: #8C879C;    /* captions, mono labels */
+
+  /* Accent: violet is THE accent (buttons, chips, the logo square, highlights) */
+  --cs-violet: #6B4EFF;
+  --cs-violet-ink: #4F35D9;              /* violet text on light (chips, links) */
+  --cs-violet-soft: rgba(107,78,255,.10);/* chip fill, selection */
+  /* Supporting: coral is the wordmark's ▪ and the gradient's end, never a second accent on its own */
+  --cs-coral: #C9573F;
+  --cs-coral-soft: rgba(201,87,63,.10);
+  --cs-green: #13804A;                   /* status only: live, approved, up */
+
+  /* The signature: headline gradient on the emphasis line (violet -> orchid -> coral) */
+  --cs-headline-gradient: linear-gradient(95deg, #6B4EFF 15%, #B24FC0 60%, #D9623F);
+
+  /* Type */
+  --cs-sans: "Geist", system-ui, sans-serif;
+  --cs-mono: "Geist Mono", ui-monospace, monospace;
+  /* Headlines: Geist 400, tracking -0.045em, line-height 1.0. Body: Geist 400, -0.01em, 1.35.
+     Labels/chips/buttons: Geist Mono 400-500, 11-14px equivalents, uppercase for labels, tracking -0.02em. */
+
+  /* Shape and depth */
+  --cs-radius: 22px;      /* cards, panels */
+  --cs-radius-btn: 10px;  /* buttons */
+  --cs-radius-chip: 999px;
+  --cs-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 6px rgba(27,23,38,.04), 0 30px 80px rgba(76,56,170,.13);
 
   /* Motion */
-  --cs-ease-in: cubic-bezier(0.22, 1, 0.36, 1);   /* expo-out feel: arrive fast, settle soft */
-  --cs-ease-move: cubic-bezier(0.65, 0, 0.35, 1); /* in-out for camera / layout moves */
+  --cs-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+  --cs-ease-move: cubic-bezier(0.65, 0, 0.35, 1);
 }

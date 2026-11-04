@@ -10,54 +10,72 @@
 <meta charset="UTF-8" />
 <title>Central Square AI — film</title>
 <style>
-  @font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
-  @font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
-  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: block; }
+  /* Brand: brand/tokens.css (live centralsquare.ai tokens). Faces repeated here so the film is self-contained. */
+  @font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Geist"; src: url("assets/fonts/geist-sans-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: block; }
+  @font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Geist Mono"; src: url("assets/fonts/geist-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
 
-  :root { --ground: #0b0b0b; --ink: #fafafa; --muted: #a3a3a3; --line: #404040; --amber: #f59e0b; }
+  :root {
+    --ground: #F6F4FB; --ink: #1B1726; --ink2: #55506A; --ink3: #8C879C; --line: rgba(27,23,38,.16);
+    --violet: #6B4EFF; --violet-ink: #4F35D9; --violet-soft: rgba(107,78,255,.10); --coral: #C9573F;
+    --grad: linear-gradient(95deg, #6B4EFF 15%, #B24FC0 60%, #D9623F);
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ground); color: var(--ink); font-family: "Inter", system-ui, sans-serif; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ground); color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
+
+  /* Soft colour fields (lavender, peach, blue) drifting slowly behind everything */
+  .field { position: absolute; border-radius: 50%; width: 90vmax; height: 90vmax; margin: -45vmax 0 0 -45vmax; }
+  #f1 { background: radial-gradient(closest-side, rgba(211,199,255,.85), rgba(211,199,255,0)); }
+  #f2 { background: radial-gradient(closest-side, rgba(255,227,214,.8), rgba(255,227,214,0)); }
+  #f3 { background: radial-gradient(closest-side, rgba(207,228,255,.6), rgba(207,228,255,0)); }
 
   /* Landscape: copy left, network right. Portrait/square reflow below. Sizes in vmin. */
-  #copy { position: absolute; left: 9vw; top: 50%; transform: translateY(-50%); width: 48vw; }
-  #net  { position: absolute; width: 78vmin; height: 78vmin; left: 69vw; top: 50%; margin: -39vmin 0 0 -39vmin; }
+  #copy { position: absolute; left: 8vw; top: 50%; transform: translateY(-50%); width: 56vw; }
+  #net  { position: absolute; width: 72vmin; height: 72vmin; left: 72vw; top: 50%; margin: -36vmin 0 0 -36vmin; }
   @media (orientation: portrait) {
-    #copy { left: 9vw; top: 11vh; transform: none; width: 82vw; }
-    #net  { left: 50vw; top: 66vh; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; }
+    #copy { left: 8vw; top: 10vh; transform: none; width: 84vw; }
+    #net  { left: 50vw; top: 66vh; width: 88vmin; height: 88vmin; margin: -44vmin 0 0 -44vmin; }
   }
   @media (aspect-ratio: 1/1) {
     #copy { left: 8vw; top: 8vh; transform: none; width: 84vw; }
-    #net  { left: 75vw; top: 74vh; width: 44vmin; height: 44vmin; margin: -22vmin 0 0 -22vmin; }
+    #net  { left: 75vw; top: 75vh; width: 42vmin; height: 42vmin; margin: -21vmin 0 0 -21vmin; }
   }
 
-  .mask { overflow: hidden; display: block; padding-bottom: 0.06em; }
+  .mask { overflow: hidden; display: block; padding-bottom: 0.08em; }
   .mask > span { display: inline-block; will-change: transform; }
-  #kicker { font-weight: 500; font-size: 3.1vmin; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-  #headline { margin-top: 2.6vmin; font-family: "Playfair Display", Georgia, serif; font-weight: 600; font-size: 11.5vmin; line-height: 0.98; letter-spacing: -0.025em; }
-  #accent { font-style: italic; font-weight: 400; color: var(--amber); }
-  #cta-row { margin-top: 5vmin; display: inline-block; position: relative; }
-  #cta { font-weight: 500; font-size: 4.4vmin; letter-spacing: 0.02em; }
-  #underline { position: absolute; left: 0; right: 0; bottom: -1.2vmin; height: 0.45vmin; background: var(--amber); transform-origin: 0 50%; }
+  /* Mono chip, as on the site: violet ink on violet-soft, pill */
+  #kicker { font-family: "Geist Mono", monospace; font-weight: 500; font-size: 2.9vmin; text-transform: uppercase; letter-spacing: -0.02em;
+            color: var(--violet-ink); background: var(--violet-soft); border-radius: 999px; padding: 0.7vmin 1.6vmin; white-space: nowrap; }
+  #headline { margin-top: 3.2vmin; font-weight: 400; font-size: 10.8vmin; line-height: 1.0; letter-spacing: -0.045em; }
+  /* The signature: gradient on the emphasis line (house-rule exception, see CLAUDE.md) */
+  #accent { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 0.06em; }
+  #cta-row { margin-top: 5.5vmin; display: inline-block; }
+  #cta { position: relative; font-family: "Geist Mono", monospace; font-weight: 500; font-size: 3.2vmin; letter-spacing: -0.02em; color: #fff;
+         padding: 1.7vmin 3vmin; border-radius: 1vmin; display: inline-block; overflow: hidden; }
+  #cta-fill { position: absolute; inset: 0; background: var(--violet); transform-origin: 0 50%; }
+  #cta-text { position: relative; }
 
   #net svg { width: 100%; height: 100%; overflow: visible; }
   #net line { stroke: var(--line); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
-  #net line.hot { stroke: var(--amber); }
+  #net line.hot { stroke: var(--violet); stroke-width: 2.2; }
   #net circle.node { fill: var(--ink); }
-  #net circle.hub { fill: var(--amber); }
-  #net circle.pulse { fill: none; stroke: var(--amber); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+  #net rect.hub { fill: var(--violet); }   /* the logo's violet rounded square */
+  #net circle.pulse { fill: none; stroke: var(--violet); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 </style>
 </head>
 <body>
+  <div id="f1" class="field"></div><div id="f2" class="field"></div><div id="f3" class="field"></div>
   <div id="net"><svg viewBox="-500 -500 1000 1000"><g id="links"></g><circle id="pulse" class="pulse" r="0" /><g id="nodes"></g></svg></div>
 
   <div id="copy">
-    <div class="mask"><span id="kicker" data-sfx="tick" data-sfx-gain="0.7">Central Square AI</span></div>
+    <div class="mask" style="display:inline-block"><span id="kicker" data-sfx="tick" data-sfx-gain="0.7">The community layer of the agentic era</span></div>
     <div id="headline">
-      <span class="mask"><span id="h1" data-sfx="whoosh" data-sfx-gain="0.5">Where</span></span>
-      <span class="mask"><span id="h2">communities</span></span>
-      <span class="mask"><span id="h3" data-sfx="impact" data-sfx-gain="0.6"><span id="accent">thrive.</span></span></span>
+      <span class="mask"><span id="h1" data-sfx="whoosh" data-sfx-gain="0.5">Your community</span></span>
+      <span class="mask"><span id="h2">is your moat.</span></span>
+      <span class="mask"><span id="h3" data-sfx="impact" data-sfx-gain="0.6"><span id="accent">Ellie helps run it.</span></span></span>
     </div>
-    <div id="cta-row"><span class="mask"><span id="cta" data-sfx="thud">centralsquare.ai</span></span><div id="underline"></div></div>
+    <div id="cta-row"><span class="mask"><span id="cta" data-sfx="thud"><span id="cta-fill"></span><span id="cta-text">Book a demo &rarr; centralsquare.ai</span></span></span></div>
   </div>
 
 <script src="lib/motion.js"></script>
@@ -74,10 +92,10 @@ const { SPB, beat } = window.Motion.grid(FILM, window.BEATS);
 
 // Story on the grid: something new every 2–4 beats (1.2–2.4 s).
 const T = {
-  hub: beat(0) - 0.15,  // hook: the amber hub is already landing on frame 0
+  hub: beat(0) - 0.15,  // hook: the violet hub (the logo square) is already landing on frame 0
   ring1: beat(0) - 0.3, // first communities are already connecting on frame 0
-  words: beat(1),       // "Where communities" rising by 0.6 s
-  accent: beat(4),      // downbeat, drums in: "thrive." + the amber link
+  words: beat(1),       // "Your community / is your moat." rising by 0.6 s
+  accent: beat(4),      // downbeat, drums in: the gradient line + the violet link
   ring2: beat(6),       // the network grows, camera eases back
   kicker: beat(8),      // downbeat: brand line
   cta: beat(10),        // CTA + underline
@@ -104,7 +122,7 @@ const L2 = ring2.map(() => el("line", { pathLength: 1, "stroke-dasharray": 1 }, 
 // (panned by where it is, weighted by its size). No hand-timed cue list to drift out of sync.
 const N1 = ring1.map((_, i) => el("circle", { id: `n1-${i}`, class: "node", r: 9, "data-sfx": "tick", "data-sfx-gain": 0.8 }, gn));
 const N2 = ring2.map((_, i) => el("circle", { id: `n2-${i}`, class: "node", r: 6, "data-sfx": "tick", "data-sfx-gain": 0.4 }, gn));
-const hub = el("circle", { id: "hub", class: "hub", r: 15, "data-sfx": "pop" }, gn);
+const hub = el("rect", { id: "hub", class: "hub", "data-sfx": "pop" }, gn);
 const pulse = document.getElementById("pulse");
 
 const $ = (id) => document.getElementById(id);
@@ -116,8 +134,12 @@ window.seek = function (t) {
   const cam = spring(t, T.ring2, "gentle");
   $("net").style.transform = `scale(${mix(1.3, 0.98, cam)}) rotate(${mix(0, -6, prog(t, 0, FILM.duration, (x) => x))}deg)`;
 
-  const kh = Math.max(0, spring(t, T.hub, "pop"));
-  hub.setAttribute("r", 15 * kh);
+  const kh = Math.max(0, spring(t, T.hub, "pop")), hs = 34 * kh; // rounded square, 25% corner radius like the logo
+  hub.setAttribute("x", -hs / 2); hub.setAttribute("y", -hs / 2); hub.setAttribute("width", hs); hub.setAttribute("height", hs); hub.setAttribute("rx", hs * 0.25);
+
+  // colour fields drift: a pure function of t
+  const f = [[0.18, 0.12, 0], [0.92, 0.95, 1], [0.95, 0.1, 2]];
+  f.forEach(([x, y, k], i) => { const el = $(`f${i + 1}`); el.style.left = `${(x + 0.04 * Math.sin(t * 0.25 + k * 2)) * 100}vw`; el.style.top = `${(y + 0.04 * Math.cos(t * 0.21 + k)) * 100}vh`; });
 
   ring1.forEach(([x, y], i) => {
     const s = T.ring1 + i * SPB * 0.5;
@@ -141,7 +163,7 @@ window.seek = function (t) {
     N2[i].setAttribute("cx", x + dx); N2[i].setAttribute("cy", y + dy); N2[i].setAttribute("r", 6 * kn);
   });
 
-  // the one amber link: lights when "thrive." lands
+  // the one violet link: lights when the gradient line lands
   L1.forEach((l, i) => l.classList.toggle("hot", i === 0 && t >= T.accent));
 
   const kp = prog(t, T.pulse, 1.1, E.outCubic);
@@ -152,11 +174,9 @@ window.seek = function (t) {
   rise($("h1"), prog(t, T.words, 0.7));
   rise($("h2"), prog(t, T.words + SPB * 0.5, 0.7));
   rise($("h3"), prog(t, T.accent, 0.7));
-  const kk = prog(t, T.kicker, 0.8);
-  rise($("kicker"), kk);
-  $("kicker").style.letterSpacing = `${mix(0.7, 0.32, kk)}em`;
-  rise($("cta"), prog(t, T.cta, 0.6));
-  $("underline").style.transform = `scaleX(${prog(t, T.cta + 0.15, 0.9, E.inOutCubic)})`;
+  rise($("kicker"), Math.min(1, spring(t, T.kicker, "snappy")));
+  rise($("cta"), Math.min(1, spring(t, T.cta, "snappy")));
+  $("cta-fill").style.transform = `scaleX(${prog(t, T.cta, 0.7, E.outExpo)})`;
 };
 
 // Manual cues only for what the picture can't express as an element appearing (here: the hub's pulse ring).

@@ -30,15 +30,31 @@ The owner is Teijas (teijas@centralsquare.ai). If a rule blocks something they e
 - glow on UI chrome;
 - generic particle bursts.
 
-Entrances are masked rises, wipes, line draws and scale-from-origin, chosen per element. Never one fade for everything.
+Entrances are masked rises, wipes, line draws, spring pops and scale-from-origin, chosen per element. Never one fade for everything.
 
-- **One display face, one UI face.** Display is **Playfair Display** (600; 400 italic for the emphasis word) and UI/body is **Inter** (400–600).
-- **One accent color unless the brief says otherwise: amber `#F59E0B`.** It marks the focal point and stays a small share of the frame. Green `#22C55E` means "live/online" only.
-- Ground is near-black `#0B0B0B` (layers `#171717`, `#262626`, lines `#404040`). Ink is `#FAFAFA`, muted `#A3A3A3`. Tokens: `brand/tokens.css`, `brand/brand.json`.
+**The brand is the live site** (`centralsquare.ai`, tokens captured into `brand/tokens.css` and `brand/brand.json`). When the site changes, re-capture it (`scripts/capture.mjs`, plus a `:root` token read) and update the tokens. Don't let the films drift from the site.
+- **Ground:** lavender paper `#F6F4FB`, washed with soft colour fields (lavender `#D3C7FF`, peach `#FFE3D6`, blue `#CFE4FF`) that may drift slowly. White `#FFFFFF` for cards and UI panels, radius 22px, a soft violet shadow (`--cs-shadow`), and hairlines at `rgba(27,23,38,.09)`.
+- **Ink:** `#1B1726` for headlines, `#55506A` for body, `#8C879C` for captions and mono labels.
+- **One type family, two cuts:**
+  - **Geist** 400 for headlines, with tight tracking (−0.045em) and line-height 1.0. 400 for body, 500/600 for emphasis.
+  - **Geist Mono** for labels, chips, buttons and data: uppercase for labels and chips.
+  - No other families.
+- **One accent colour: violet `#6B4EFF`** (`#4F35D9` for violet text on light). Use it for buttons, chips (violet ink on a 10% violet pill), the logo square and the focal highlight.
+  - Coral `#C9573F` appears only as the wordmark's ▪ and inside the headline gradient. It's never a second accent on its own.
+  - Green `#13804A` is for status only: approved, live, up.
+- **Exception 1: the headline gradient** `linear-gradient(95deg, #6B4EFF 15%, #B24FC0 60%, #D9623F)` is the brand's signature, and is allowed **on text only**:
+  - one emphasis line or phrase per frame, the line that carries the point;
+  - never on backgrounds, never on UI chrome, never as a "title on a gradient".
+- **Exception 2: "one accent colour"** counts that gradient as the violet accent, not as extra colours. Violet UI plus one gradient line in the same frame is fine. A second, separate highlight colour isn't.
+- **Logo:** `brand/logo-mark.svg` (the ink "C" with the violet rounded square). The wordmark is "**centralsquare** ▪ ai": Geist 600 "centralsquare", a coral ▪, Geist 500 "ai". Use the real mark only; never redraw or invent one.
+- **The product is Ellie** (she/her), an AI teammate for community teams.
+- **Visual motifs taken from the product:**
+  - Ellie's panels: white cards with a mono label row.
+  - "EXAMPLE DATA" chips, metric tiles, and sources joined into one person.
+  - Approve-before-send buttons.
+  - The logo square as a node in a network of members.
 - **Every 2 to 4 seconds something new must happen on screen.**
-- Visual metaphor: **networks and constellations** (warm points joined by thin lines; communities connecting), plus the public square. Repo imagery: `../public/images/city-square.png`, `../public/images/earth-from-space.png`, `../public/design/boston-skyline.jpg`.
-- Aesthetic: human, warm, civic, spacious. Editorial asymmetric layouts (copy on one side, the world on the other), not centered stacks.
-- **There is no logo file in the repo yet.** Until one is added to `brand/`, the lockup is the "Central Square AI" wordmark in Inter 500, uppercase, tracked. Never invent a logo mark.
+- Aesthetic: calm, precise, airy, product-led. Asymmetric layouts (copy on one side, the product on the other), lots of lavender air, no heavy darkness.
 
 ## 3. Sound
 
@@ -83,15 +99,36 @@ Never say a film is done from a successful exit code. "Done" means 8+ on every r
 1. **Every factual claim on screen needs a source** in `BRIEF.md` → "Sources". That covers numbers, customer names, quotes and outcomes. With no source, cut the claim or ask.
 2. **Adobe, Microsoft and the Aspen Institute are targets in the business plan, not customers.** Never show their names or logos, or imply a partnership, unless Teijas confirms in writing for that video.
 3. No invented testimonials, metrics, logos, user counts or UI that doesn't exist. Show real product screens. Label future UI on screen as "Concept" or "Coming soon".
-4. No cloned voices, avatars or likenesses of real people without recorded consent. No imitating another brand's look.
-5. `/reverse-any-video` and `/style-sampling` are for learning a technique or porting our own work. Never ship a recreation of someone else's video.
+4. **Example data stays labelled.** The Wakelet page shows example figures ("The numbers and names below are examples. Wakelet's real figures stay private."). Examples include the 186/64/122/71 dashboard and "Hannah O." Whenever those appear in a film, they carry an on-screen **EXAMPLE DATA** chip, exactly as the site does. Never present them as Wakelet's real numbers.
+5. **Real, citable Wakelet facts** (source: centralsquare.ai/customers/wakelet):
+   - 2 people on the community team;
+   - at least ½ day a week saved, which is more than 20 working days a year;
+   - 4 sources (documents, spreadsheets, Wakelet's own data, HubSpot);
+   - checked every Monday;
+   - ambassador programme rebuilt into tiers tied to revenue goals;
+   - James Davis, Head of Community and Growth, quoted word for word.
+   Quotes must be verbatim.
+6. No cloned voices, avatars or likenesses of real people without recorded consent. No imitating another brand's look.
+7. `/reverse-any-video` and `/style-sampling` are for learning a technique or porting our own work. Never ship a recreation of someone else's video.
 
 ## 6. Who we are on screen
 
-**Central Square AI** is the AI-powered hub for community operators: events, engagement, analytics, sponsor matching and member management in one place. It replaces the WhatsApp + Discord + Notion + Eventbrite patchwork.
-Tagline: **"A digital agora where communities thrive."** The two layers are **The Square** (public discovery) and **The Arcades** (community homes).
-Buyers: community leads at enterprises and mid-size SaaS companies, universities, foundations and associations. Read `../claude.md`, `../business_plan.md` and `../app/partner/page.tsx` before writing copy.
-**Voice:** human, warm, civic, confident. Short declarative lines that speak to the operator ("your members"). No hype words ("revolutionary", "game-changing", "unlock", "supercharge", "seamless", "leverage") and no exclamation marks.
+**Central Square AI** builds **Ellie**, an AI teammate for community teams. "Most community teams we meet are one or two people doing the work of seven. Ellie is the extra pair of hands."
+- **How she works**, in three steps:
+  1. **Give Ellie a goal** (grow the ambassador programme, win back quiet members).
+  2. **She builds the view**: she reads every channel the community already uses (nothing moves, members install nothing), joins each person up across sources, and charts what leadership asks, weekly, linked to the posts behind it.
+  3. **You approve every send**: she drafts in your voice, and nothing reaches a member until someone says yes.
+- **Positioning:** "Your community is your moat. Not enough people are running it." and "The community layer of the agentic era."
+- **Proof:** the Wakelet customer story (`centralsquare.ai/customers/wakelet`).
+- **Buyers:** heads of community and growth on small community teams at product companies (e.g. EdTech, SaaS).
+- **Source of truth for copy:** the live site. Use `projects/<slug>/docs/site/pages.json` (from `scripts/crawl-site.mjs`) and the site knowledge graph. The older repo docs (`../claude.md`, `../business_plan.md`) describe an earlier "Square/Arcades" product. Don't use them for film copy.
+- **Voice** (from the site):
+  - plain, specific, calm, first-person plural ("we");
+  - Ellie is "she";
+  - short declaratives ("Nothing moves. Nothing goes out until you approve it.");
+  - concrete nouns (HubSpot, spreadsheets, Monday 08:00);
+  - mono uppercase labels for structure ("CUSTOMER STORY", "WITH ELLIE", "SINCE LAST MONDAY").
+- **Banned words:** hype ("revolutionary", "game-changing", "unlock", "supercharge", "seamless", "leverage"). No exclamation marks.
 
 ## 7. Craft bar (the numbers)
 
@@ -107,7 +144,7 @@ Buyers: community leads at enterprises and mid-size SaaS companies, universities
   - No bounce or elastic on text; back-out only for small node and UI pops.
   - Stagger 50–150 ms, or half-beats. Never move everything at once.
 - **Pacing:** social cuts every 1.5–3 s; explainer beats every 3–6 s. The end card holds the CTA for the last 2.5–4 s.
-- **Captions** are burned in by default for social (Inter 600). Leave them off for silent hero loops.
+- **Captions** are burned in by default for social (Geist 500 on a white 90% pill, ink text). Leave them off for silent hero loops.
 
 ## 8. Formats
 
