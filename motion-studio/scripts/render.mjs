@@ -178,7 +178,7 @@ if (wantAudio) {
 }
 
 // after painting frame t, wait two paints so the compositor has rasterized it (large zoomed images included)
-const seek = (t) => page.evaluate(async (tt) => { await window.seek(tt); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); }, t);
+const seek = (t) => page.evaluate(async (tt) => { await window.seek(tt); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r)))); }, t);
 const shot = () => page.screenshot({ type: "png", clip: { x: 0, y: 0, width: film.width, height: film.height } });
 
 // ---------- poster: one full-resolution still
