@@ -170,6 +170,7 @@ const GR = $("grain"), gctx = GR.getContext("2d"); GR.width = 360; GR.height = 4
 const tiles = Array.from({ length: 4 }, (_, k) => { const id = gctx.createImageData(360, 450), rnd = M.mulberry32(77 + k); for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } return id; });
 
 // ================================================================= 1 · HOOK (words on screen by frame 8)
+let tNow = 0;
 const H1a = Head([{ t: "Thousands", at: 0.2, sfx: "impact", gain: 0.6 }, { br: "tall" }, { t: "of", at: 0.2 }, { br: "sq" }, { t: "members.", at: 0.2 }], { in: 0.2, out: b(3), dur: 0.12, zone: () => [0.3, 0.62] });
 const H1b = Head([{ t: "Two", at: b(3), sfx: "tick", gain: 0.9 }, { br: 1 }, { t: "people.", at: b(3.5) }], { in: b(3), out: b(6), zone: () => [0.2, 0.75], max: 330 });
 
@@ -244,8 +245,8 @@ const team = el("div", "photo", $("mid"), `<img src="assets/photos/community.jpg
 
 // ================================================================= 8 · JAMES
 const james = el("div", "photo", $("mid"), `<img src="assets/photos/james.jpg">`); james.style.borderRadius = "26px";
-const Q1 = Head([{ t: "“It", at: b(56) }, { t: "helps", at: b(56.25) }, { t: "you", at: b(56.5) }, { br: 1 }, { t: "identify", at: b(56.75) }, { br: 1 }, { t: "underserved", at: b(57.25) }, { br: 1 }, { t: "members…", at: b(57.75) }], { in: b(56), out: b(61), zone: () => [F(0.5, 0.52), F(0.86, 0.86)] });
-const Q2 = Head([{ t: "…who", at: b(61) }, { t: "might", at: b(61.25) }, { t: "not", at: b(61.5) }, { br: 1 }, { t: "be", at: b(61.75) }, { t: "the", at: b(62) }, { br: 1 }, { t: "loudest", at: b(62.5), cls: "coral", sfx: "chime", gain: 0.35 }, { br: 1 }, { t: "voices.”", at: b(62.75), cls: "coral" }], { in: b(61), out: b(66), zone: () => [F(0.5, 0.52), F(0.86, 0.86)] });
+const Q1 = Head([{ t: "“It", at: b(56) }, { t: "helps", at: b(56.25) }, { t: "you", at: b(56.5) }, { br: 1 }, { t: "identify", at: b(56.75) }, { br: 1 }, { t: "underserved", at: b(57.25) }, { br: 1 }, { t: "members…", at: b(57.75) }], { in: b(56), out: b(61), zone: () => { const d = -0.03 * P(tNow, b(58), b(61) - b(58), E.io); return [F(0.5, 0.52) + d, F(0.86, 0.86) + d]; } });
+const Q2 = Head([{ t: "…who", at: b(61) }, { t: "might", at: b(61.25) }, { t: "not", at: b(61.5) }, { br: 1 }, { t: "be", at: b(61.75) }, { t: "the", at: b(62) }, { br: 1 }, { t: "loudest", at: b(62.5), cls: "coral", sfx: "chime", gain: 0.35 }, { br: 1 }, { t: "voices.”", at: b(62.75), cls: "coral" }], { in: b(61), out: b(66), zone: () => { const d = -0.03 * P(tNow, b(63), b(66) - b(63), E.io); return [F(0.5, 0.52) + d, F(0.86, 0.86) + d]; } });
 const attr = el("div", "abs", $("fg"), `<div style="display:flex;align-items:center;justify-content:center;gap:.6em"><span id="wk" style="font-family:Inter;font-weight:700;letter-spacing:-.03em;font-size:1.25em">wakelet</span><span style="width:2px;height:1.1em;background:rgba(244,240,237,.35)"></span><span><b style="font-weight:600">James Davis</b> · Head of Community &amp; Growth</span></div>`);
 
 // ================================================================= 9 · LOCKUP
@@ -259,7 +260,7 @@ const url = el("div", "kh", $("fg"), `<span style="font-family:Inter;font-weight
 // ================================================================= seek(t)
 const bg = $("bg"), ctx = bg.getContext("2d");
 window.seek = function (t) {
-  layout();
+  layout(); tNow = t;
   if (bg.width !== W || bg.height !== H) { bg.width = W; bg.height = H; }
   const cam = camera(t), camPrev = camera(Math.max(0, t - FR));
   ctx.fillStyle = C.base; ctx.fillRect(0, 0, W, H);
@@ -364,7 +365,7 @@ window.seek = function (t) {
   { const on = t >= b(56) && t < b(66.2); show(james, on); show(attr, on);
     if (on) { const kj = clamp(M.spring(t, b(56), "snappy")), ko = P(t, b(66) - 0.1, 0.25, E.inQ);
       const js = F(0.52, 0.4) * W, jy = Y(F(0.24, 0.24)), s = js * kj * (1 - ko);
-      box(james, W / 2 - s / 2, jy - s / 2, s, s);
+      box(james, W / 2 - s / 2, jy - s / 2 + Math.sin((t - b(56)) * 1.8) * 8 * S, s, s); james.style.transform = `rotate(${Math.sin((t - b(56)) * 1.3) * 1.5}deg)`;
       const img = james.querySelector("img"); img.style.width = `${js * 1.06}px`; img.style.left = `${s / 2}px`; img.style.top = `${s / 2 + js * 0.06}px`;
       img.style.transform = `translate(-50%,-50%) scale(${mix(1.02, 1.16, P(t, b(56), 5, E.io))})`;
       attr.style.left = `${W / 2}px`; attr.style.top = `${Y(F(0.93, 0.95))}px`; attr.style.fontSize = `${30 * S}px`; attr.style.whiteSpace = "nowrap";
@@ -380,6 +381,7 @@ window.seek = function (t) {
       e.style.clipPath = `inset(${(1 - k) * 100}% 0 0 0)`; e.style.transform = `translate(-50%,-50%) translateY(${(1 - k) * 0.5}em)`; } }
 
   for (const h of HEADS) drawHead(h, t);
+  for (const pt of Q2.parts.slice(-2)) { const pg = pulse(t, [63, 64, 65], 7); pt.s.style.textShadow = `0 0 ${mix(0, 40, pg) * S}px rgba(198,82,63,.9)`; if (t >= b(62.75)) pt.s.style.transform += ` scale(${1 + 0.05 * pg})`; }
   const f = Math.round(t * 30); $("flash").style.display = f === Math.round(b(14) * 30) ? "block" : "none"; // the one cream flash, on the beat at 0:07
   gctx.putImageData(tiles[f % 4], 0, 0);
 };

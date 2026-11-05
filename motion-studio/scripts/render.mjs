@@ -50,7 +50,7 @@ const filmDir = path.dirname(filmPath);
 const name = path.basename(filmPath, ".html");
 const crf = Number(opt("crf", 16));
 const out = path.resolve(opt("out", path.join(filmDir, "renders", `${name}.mp4`)));
-const audioDir = path.join(filmDir, "audio");
+const audioDir = path.join(filmDir, "audio" + (opt("size") ? `-${opt("size")}` : "")); // per size, so parallel renders never share files
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.mkdirSync(audioDir, { recursive: true });
 
