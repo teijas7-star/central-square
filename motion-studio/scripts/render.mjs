@@ -145,7 +145,7 @@ if (wantAudio) {
     beats = { ...JSON.parse(fs.readFileSync(path.join(audioDir, "beats.json"), "utf8")), source: "measured" };
   } else {
     track = path.join(audioDir, "score.wav");
-    py("synth_audio.py", "score", "--bpm", String(film.bpm ?? 100), "--duration", String(film.duration), "--seed", String(film.seed ?? 7), "--out", track);
+    py("synth_audio.py", "score", "--bpm", String(film.bpm ?? 100), "--duration", String(film.duration), "--seed", String(film.seed ?? 7), "--style", film.music || "warm", "--out", track);
     beats = JSON.parse(fs.readFileSync(path.join(audioDir, "score.beats.json"), "utf8"));
     // measure it anyway and record the drift so the grid is honest
     py("analyze_audio.py", track, "--fps", String(film.fps), "--out", path.join(audioDir, "beats.measured.json"));

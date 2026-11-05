@@ -1,0 +1,403 @@
+<!doctype html>
+<!--
+  Wakelet × Ellie: LinkedIn cut. 36 s at 120 BPM (beat = 0.5 s = 15 frames). 4:5 (1080×1350) primary, 1:1 secondary.
+  Reuses the film.html motion system (squares, member particles, cards, pills, counters, kinetic type, camera, grain).
+  Built for muted autoplay: every idea is on-screen text (window.CAPTIONS also feeds captions.srt).
+  Safe area: 64 px sides, 64 px top, 120 px clear at the bottom (LinkedIn controls + caption overlay).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Wakelet x Ellie: LinkedIn</title>
+<style>
+  @font-face { font-family: "Fraunces"; src: url("assets/fonts/fraunces-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: block; }
+  :root { --base: #0A0511; --violet: #7C5EFF; --violet2: #9D8BFF; --coral: #C6523F; --cream: #F4F0ED; --ink: #150F1D;
+          --grad: linear-gradient(100deg, #7C5EFF 10%, #9D8BFF 45%, #C6523F 95%); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--base); color: var(--cream); font-family: "Inter", sans-serif; }
+  canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  #stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  .layer { position: absolute; inset: 0; }
+  #mid { z-index: 1; } #fg { z-index: 2; }
+  .abs { position: absolute; }
+  .kh { position: absolute; transform: translate(-50%, -50%); text-align: center; font-family: "Fraunces", serif; font-weight: 500; letter-spacing: -0.02em; line-height: 1.0; white-space: nowrap; }
+  .kh .m { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.04em 0.03em 0.14em; margin: -0.04em -0.03em -0.14em; }
+  .kh .w { display: inline-block; transform-origin: 50% 80%; }
+  .kh .gap { display: inline-block; width: 0.26em; }
+  .coral { color: var(--coral); }
+  .card { position: absolute; background: var(--cream); color: var(--ink); border-radius: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.5); overflow: hidden; }
+  .t36 { font-family: Inter; font-weight: 600; letter-spacing: -0.01em; }
+  .ln { position: absolute; border-radius: 99px; background: rgba(21,15,29,.13); }
+  .pill { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 0.45em; white-space: nowrap; font-family: Inter; font-weight: 600; border-radius: 999px; padding: 0.45em 0.95em; }
+  .sq { position: absolute; border-radius: 22%; }
+  .btn { position: absolute; display: flex; align-items: center; justify-content: center; font-family: Inter; font-weight: 600; border-radius: 14px; }
+  #vig { position: absolute; inset: 0; pointer-events: none; z-index: 3; background: radial-gradient(ellipse at 50% 46%, rgba(10,5,17,0) 50%, rgba(25,10,50,.5) 88%, rgba(10,5,17,.85) 115%); }
+  #grain { opacity: 0.09; mix-blend-mode: overlay; image-rendering: pixelated; z-index: 4; }
+  #flash { position: absolute; inset: 0; background: var(--cream); display: none; z-index: 5; }
+  #gradfill { position: absolute; inset: 0; background: linear-gradient(150deg, #7C5EFF 0%, #9D8BFF 38%, #C6523F 100%); display: none; z-index: 0; }
+  .photo { position: absolute; overflow: hidden; }
+  .photo img { position: absolute; transform: translate(-50%, -50%); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="mb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mbg" stdDeviation="0 0" /></filter></svg>
+<canvas id="bg"></canvas>
+<div id="stage"><div id="gradfill"></div><div class="layer" id="mid"></div><div class="layer" id="fg"></div></div>
+<div id="vig"></div>
+<canvas id="grain"></canvas>
+<div id="flash"></div>
+
+<script src="lib/motion.js"></script>
+<script>
+"use strict";
+window.FILM = { width: 1080, height: 1350, fps: 30, duration: 36.0, bpm: 120, seed: 31, music: "drive" };
+const M = window.Motion, { clamp, mix, hash, noise } = M;
+const BEAT = 0.5, FR = 1 / 30, b = (n) => n * BEAT;
+const C = { base: "#0A0511", violet: "#7C5EFF", violet2: "#9D8BFF", coral: "#C6523F", cream: "#F4F0ED", ink: "#150F1D" };
+const E = { out: M.ease.outExpo, back: (x) => M.ease.outBack(x, 1.9), io: M.ease.inOutCubic, inQ: (x) => x * x * x, cub: M.ease.outCubic };
+const P = (t, s, d, f = E.out) => f(clamp((t - s) / d));
+const pulse = (t, beats, k = 9) => beats.reduce((a, n) => a + (t >= b(n) ? Math.exp(-(t - b(n)) * k) : 0), 0);
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (parent || $("mid")).appendChild(e); return e; };
+const show = (e, on) => { e.style.display = on ? (e.id === "gradfill" || e.id === "flash" ? "block" : "") : "none"; };
+const hex = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const box = (e, x, y, w, h) => { e.style.left = `${x}px`; e.style.top = `${y}px`; e.style.width = `${w}px`; e.style.height = `${h}px`; };
+
+// ---------------------------------------------------------------- layout: 4:5 primary, 1:1 secondary; everything inside the safe box
+let W = 1080, H = 1350, S = 1, TALL = true, SAFE = {};
+function layout() {
+  W = innerWidth; H = innerHeight; S = W / 1080; TALL = H / W > 1.12;
+  SAFE = { l: 64 * S, r: W - 64 * S, t: 64 * S, b: H - 120 * S }; SAFE.w = SAFE.r - SAFE.l; SAFE.h = SAFE.b - SAFE.t; SAFE.cx = W / 2;
+}
+const F = (tall, sq) => (TALL ? tall : sq);                   // pick per format
+const Y = (f) => SAFE.t + f * SAFE.h;                         // a y position as a fraction of the safe box
+
+// ---------------------------------------------------------------- KineticHeadline (auto-fit: 85% of safe width, clamped to its zone height)
+const HEADS = [];
+function Head(words, opts) {
+  const e = el("div", "kh", $("fg"));
+  const parts = words.map((w, i) => {
+    if (w.br) { // w.br === "tall": a break only in 4:5 (in 1:1 it is a space)
+      if (w.br === "tall") { el("span", "gap brs", e); el("br", "brt", e); }
+      else if (w.br === "sq") { el("span", "gap qbs", e); el("br", "qbt", e); }
+      else el("br", null, e);
+      return null; }
+    if (i && !words[i - 1].br) el("span", "gap", e);
+    const m = el("span", "m", e), s = el("span", "w " + (w.cls || ""), m, w.t);
+    if (w.sfx) { s.dataset.sfx = w.sfx; s.dataset.sfxGain = w.gain || 0.5; }
+    return { s, at: w.at };
+  }).filter(Boolean);
+  const h = { e, parts, fill: 0.86, dur: 0.32, ...opts }; HEADS.push(h); return h;
+}
+function drawHead(h, t) {
+  const on = t >= h.in - 0.001 && t < h.out; show(h.e, on); if (!on) return;
+  const [z0, z1] = h.zone();                                   // vertical zone (fractions of the safe box)
+  for (const x of h.e.querySelectorAll(".brt")) x.style.display = TALL ? "" : "none";
+  for (const x of h.e.querySelectorAll(".brs")) x.style.display = TALL ? "none" : "inline-block";
+  for (const x of h.e.querySelectorAll(".qbt")) x.style.display = TALL ? "none" : "";
+  for (const x of h.e.querySelectorAll(".qbs")) x.style.display = TALL ? "inline-block" : "none";
+  h.e.style.fontSize = "100px";
+  const ow = h.e.offsetWidth, oh = h.e.offsetHeight;
+  const size = Math.min(100 * (h.fill * SAFE.w) / ow, 100 * ((z1 - z0) * SAFE.h) / oh, (h.max || 400) * S);
+  h.e.style.fontSize = `${size}px`; h.e.style.left = `${SAFE.cx}px`; h.e.style.top = `${Y((z0 + z1) / 2)}px`;
+  const kout = h.exit ? P(t, h.out - h.exit, h.exit, E.io) : 0;
+  for (const p of h.parts) {
+    const k = P(t, p.at, h.dur, E.out), kp = P(t, p.at, 0.3, E.back);
+    p.s.style.transform = `translateY(${(1 - k) * 105 - kout * 105}%) scale(${mix(1.2, 1, kp)})`;
+  }
+}
+
+// ---------------------------------------------------------------- Pill / Counter / Camera
+function count(e, t, at, to, dur = 0.9) { e.textContent = Math.round(mix(0, to, P(t, at, dur, E.cub))); }
+function springIn(t, at, v = 5) { return Math.max(0, M.spring(t, at, { stiffness: 460, damping: 20, velocity: v })); }
+function camera(t) {
+  let x = 0, y = 0, s = 1;
+  const scenes = [[0, b(6)], [b(6), b(14)], [b(14), b(18)], [b(18), b(30)], [b(30), b(40)], [b(40), b(48)], [b(48), b(56)], [b(56), b(66)], [b(66), 36]];
+  for (const [a, z] of scenes) if (t >= a && t < z) s *= 1 + 0.04 * clamp((t - a) / (z - a));
+  for (const [at, amp] of [[b(6), 8], [b(7), 8], [b(8), 8], [b(9), 8], [b(14), 14], [b(46), 8], [b(48), 16], [b(67), 10]]) {
+    const d = t - at; if (d < 0 || d > 0.5) continue; const k = Math.exp(-d * 11) * amp * S;
+    x += noise(d * 38, at * 13) * k; y += noise(d * 41, at * 17 + 3) * k;
+  }
+  for (const at of [b(40), b(56)]) { // whip-pans
+    if (t >= at - 0.2 && t < at) x -= P(t, at - 0.2, 0.2, E.inQ) * W * 0.9;
+    if (t >= at && t < at + 0.28) x += (1 - P(t, at, 0.28, E.out)) * W * 0.9;
+  }
+  return { x, y, s };
+}
+
+// ---------------------------------------------------------------- Members: 200 squares, already moving at frame 0
+const N = 200;
+const MEM = Array.from({ length: N }, (_, i) => {
+  const r = (k) => hash(i, 300 + k); const loud = i < 9, quiet = !loud && r(5) < 0.42;
+  return { hx: 0.03 + r(0) * 0.94, hy: 0.03 + r(1) * 0.94, small: 6 + r(2) * 8, own: loud ? 44 + r(3) * 30 : quiet ? 8 + r(3) * 6 : 10 + r(3) * 8, loud, quiet, sp: 0.3 + r(6) * 0.8, ph: r(7) * 100, ang: r(4) * 6.283 };
+});
+function memberPos(m, t) {
+  let x = m.hx + noise(t * 0.3 * m.sp + m.ph, 1) * 0.03, y = m.hy + noise(t * 0.27 * m.sp + m.ph, 2) * 0.03 - t * 0.004 * m.sp;
+  const kc = P(t, b(66), 0.5, E.inQ); // lockup: everyone rushes to the monogram
+  return [mix(x, 0.5, kc), mix(y, 0.4, kc)];
+}
+function drawMembers(ctx, t, cam) {
+  if (t >= b(67)) return;
+  const vis = t < b(6) ? 1 : t < b(31.5) ? 0.35 : t < b(40) ? 1 : t < b(48) ? 0.3 : t < b(66) ? 0 : 1;
+  if (!vis) return;
+  const field = clamp(M.spring(t, b(31.5), "gentle")) * (1 - P(t, b(40), 0.3));
+  const scanX = mix(-0.15, 1.15, P(t, b(32), 2.0, E.io));
+  for (const m of MEM) {
+    const [ux, uy] = memberPos(m, t);
+    const px = W / 2 + (ux * W - W / 2) * (1 + (cam.s - 1) * 0.5) + cam.x * 0.5, py = H / 2 + (uy * H - H / 2) * (1 + (cam.s - 1) * 0.5) + cam.y * 0.5;
+    let size = mix(m.small, m.own, field) * S, a = (m.quiet ? mix(0.6, 0.3, field) : 0.85) * vis, col = C.violet, glow = 0;
+    if (m.loud && field > 0.1) { col = C.violet2; a = mix(a, 0.35, P(t, b(33), 1.0)); glow = 24; } // loud squares dim as the quiet ones light
+    if (m.quiet && t >= b(32) && t < b(40) && scanX > m.hx) {
+      const tl = b(32) + 2.0 * clamp((m.hx + 0.15) / 1.3);
+      col = C.coral; a = 0.95; glow = 20; size *= mix(1, 1.9, Math.max(0, M.spring(t, tl, "pop"))) * (1 + 0.4 * pulse(t, [37, 38, 39], 7));
+    }
+    ctx.shadowBlur = glow * S; ctx.shadowColor = hex(col, 0.85); ctx.fillStyle = hex(col, a);
+    ctx.beginPath(); ctx.roundRect(px - size / 2, py - size / 2, size, size, size * 0.22); ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  if (t >= b(32) && t < b(36.5)) {
+    const x = scanX * W + cam.x * 0.5, g = ctx.createLinearGradient(x - 100 * S, 0, x + 6 * S, 0);
+    g.addColorStop(0, hex(C.coral, 0)); g.addColorStop(1, hex(C.coral, 0.55)); ctx.fillStyle = g; ctx.fillRect(x - 100 * S, 0, 106 * S, H);
+    ctx.fillStyle = hex(C.coral, 0.95); ctx.fillRect(x, 0, 3 * S, H);
+  }
+}
+
+// ---------------------------------------------------------------- grain
+const GR = $("grain"), gctx = GR.getContext("2d"); GR.width = 360; GR.height = 450;
+const tiles = Array.from({ length: 4 }, (_, k) => { const id = gctx.createImageData(360, 450), rnd = M.mulberry32(77 + k); for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } return id; });
+
+// ================================================================= 1 · HOOK (words on screen by frame 8)
+const H1a = Head([{ t: "Thousands", at: 0.2, sfx: "impact", gain: 0.6 }, { br: "tall" }, { t: "of", at: 0.2 }, { br: "sq" }, { t: "members.", at: 0.2 }], { in: 0.2, out: b(3), dur: 0.12, zone: () => [0.3, 0.62] });
+const H1b = Head([{ t: "Two", at: b(3), sfx: "tick", gain: 0.9 }, { br: 1 }, { t: "people.", at: b(3.5) }], { in: b(3), out: b(6), zone: () => [0.2, 0.75], max: 330 });
+
+// ================================================================= 2 · THE GRIND: big cards pile up, an NPS card among them
+const sheet = (c) => { c.innerHTML = `<div class="t36" style="position:absolute;left:6%;top:7%;font-size:${36}px">Members.xlsx</div>`; for (let r = 0; r < 6; r++) for (let k = 0; k < 4; k++) { const d = el("div", "", c); d.style.cssText = `position:absolute;left:${6 + k * 22}%;top:${28 + r * 11}%;width:20%;height:8.5%;border-radius:5px;background:${(r + k) % 5 === 0 ? "rgba(124,94,255,.4)" : "rgba(21,15,29,.10)"}`; } };
+const docC = (c) => { c.innerHTML = `<div class="t36" style="position:absolute;left:7%;top:8%;font-size:36px">Community notes</div>`; [[30, 82], [41, 70], [52, 86], [63, 60], [74, 78]].forEach(([y, w]) => { const d = el("div", "ln", c); d.style.cssText += `left:7%;top:${y}%;width:${w}%;height:5.5%`; }); };
+const contactC = (c) => { c.innerHTML = `<div style="position:absolute;left:7%;top:10%;width:17%;aspect-ratio:1;border-radius:50%;background:${C.violet2}"></div><div class="t36" style="position:absolute;left:29%;top:11%;font-size:36px">CRM contact</div><div style="position:absolute;left:29%;top:27%;font-size:30px;color:rgba(21,15,29,.6)">Lifecycle: customer</div>`; [[55, 84], [68, 64], [81, 74]].forEach(([y, w]) => { const d = el("div", "ln", c); d.style.cssText += `left:7%;top:${y}%;width:${w}%;height:6%`; }); };
+const npsC = (c) => { c.innerHTML = `<div class="t36" style="position:absolute;left:7%;top:8%;font-size:36px">NPS survey</div>`; [[C.violet, 62], [C.violet2, 40], [C.coral, 24]].forEach(([col, w], i) => { const d = el("div", "", c); d.style.cssText = `position:absolute;left:7%;top:${36 + i * 18}%;width:${w * 1.3}%;height:11%;border-radius:8px;background:${col}`; }); };
+const PILE = [
+  { make: sheet, from: [-1.0, 0.5], to: [0.42, 0.54], rot: -6, at: 6 },
+  { make: docC, from: [1.1, 0.4], to: [0.6, 0.62], rot: 5, at: 7 },
+  { make: contactC, from: [0.4, 1.4], to: [0.45, 0.72], rot: 3, at: 8 },
+  { make: npsC, from: [0.7, 1.5], to: [0.57, 0.8], rot: -4, at: 9 },
+].map((m, i) => { const c = el("div", "card", $("mid")); m.make(c); c.dataset.sfx = "whoosh"; c.dataset.sfxGain = 0.4; return { ...m, c, i }; });
+const H2a = Head([{ t: "Reports", at: b(6), sfx: "tick", gain: 0.6 }, { t: "in", at: b(6.5) }, { br: 1 }, { t: "four", at: b(7) }, { t: "places.", at: b(7.5) }], { in: b(6), out: b(10), fill: 0.9, zone: () => [0.04, F(0.3, 0.27)] });
+const H2b = Head([{ t: "Hours.", at: b(10), sfx: "impact", gain: 0.5 }, { br: 1 }, { t: "Every", at: b(11) }, { t: "week.", at: b(11.5), cls: "coral" }], { in: b(10), out: b(14), fill: 0.9, zone: () => [0.04, F(0.3, 0.27)] });
+
+// ================================================================= 3 · ELLIE: cream flash, coral square slices the pile
+const ellieSq = el("div", "sq", $("mid")); ellieSq.style.background = C.coral; ellieSq.style.boxShadow = "0 0 90px rgba(198,82,63,.75)";
+const H3 = Head([{ t: "Meet", at: b(15), sfx: "impact", gain: 0.6 }, { t: "Ellie.", at: b(15.5), cls: "coral" }], { in: b(15), out: b(18), zone: () => [0.05, 0.3] });
+
+// ================================================================= 4 · HERO: the brief builds itself
+const SRC = ["Docs", "Sheets", "HubSpot", "NPS"].map((n, i) => { const p = el("div", "pill", $("mid"), `<span style="width:.75em;height:.75em;border-radius:22%;background:${[C.violet, C.violet2, C.coral, C.violet][i]}"></span>${n}`); p.style.background = "rgba(244,240,237,.1)"; p.style.color = C.cream; p.style.border = "2px solid rgba(244,240,237,.25)"; p.dataset.sfx = "tick"; p.dataset.sfxGain = 0.4; return p; });
+const streams = el("canvas", "", $("mid")); streams.style.pointerEvents = "none";
+const brief = el("div", "card", $("mid"));
+brief.innerHTML = `
+  <div class="bh" style="position:absolute;left:5.5%;top:4.5%;right:5.5%;display:flex;align-items:center;gap:.5em">
+    <span style="width:1em;height:1em;border-radius:22%;background:${C.coral};box-shadow:0 0 18px rgba(198,82,63,.6)"></span>
+    <span style="font-family:Fraunces;font-weight:500;font-size:1.32em;letter-spacing:-.02em">Weekly community brief</span></div>
+  <div class="bs" style="position:absolute;left:5.5%;top:14%;font-size:.95em;color:rgba(21,15,29,.6)">Mon 08:00 · built by Ellie</div>
+  <div class="s1" style="position:absolute;left:5.5%;right:5.5%;top:25%">
+    <div style="font-weight:600;font-size:.95em">NPS summary</div>
+    <div style="display:flex;height:.9em;margin-top:.45em;border-radius:10px;overflow:hidden"><span class="b1" style="width:58%;background:${C.violet}"></span><span class="b2" style="width:27%;background:${C.violet2}"></span><span class="b3" style="width:15%;background:${C.coral}"></span></div></div>
+  <div class="s2" style="position:absolute;left:5.5%;right:5.5%;top:43%">
+    <div style="font-weight:600;font-size:.95em">Top themes</div>
+    <div style="display:flex;gap:.4em;margin-top:.45em;flex-wrap:wrap">${["Onboarding", "Events", "Ambassadors"].map((x) => `<span class="th" style="display:inline-block;background:rgba(124,94,255,.14);color:${C.ink};border-radius:999px;padding:.25em .7em;font-weight:500;font-size:.95em">${x}</span>`).join("")}</div></div>
+  <div class="s3" style="position:absolute;left:5.5%;right:5.5%;top:63%;bottom:12%;display:flex;gap:4%">
+    ${[["Going quiet", C.coral, "gq"], ["Returning", C.violet, "rt"]].map(([l, c, id]) => `<div class="tile" id="tile-${id}" style="flex:1;border-radius:18px;background:rgba(21,15,29,.06);position:relative"><div style="position:absolute;left:9%;top:12%;font-weight:600;font-size:.95em;display:flex;align-items:center;gap:.4em"><span style="width:.7em;height:.7em;border-radius:22%;background:${c}"></span>${l}</div><div class="num" id="n-${id}" style="position:absolute;left:9%;bottom:8%;font-family:Fraunces;font-weight:500;font-size:2.6em;letter-spacing:-.02em;line-height:1">0</div></div>`).join("")}</div>
+  <div class="s4" style="position:absolute;left:5.5%;bottom:3.5%;font-size:.95em;color:rgba(21,15,29,.5)">Illustrative data</div>`;
+brief.dataset.sfx = "whoosh"; brief.dataset.sfxGain = 0.5;
+const BS = ["bh", "bs", "s1", "s2", "s3", "s4"].map((c) => brief.querySelector("." + c));
+const themes = [...brief.querySelectorAll(".th")], tiles2 = [...brief.querySelectorAll(".tile")];
+tiles2.forEach((tl) => { tl.dataset.sfx = "pop"; tl.dataset.sfxGain = 0.5; });
+const H4 = [
+  Head([{ t: "One", at: b(18), sfx: "tick", gain: 0.5 }, { t: "brief.", at: b(18.5) }], { in: b(18), out: b(22), zone: () => [0.045, 0.2] }),
+  Head([{ t: "Every", at: b(22) }, { br: 1 }, { t: "Monday.", at: b(22.5), cls: "coral" }], { in: b(22), out: b(26), zone: () => [0.045, F(0.3, 0.33)] }),
+  Head([{ t: "On", at: b(26) }, { t: "its", at: b(26.25) }, { t: "own.", at: b(26.5) }], { in: b(26), out: b(30), zone: () => [0.045, 0.2] }),
+];
+
+// ================================================================= 5 · THE QUIET ONES
+const zoomSq = el("div", "sq", $("fg")); zoomSq.style.background = C.coral;
+const H5 = Head([{ t: "Finds", at: b(32), sfx: "whoosh", gain: 0.4 }, { t: "the", at: b(32.25) }, { br: 1 }, { t: "members", at: b(32.75) }, { br: 1 }, { t: "you'd", at: b(33.5) }, { t: "miss.", at: b(34), cls: "coral" }], { in: b(32), out: b(40), exit: 0.2, zone: () => [0.05, F(0.44, 0.5)] });
+
+// ================================================================= 6 · YOU APPROVE
+const draft = el("div", "card", $("mid"));
+draft.innerHTML = `<div style="position:absolute;left:6%;top:9%;font-size:.92em;font-weight:600;color:${C.coral};display:flex;align-items:center;gap:.45em"><span style="width:.8em;height:.8em;border-radius:22%;background:${C.coral}"></span>Ellie drafted · to Sam</div>
+  <div style="position:absolute;left:6%;top:28%;right:6%;font-size:1.05em;line-height:1.3;color:${C.ink}">Hi Sam, we missed you this term. Want first look at the new guide?</div>
+  <div class="btn" style="right:31%;bottom:8%;width:22%;height:19%;border:2px solid rgba(21,15,29,.2);font-size:.9em">Edit</div>
+  <div class="btn" id="doit" style="right:6%;bottom:8%;width:23%;height:19%;background:${C.violet};color:${C.cream};font-size:.9em">Do it</div>`;
+draft.dataset.sfx = "whoosh"; draft.dataset.sfxGain = 0.45;
+const cursor = el("div", "abs", $("fg"), `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M3 2 L3 19 L8 14.5 L11.5 22 L14.5 20.6 L11 13.3 L17.5 13.3 Z" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4" stroke-linejoin="round"/></svg>`);
+const burst = Array.from({ length: 16 }, () => { const s = el("div", "sq", $("fg")); s.style.background = C.coral; s.style.boxShadow = "0 0 20px rgba(198,82,63,.8)"; return s; });
+burst[0].dataset.sfx = "pop"; burst[0].dataset.sfxGain = 1.0;
+const H6 = Head([{ t: "Nothing", at: b(40) }, { br: "tall" }, { t: "sends", at: b(40.5) }, { br: 1 }, { t: "without", at: b(42) }, { br: 1 }, { t: "your", at: b(42.5) }, { t: "yes.", at: b(43), cls: "coral" }], { in: b(40), out: b(48), zone: () => [0.045, F(0.53, 0.52)] });
+
+// ================================================================= 7 · PAYOFF: gradient fill, ½ day, team photo
+const clock = el("div", "abs", $("mid"), `<svg viewBox="-100 -100 200 200" width="100%" height="100%"><g id="dial"><circle r="94" fill="none" stroke="${C.cream}" stroke-width="2.5"/>${Array.from({ length: 60 }, (_, i) => `<line x1="0" y1="-94" x2="0" y2="${i % 5 ? -89 : -82}" stroke="${C.cream}" stroke-width="${i % 5 ? 1.2 : 3}" transform="rotate(${i * 6})"/>`).join("")}<circle cx="0" cy="-94" r="5" fill="${C.cream}"/></g></svg>`);
+clock.style.opacity = 0.25;
+const half = el("div", "kh", $("fg"), "½ day"); half.style.color = C.cream; half.dataset.sfx = "impact"; half.dataset.sfxGain = 0.2;
+const H7 = Head([{ t: "back,", at: b(50) }, { br: 1 }, { t: "every", at: b(50.5) }, { t: "week.", at: b(51) }], { in: b(50), out: b(52), fill: 0.86, zone: () => [F(0.62, 0.64), F(0.9, 0.92)] });
+const team = el("div", "photo", $("mid"), `<img src="assets/photos/community.jpg">`); team.dataset.sfx = "whoosh"; team.dataset.sfxGain = 0.5;
+
+// ================================================================= 8 · JAMES
+const james = el("div", "photo", $("mid"), `<img src="assets/photos/james.jpg">`); james.style.borderRadius = "26px";
+const Q1 = Head([{ t: "“It", at: b(56) }, { t: "helps", at: b(56.25) }, { t: "you", at: b(56.5) }, { br: 1 }, { t: "identify", at: b(56.75) }, { br: 1 }, { t: "underserved", at: b(57.25) }, { br: 1 }, { t: "members…", at: b(57.75) }], { in: b(56), out: b(61), zone: () => [F(0.5, 0.52), F(0.86, 0.86)] });
+const Q2 = Head([{ t: "…who", at: b(61) }, { t: "might", at: b(61.25) }, { t: "not", at: b(61.5) }, { br: 1 }, { t: "be", at: b(61.75) }, { t: "the", at: b(62) }, { br: 1 }, { t: "loudest", at: b(62.5), cls: "coral", sfx: "chime", gain: 0.35 }, { br: 1 }, { t: "voices.”", at: b(62.75), cls: "coral" }], { in: b(61), out: b(66), zone: () => [F(0.5, 0.52), F(0.86, 0.86)] });
+const attr = el("div", "abs", $("fg"), `<div style="display:flex;align-items:center;justify-content:center;gap:.6em"><span id="wk" style="font-family:Inter;font-weight:700;letter-spacing:-.03em;font-size:1.25em">wakelet</span><span style="width:2px;height:1.1em;background:rgba(244,240,237,.35)"></span><span><b style="font-weight:600">James Davis</b> · Head of Community &amp; Growth</span></div>`);
+
+// ================================================================= 9 · LOCKUP
+const mono = el("div", "abs", $("fg"), `<svg viewBox="200 178 242 284" width="100%" height="100%"><g transform="translate(192.7,445.7)"><path d="M239.58 -64.98Q239.58 -52.56 232.74 -39.96Q225.9 -27.36 213.03 -16.83Q200.16 -6.3 181.8 0.18Q163.44 6.66 140.22 6.66Q101.52 6.66 73.53 -10.17Q45.54 -27.0 30.33 -56.52Q15.12 -86.04 15.12 -124.38Q15.12 -153.36 24.12 -177.75Q33.12 -202.14 49.41 -220.14Q65.7 -238.14 87.66 -248.13Q109.62 -258.12 135.54 -258.12Q153.9 -258.12 165.33 -254.43Q176.76 -250.74 183.33 -246.96Q189.9 -243.18 193.5 -243.18Q198.0 -243.18 200.07 -246.42Q202.14 -249.66 204.39 -252.81Q206.64 -255.96 210.96 -255.96Q213.84 -255.96 215.82 -254.16Q217.8 -252.36 219.06 -247.86L238.14 -186.3Q239.4 -182.34 237.51 -179.37Q235.62 -176.4 231.66 -175.68Q227.88 -175.14 224.82 -176.67Q221.76 -178.2 220.14 -181.98Q210.24 -203.58 198.27 -216.45Q186.3 -229.32 172.17 -234.99Q158.04 -240.66 141.3 -240.66Q124.56 -240.66 110.43 -233.19Q96.3 -225.72 86.04 -211.86Q75.78 -198.0 70.02 -178.56Q64.26 -159.12 64.26 -135.0Q64.26 -98.28 76.05 -72.72Q87.84 -47.16 108.09 -33.84Q128.34 -20.52 154.26 -20.52Q179.46 -20.52 197.73 -32.31Q216.0 -44.1 225.72 -65.34Q227.7 -69.12 229.86 -70.47Q232.02 -71.82 234.72 -71.28Q237.24 -70.92 238.41 -69.3Q239.58 -67.68 239.58 -64.98Z" fill="${C.cream}"/><rect x="155.3" y="-171.9" width="81.7" height="81.7" rx="20.4" fill="${C.violet}"/></g></svg>`);
+mono.dataset.sfx = "impact"; mono.dataset.sfxGain = 0.6;
+const wordmark = el("div", "kh", $("fg"), `<span style="font-family:Inter;font-weight:600;letter-spacing:-.02em">centralsquare</span> <span style="font-family:Inter;color:${C.coral};font-size:.75em">▪</span> <span style="font-family:Inter;font-weight:500">ai</span>`);
+wordmark.dataset.sfx = "chime"; wordmark.dataset.sfxGain = 0.35;
+const subline = el("div", "kh", $("fg"), `<span style="font-family:Inter;font-weight:400;letter-spacing:-.01em">Ellie, the agent for<br>community teams.</span>`);
+const url = el("div", "kh", $("fg"), `<span style="font-family:Inter;font-weight:500;letter-spacing:-.01em">centralsquare.ai</span>`);
+
+// ================================================================= seek(t)
+const bg = $("bg"), ctx = bg.getContext("2d");
+window.seek = function (t) {
+  layout();
+  if (bg.width !== W || bg.height !== H) { bg.width = W; bg.height = H; }
+  const cam = camera(t), camPrev = camera(Math.max(0, t - FR));
+  ctx.fillStyle = C.base; ctx.fillRect(0, 0, W, H);
+  const glow = (x, y, r, col, a) => { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, hex(col, a)); g.addColorStop(1, hex(col, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); };
+  glow(W * (0.3 + 0.08 * Math.sin(t * 0.3)) + cam.x * 0.2, H * 0.3, H * 0.8, C.violet, 0.17);
+  if (t >= b(14)) glow(W * 0.75 + cam.x * 0.2, H * 0.75, H * 0.6, C.coral, 0.09);
+  drawMembers(ctx, t, cam);
+
+  const st = $("stage"); st.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.s})`;
+  const vx = Math.abs(cam.x - camPrev.x) / (W * 0.01);
+  $("mbg").setAttribute("stdDeviation", `${Math.min(40, vx * 1.6)} 0`); st.style.filter = vx > 0.6 ? "url(#mb)" : "none";
+
+  // ---- 2 the grind: four big cards (≥ 63% of frame width) pile up and jitter in the lower zone
+  for (const m of PILE) {
+    const on = t >= b(m.at) && t < b(15.2); show(m.c, on); if (!on) continue;
+    const cw = F(0.66, 0.6) * W, ch = cw * 0.62, k = P(t, b(m.at), 0.38, E.out);
+    let x = mix(m.from[0], m.to[0], k) * W, y = Y(mix(m.from[1], F(m.to[1], m.to[1] * 0.98 + 0.03), k));
+    const jit = 1 - P(t, b(14), 0.1);
+    x += noise(t * 9 + m.i * 7, 12) * 8 * S * jit; y += noise(t * 9 + m.i * 5, 13) * 8 * S * jit;
+    let r = m.rot * k + noise(t * 3 + m.i, 11) * 2.5 * jit;
+    // the coral square slices through at b14: cards blow outward
+    const kb = P(t, b(14), 0.6, E.inQ), dir = m.i % 2 ? 1 : -1;
+    x += dir * kb * W * 0.9; y += (m.i < 2 ? -1 : 1) * kb * H * 0.25; r += dir * kb * 25;
+    box(m.c, x - cw / 2, y - ch / 2, cw, ch); m.c.style.transform = `rotate(${r}deg)`;
+    m.c.style.filter = kb > 0.05 ? "url(#mb)" : "none";
+  }
+  { const on = t >= b(14) && t < b(18.3); show(ellieSq, on);
+    if (on) { const k = P(t, b(14), 0.55, E.io), kl = clamp(M.spring(t, b(15), "snappy")), sz = mix(260, 300, kl) * S;
+      let x = mix(-0.2, 1.2, k) * W, y = mix(1.1, -0.1, k) * H; x = mix(x, W / 2, kl); y = mix(y, Y(F(0.62, 0.66)), kl);
+      const ko = P(t, b(18), 0.3, E.inQ); // shrinks into the brief's header icon
+      const s2 = sz * (1 - ko * 0.85);
+      box(ellieSq, x - s2 / 2, mix(y, Y(0.3), ko) - s2 / 2, s2, s2); ellieSq.style.transform = `rotate(${(1 - kl) * 45 + Math.sin(t * 2) * 4}deg) scale(${1 + 0.06 * pulse(t, [16, 17], 6)})`;
+      ellieSq.style.filter = t < b(15) ? "url(#mb)" : "none"; } }
+
+  // ---- 4 the brief builds itself: sources stream into one card, sections assemble (3-frame stagger), counters count
+  const bw = F(1.0, 0.885) * SAFE.w, bh = bw * F(0.78, 0.65), bx = SAFE.cx - bw / 2, by = Y(F(0.33, 0.36));
+  { const on = t >= b(18) && t < b(31.6); show(brief, on); show(streams, on);
+    SRC.forEach((p) => show(p, t >= b(18) && t < b(20)));
+    if (on) {
+      // zoom into the "Going quiet" tile at b30 -> b31.5
+      const kz = P(t, b(30), 1.4, E.inQ), tile = $("tile-gq");
+      const k = springIn(t, b(19), 3);
+      box(brief, bx, by, bw, bh); brief.style.fontSize = `${bw / F(28, 25.5)}px`; // .95em ≈ 32 px at 4:5
+      const push = mix(1, F(1.06, 1.025), P(t, b(23), b(30) - b(23), E.io));
+      const tr = tile.getBoundingClientRect(), br0 = brief.getBoundingClientRect();
+      brief.style.transformOrigin = kz > 0 ? `${(tr.left + tr.width / 2 - br0.left) / (br0.width / bw)}px ${(tr.top + tr.height / 2 - br0.top) / (br0.height / bh)}px` : "50% 50%";
+      brief.style.transform = `scale(${Math.min(1, k) * push * Math.pow(9, kz)}) translateY(${(1 - Math.min(1, k)) * 80 * S}px)`;
+      brief.style.filter = kz > 0.2 ? "url(#mb)" : "none";
+      BS.forEach((s, i) => { const at = b(19.5) + i * 0.1 + (i >= 2 ? b(i - 1.5) : 0); const ks = P(t, at, 0.35, E.out); s.style.clipPath = `inset(0 ${(1 - ks) * 100}% 0 0)`; s.style.transform = `translateY(${(1 - ks) * 20}px)`; });
+      themes.forEach((th, i) => { const kk = springIn(t, b(21) + i * 0.1, 6); th.style.transform = `scale(${kk})`; });
+      ["b1", "b2", "b3"].forEach((c, i) => { brief.querySelector("." + c).style.transform = `scaleX(${P(t, b(20) + i * 0.1, 0.5, E.out)})`; brief.querySelector("." + c).style.transformOrigin = "0 50%"; });
+      tiles2.forEach((tl, i) => { const kk = springIn(t, b(22) + i * 0.1, 6); tl.style.transform = `scale(${kk * (1 + 0.05 * pulse(t, [24, 26, 28], 9))})`; });
+      count($("n-gq"), t, b(22.2), 21); count($("n-rt"), t, b(22.3), 44);
+      // sources: chips above the card stream particles into it (b18 -> b20)
+      const sctx = streams.getContext("2d"); streams.width = W; streams.height = H; box(streams, 0, 0, W, H);
+      SRC.forEach((p, i) => {
+        const cx = SAFE.l + SAFE.w * (0.125 + i * 0.25), cy = Y(F(0.27, 0.27)), kk = springIn(t, b(18) + i * 0.1, 6), ko = P(t, b(19.5), 0.4, E.inQ);
+        p.style.left = `${cx}px`; p.style.top = `${mix(cy, by + bh * 0.08, ko)}px`; p.style.fontSize = `${30 * S}px`; p.style.transform = `translate(-50%,-50%) scale(${kk * (1 - ko * 0.6)})`;
+        if (t >= b(18.5) && t < b(20.5)) for (let j = 0; j < 14; j++) { const ph = ((t - b(18.5)) * 1.6 + j / 14) % 1, x = mix(cx, SAFE.cx + (i - 1.5) * 40 * S, ph), y = mix(cy, by + bh * 0.1, ph);
+          sctx.fillStyle = hex(i === 2 ? C.coral : C.violet2, 0.9 * (1 - ph)); const s = 10 * S * (1 - ph * 0.5); sctx.fillRect(x - s / 2, y - s / 2, s, s); }
+      });
+    } }
+  // ---- 5 quiet ones: the tile's coral fills the frame, then the member field
+  { const on = t >= b(31) && t < b(32.2); show(zoomSq, on);
+    if (on) { const k = P(t, b(31), 0.35, E.inQ), ko = P(t, b(31.6), 0.5, E.out), s = mix(200 * S, Math.hypot(W, H) * 1.1, k) * (1 - ko);
+      box(zoomSq, W / 2 - s / 2, H / 2 - s / 2, s, s); zoomSq.style.transform = `rotate(${ko * 45}deg)`; } }
+
+  // ---- 6 approve: the draft slides up, cursor clicks "Do it" on b46, coral burst, card flies off
+  { const on = t >= b(40) && t < b(47.6); show(draft, on); show(cursor, t >= b(41) && t < b(47));
+    const dw = F(1.0, 0.92) * SAFE.w, dh = dw * 0.5, dx = SAFE.cx, dy = Y(F(0.765, 0.75));
+    if (on) { const k = P(t, b(40), 0.45, E.out), ko = P(t, b(47), 0.3, E.inQ);
+      box(draft, dx - dw / 2, dy - dh / 2 + (1 - k) * H * 0.6 - ko * H * 0.9, dw, dh); draft.style.fontSize = `${dw / F(28, 25.5)}px`;
+      draft.style.transform = `rotate(${ko * -12}deg) scale(${1 + 0.03 * pulse(t, [44, 45], 8)})`; draft.style.filter = ko > 0.05 ? "url(#mb)" : "none";
+      $("doit").style.transform = `scale(${t >= b(46) && t < b(46) + 0.15 ? 0.9 : 1})`; $("doit").style.background = t >= b(46) ? C.coral : C.violet; }
+    const tx = dx + dw * 0.3, ty = dy + dh * 0.31, kc = P(t, b(43), b(46) - b(43), E.io);
+    const cx = mix(W * 0.85, tx, kc) + Math.sin(t * 3) * 6 * S * (1 - kc), cy = mix(H * 0.98, ty, kc), cs = 64 * S * (t >= b(46) && t < b(46) + 0.12 ? 0.85 : 1);
+    box(cursor, cx - cs * 0.15, cy - cs * 0.1, cs, cs);
+    burst.forEach((s, i) => { const on2 = t >= b(46) && t < b(46) + 0.7; show(s, on2); if (!on2) return;
+      const k2 = P(t, b(46), 0.7, E.out), a = (i / burst.length) * 6.283 + 0.2, d = mix(10, 300, k2) * S * (0.7 + hash(i, 5) * 0.6), sz = mix(26, 0, P(t, b(46) + 0.2, 0.5)) * S;
+      box(s, tx + Math.cos(a) * d - sz / 2, ty + Math.sin(a) * d - sz / 2, sz, sz); s.style.transform = `rotate(${k2 * 90}deg)`; }); }
+
+  // ---- 7 payoff: full-bleed gradient on b48, ½ day at 85% width, the clock BEHIND it, then the team photo
+  { const on = t >= b(48) && t < b(52.6); show($("gradfill"), on); show(half, on); show(clock, on);
+    if (on) {
+      const k = Math.max(0, M.spring(t, b(48), { stiffness: 300, damping: 15, velocity: 3 })), ko = P(t, b(52) - 0.1, 0.4, E.inQ);
+      half.style.fontSize = "100px"; const fs = 100 * (0.85 * W) / half.offsetWidth; half.style.fontSize = `${fs}px`;
+      const hy = Y(F(0.36, 0.36)); half.style.left = `${W / 2}px`; half.style.top = `${hy}px`;
+      half.style.transform = `translate(-50%,-50%) scale(${mix(0.8, 1, k) * (1 + 0.03 * pulse(t, [49, 50, 51], 9)) * (1 + ko * 0.5)})`;
+      // the dial circles OUTSIDE the type: its radius exceeds half the ½-day width, so ring and ticks never cross a glyph
+      const cs = Math.max(half.offsetWidth * 1.38, W * 1.18); box(clock, W / 2 - cs / 2, hy - cs / 2, cs, cs);
+      $("dial").setAttribute("transform", `rotate(${-(1 - Math.exp(-(t - b(48)) * 1.4)) * 540 - (t - b(48)) * 60})`);
+      $("gradfill").style.backgroundPosition = "0 0"; $("gradfill").style.transform = `scale(${1 + 0.05 * P(t, b(48), 2.5, E.io)})`;
+    } }
+  { const onT = t >= b(52) - 0.05 && t < b(56); show(team, onT);
+    if (onT) { const k = clamp(M.spring(t, b(52), { stiffness: 150, damping: 22 })), s = mix(160 * S, Math.hypot(W, H) * 1.02, k);
+      const tw = Math.min(s, W), th = Math.min(s, H), tl = W / 2 - tw / 2, tt = H / 2 - th / 2;
+      box(team, tl, tt, tw, th); team.style.borderRadius = `${mix(30, 0, k) * S}px`;
+      const img = team.querySelector("img"), push = mix(1.0, 1.12, P(t, b(52), b(56) - b(52), (x) => x)), ih = H * push, iw = ih * 4 / 3;
+      img.style.width = `${iw}px`; img.style.left = `${W / 2 - tl}px`; img.style.top = `${H / 2 - tt}px`; } }
+
+  // ---- 8 James: large photo, upper half; quote in two cuts; readable attribution
+  { const on = t >= b(56) && t < b(66.2); show(james, on); show(attr, on);
+    if (on) { const kj = clamp(M.spring(t, b(56), "snappy")), ko = P(t, b(66) - 0.1, 0.25, E.inQ);
+      const js = F(0.52, 0.4) * W, jy = Y(F(0.24, 0.24)), s = js * kj * (1 - ko);
+      box(james, W / 2 - s / 2, jy - s / 2, s, s);
+      const img = james.querySelector("img"); img.style.width = `${js * 1.06}px`; img.style.left = `${s / 2}px`; img.style.top = `${s / 2 + js * 0.06}px`;
+      img.style.transform = `translate(-50%,-50%) scale(${mix(1.02, 1.16, P(t, b(56), 5, E.io))})`;
+      attr.style.left = `${W / 2}px`; attr.style.top = `${Y(F(0.93, 0.95))}px`; attr.style.fontSize = `${30 * S}px`; attr.style.whiteSpace = "nowrap";
+      const ka = P(t, b(57), 0.4); attr.style.transform = `translate(-50%,-50%) translateY(${(1 - ka) * 30}px)`; attr.style.clipPath = `inset(0 0 ${(1 - ka) * 100}% 0)`; } }
+
+  // ---- 9 lockup: converge (b66 -> b67), monogram, wordmark, subline, URL; hold to 36.0
+  { const on = t >= b(67); show(mono, on); show(wordmark, t >= b(67.5)); show(subline, t >= b(68)); show(url, t >= b(68.5));
+    if (on) { const k = Math.max(0, M.spring(t, b(67), { stiffness: 420, damping: 18, velocity: 4 })), ms = 340 * S;
+      box(mono, W / 2 - ms / 2, H * F(0.385, 0.33) - ms * 0.6, ms, ms * 284 / 242); mono.style.transform = `scale(${k})`; mono.style.filter = `drop-shadow(0 0 ${36 * S}px rgba(124,94,255,.6))`; }
+    for (const [e, at, y, sz] of [[wordmark, b(67.5), H * F(0.385, 0.33) + 290 * S, 80], [subline, b(68), H * F(0.385, 0.33) + 420 * S, 48], [url, b(68.5), H * F(0.385, 0.33) + 545 * S, 40]]) {
+      if (t < at) continue; const k = P(t, at, 0.4, E.out);
+      e.style.left = `${W / 2}px`; e.style.top = `${y}px`; e.style.fontSize = `${sz * S}px`; e.style.color = e === url ? C.violet2 : C.cream;
+      e.style.clipPath = `inset(${(1 - k) * 100}% 0 0 0)`; e.style.transform = `translate(-50%,-50%) translateY(${(1 - k) * 0.5}em)`; } }
+
+  for (const h of HEADS) drawHead(h, t);
+  const f = Math.round(t * 30); $("flash").style.display = f === Math.round(b(14) * 30) ? "block" : "none"; // the one cream flash, on the beat at 0:07
+  gctx.putImageData(tiles[f % 4], 0, 0);
+};
+// On-screen text, in order: the muted-autoplay story, also exported as captions.srt
+window.CAPTIONS = [
+  [0.2, b(3), "Thousands of members."], [b(3), b(6), "Two people."], [b(6), b(10), "Reports in four places."], [b(10), b(14), "Hours. Every week."],
+  [b(15), b(18), "Meet Ellie."], [b(18), b(22), "One brief."], [b(22), b(26), "Every Monday."], [b(26), b(30), "On its own."],
+  [b(32), b(40), "Finds the members you'd miss."], [b(40), b(48), "Nothing sends without your yes."], [b(48), b(52), "½ day back, every week."],
+  [b(56), b(61), "“It helps you identify underserved members…”"], [b(61), b(66), "“…who might not be the loudest voices.” James Davis, Head of Community & Growth, Wakelet"],
+  [b(67), 36.0, "centralsquare.ai: Ellie, the agent for community teams."],
+];
+window.CUES = [
+  { t: b(14), sfx: "impact", gain: 0.8 }, { t: b(14) + 0.3, sfx: "whoosh", gain: 0.6 },
+  { t: b(30) + 0.7, sfx: "whoosh", gain: 0.6 }, ...[33, 34, 35, 36].map((n) => ({ t: b(n), sfx: "tick", gain: 0.45 })),
+  { t: b(40), sfx: "whoosh", gain: 0.55 }, { t: b(56), sfx: "whoosh", gain: 0.55 },
+  { t: b(48), sfx: "riser", gain: 0.7 }, { t: b(48), sfx: "drop", gain: 1.0 }, { t: b(66), sfx: "riser", gain: 0.35 },
+];
+seek(0);
+</script>
+</body>
+</html>

@@ -57,7 +57,9 @@ def place(buf, sig, t, gain=1.0):
 
 
 # ---------------------------------------------------------------- score
-def score(bpm, duration, seed):
+def score(bpm, duration, seed, style="warm"):
+    if style == "drive":
+        return score_drive(bpm, duration, seed)
     r = rng_for(seed)
     n = int(duration * SR)
     pad = np.zeros(n); bass = np.zeros(n); drums = np.zeros(n)
@@ -100,6 +102,59 @@ def score(bpm, duration, seed):
     fade = np.ones(n); k = int(1.5 * SR); fade[-k:] = np.linspace(1, 0, k)
     mix = mix * fade
     return stereo(mix, width=0.25, seed=seed)
+
+
+def score_drive(bpm, duration, seed):
+    """Energetic, warm bed: four-on-the-floor from beat 1 (the hook needs energy immediately), offbeat bass,
+    16th-note plucked arpeggio over a sidechained pad, A minor Am-F-C-G. Breakdown on bar 12 lifts into the drop."""
+    r = rng_for(seed)
+    n = int(duration * SR)
+    pad = np.zeros(n); bass = np.zeros(n); drums = np.zeros(n); arp = np.zeros(n)
+    beat = 60.0 / bpm; bar = 4 * beat; six = beat / 4
+    chords = [[57, 60, 64, 69], [53, 57, 60, 65], [55, 60, 64, 67], [55, 59, 62, 67]]
+    roots = [45, 41, 48, 43]
+    nbars = int(np.ceil(duration / bar))
+    breakdown = {11}  # bar index before the drop (bar 13 = 24 s at 120 BPM): drums thin out, riser takes over
+    for b in range(nbars):
+        t0 = b * bar; ch = chords[b % 4]
+        L = int(bar * SR * 1.1); tt = np.arange(L) / SR
+        sig = np.zeros(L)
+        for m in ch:
+            for det in (-0.08, 0.08):
+                ff = midi(m) * 2 ** (det / 12); ph = r.uniform(0, 2 * np.pi)
+                sig += sum(np.sin(2 * np.pi * ff * h * tt + ph) / h for h in range(1, 6)) * 0.4
+        sig = lp(sig, 1800) * env_adsr(L, 0.05, 0.3, 0.75, 0.3) / 12
+        # sidechain pump: duck the pad on every beat
+        pump = np.ones(L); bl = int(beat * SR)
+        for q in range(5):
+            i = q * bl; k = min(L - i, int(0.22 * SR))
+            if k > 0: pump[i:i + k] = np.linspace(0.35, 1, k)
+        place(pad, sig * pump, t0)
+        # arp: 16ths through the chord, plucked
+        notes = ch + [ch[1] + 12, ch[2] + 12, ch[3] + 12, ch[2] + 12]
+        for k in range(16):
+            Ln = int(six * SR * 1.4); tn = np.arange(Ln) / SR; f = midi(notes[k % len(notes)] + 12)
+            pl = (np.sin(2 * np.pi * f * tn) + 0.3 * np.sin(4 * np.pi * f * tn)) * np.exp(-tn * 22)
+            place(arp, pl * (0.11 if b not in breakdown else 0.16), t0 + k * six)
+        # bass: offbeat 8ths on the root (octave pulse)
+        if b not in breakdown:
+            for q in range(4):
+                Lb = int(beat * 0.45 * SR); tb = np.arange(Lb) / SR; f = midi(roots[b % 4])
+                sb = np.sin(2 * np.pi * f * tb) + 0.4 * np.sin(2 * np.pi * 2 * f * tb)
+                place(bass, sb * env_adsr(Lb, 0.005, 0.08, 0.7, 0.08) * 0.32, t0 + q * beat + beat / 2)
+        # drums
+        for q in range(4):
+            tq = t0 + q * beat
+            if b not in breakdown or q < 2:
+                place(drums, sfx_kick(), tq, 0.6)
+            if q in (1, 3) and b not in breakdown:
+                place(drums, sfx_clap(r), tq, 0.22)
+            for e in (0.5,):
+                place(drums, sfx_hat(r), tq + e * beat, 0.09)
+            place(drums, sfx_hat(r), tq + 0.25 * beat, 0.035); place(drums, sfx_hat(r), tq + 0.75 * beat, 0.035)
+    mix = pad + bass + drums + arp
+    fade = np.ones(n); k = int(1.2 * SR); fade[-k:] = np.linspace(1, 0, k)
+    return stereo(mix * fade, width=0.3, seed=seed)
 
 
 def sfx_kick():
@@ -188,12 +243,13 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("score"); s.add_argument("--bpm", type=float, default=100); s.add_argument("--duration", type=float, required=True)
+    s.add_argument("--style", default="warm", choices=["warm", "drive"])
     s.add_argument("--seed", type=int, default=7); s.add_argument("--out", required=True)
     x = sub.add_parser("sfx"); x.add_argument("--duration", type=float, required=True); x.add_argument("--cues", required=True)
     x.add_argument("--seed", type=int, default=7); x.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "score":
-        sf.write(a.out, score(a.bpm, a.duration, a.seed), SR, subtype="FLOAT")
+        sf.write(a.out, score(a.bpm, a.duration, a.seed, a.style), SR, subtype="FLOAT")
         # The score is generated on an exact grid, so write that grid next to it (same schema as
         # analyze_audio.py). analyze_audio.py on the WAV should agree within ~30 ms.
         beat = 60.0 / a.bpm
