@@ -240,7 +240,7 @@ const H6 = Head([{ t: "Nothing", at: b(40) }, { br: "tall" }, { t: "sends", at: 
 const clock = el("div", "abs", $("mid"), `<svg viewBox="-100 -100 200 200" width="100%" height="100%"><g id="dial"><circle r="94" fill="none" stroke="${C.cream}" stroke-width="2.5"/>${Array.from({ length: 60 }, (_, i) => `<line x1="0" y1="-94" x2="0" y2="${i % 5 ? -89 : -82}" stroke="${C.cream}" stroke-width="${i % 5 ? 1.2 : 3}" transform="rotate(${i * 6})"/>`).join("")}<circle cx="0" cy="-94" r="5" fill="${C.cream}"/></g></svg>`);
 clock.style.opacity = 0.25;
 const half = el("div", "kh", $("fg"), "½ day"); half.style.color = C.cream; half.dataset.sfx = "impact"; half.dataset.sfxGain = 0.2;
-const H7 = Head([{ t: "back,", at: b(50) }, { br: 1 }, { t: "every", at: b(50.5) }, { t: "week.", at: b(51) }], { in: b(50), out: b(52), fill: 0.86, zone: () => [F(0.62, 0.64), F(0.9, 0.92)] });
+const H7 = Head([{ t: "back,", at: b(50) }, { br: 1 }, { t: "every", at: b(50.5) }, { t: "week.", at: b(51) }], { in: b(50), out: b(52), exit: 0.2, fill: 0.86, zone: () => [F(0.62, 0.64), F(0.9, 0.92)] });
 const team = el("div", "photo", $("mid"), `<img src="assets/photos/community.jpg">`); team.dataset.sfx = "whoosh"; team.dataset.sfxGain = 0.5;
 
 // ================================================================= 8 · JAMES
@@ -343,9 +343,9 @@ window.seek = function (t) {
       box(s, tx + Math.cos(a) * d - sz / 2, ty + Math.sin(a) * d - sz / 2, sz, sz); s.style.transform = `rotate(${k2 * 90}deg)`; }); }
 
   // ---- 7 payoff: full-bleed gradient on b48, ½ day at 85% width, the clock BEHIND it, then the team photo
-  { const on = t >= b(48) && t < b(52.6); show($("gradfill"), on); show(half, on); show(clock, on);
+  { const on = t >= b(48) && t < b(52.6); show($("gradfill"), on); show(half, on && t < b(52)); show(clock, on);
     if (on) {
-      const k = Math.max(0, M.spring(t, b(48), { stiffness: 300, damping: 15, velocity: 3 })), ko = P(t, b(52) - 0.1, 0.4, E.inQ);
+      const k = Math.max(0, M.spring(t, b(48), { stiffness: 300, damping: 15, velocity: 3 })), ko = P(t, b(52) - 0.2, 0.2, E.inQ); // type is gone before the photo opens
       half.style.fontSize = "100px"; const fs = 100 * (0.85 * W) / half.offsetWidth; half.style.fontSize = `${fs}px`;
       const hy = Y(F(0.36, 0.36)); half.style.left = `${W / 2}px`; half.style.top = `${hy}px`;
       half.style.transform = `translate(-50%,-50%) scale(${mix(0.8, 1, k) * (1 + 0.03 * pulse(t, [49, 50, 51], 9)) * (1 + ko * 0.5)})`;
@@ -354,7 +354,7 @@ window.seek = function (t) {
       $("dial").setAttribute("transform", `rotate(${-(1 - Math.exp(-(t - b(48)) * 1.4)) * 540 - (t - b(48)) * 60})`);
       $("gradfill").style.backgroundPosition = "0 0"; $("gradfill").style.transform = `scale(${1 + 0.05 * P(t, b(48), 2.5, E.io)})`;
     } }
-  { const onT = t >= b(52) - 0.05 && t < b(56); show(team, onT);
+  { const onT = t >= b(52) && t < b(56); show(team, onT);
     if (onT) { const k = clamp(M.spring(t, b(52), { stiffness: 150, damping: 22 })), s = mix(160 * S, Math.hypot(W, H) * 1.02, k);
       const tw = Math.min(s, W), th = Math.min(s, H), tl = W / 2 - tw / 2, tt = H / 2 - th / 2;
       box(team, tl, tt, tw, th); team.style.borderRadius = `${mix(30, 0, k) * S}px`;
